@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi App Local - Gestor de Tareas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Encabezado -->
+        <header class="app-header">
+            <div>
+                <h1>Gestor de Tareas Local</h1>
+                <p class="subtitle">Aplicación local impulsada por Python y JavaScript</p>
+            </div>
+            <div id="backend-badge" class="badge badge-offline">
+                <span class="status-dot"></span>
+                <span id="backend-status-text">Conectando...</span>
+            </div>
+        </header>
+
+        <!-- Métricas / Resumen -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <span class="stat-num" id="stat-total">0</span>
+                <span class="stat-label">Total de tareas</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-pending">0</span>
+                <span class="stat-label">Pendientes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="stat-completed">0</span>
+                <span class="stat-label">Completadas</span>
+            </div>
+        </section>
+
+        <!-- Formulario para agregar nueva tarea -->
+        <section class="card form-card">
+            <h2>Agregar nueva tarea</h2>
+            <form id="task-form">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="task-title" 
+                        placeholder="¿Qué necesitas hacer hoy?" 
+                        required 
+                        autocomplete="off"
+                    >
+                    <select id="task-category">
+                        <option value="General">General</option>
+                        <option value="Desarrollo">Desarrollo</option>
+                        <option value="Estudios">Estudios</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Lista de tareas -->
+        <section class="card list-card">
+            <div class="list-header">
+                <h2>Mis Tareas</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Todas</button>
+                    <button class="filter-btn" data-filter="pending">Pendientes</button>
+                    <button class="filter-btn" data-filter="completed">Completadas</button>
+                </div>
+            </div>
+
+            <ul id="task-list" class="task-list">
+                <!-- Se llena dinámicamente con app.js -->
+            </ul>
+
+            <div id="empty-state" class="empty-state hidden">
+                <p>🎉 No hay tareas pendientes en esta sección.</p>
+            </div>
+        </section>
+
+        <!-- Pie de página con información del sistema -->
+        <footer class="app-footer">
+            <p id="system-info">Cargando información del entorno local...</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

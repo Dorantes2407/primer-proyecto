@@ -1,15 +1,19 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
         {
+            "name": "Ejecutar App Local (Python)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Abrir en Navegador (Edge)",
             "type": "msedge",
             "request": "launch",
-            "name": "Open hola.html",
-            "file": "c:\\Users\\EsmeP\\OneDrive\\Desktop\\proyecto integrador\\hola.html"
+            "url": "http://localhost:5000",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }
