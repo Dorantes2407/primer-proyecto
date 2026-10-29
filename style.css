@@ -1,14 +1,25 @@
+/* ========================================================
+   HISTORIA DIVERTIDA - ESTILOS PARA PEQUEÑOS HISTORIADORES
+   ======================================================== */
+
 :root {
-    --bg-color: #f3f4f6;
+    --primary: #d97706;          /* Ámbar / Oro histórico */
+    --primary-hover: #b45309;
+    --primary-light: #fef3c7;
+    --accent: #2563eb;           /* Azul aventura */
+    --accent-hover: #1d4ed8;
+    --bg-page: #fdfbf7;          /* Fondo pergamino suave */
     --card-bg: #ffffff;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --danger: #ef4444;
-    --success: #10b981;
-    --border-color: #e5e7eb;
-    --radius: 12px;
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --error: #dc2626;
+    --error-light: #fee2e2;
+    --border: #e5e7eb;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 }
 
 * {
@@ -18,308 +29,589 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    line-height: 1.5;
-    padding: 2rem 1rem;
+    font-family: 'Comic Neue', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
 }
 
-.app-container {
-    max-width: 760px;
+.app-wrapper {
+    max-width: 900px;
     margin: 0 auto;
+}
+
+/* Control de pantallas (Screens) */
+.screen {
+    display: none;
+    animation: fadeIn 0.35s ease-out;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================================
+   PANTALLA DE INICIO (WELCOME SCREEN)
+   ======================================================== */
+
+.hero-card {
+    background: var(--card-bg);
+    border: 3px solid #fde68a;
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.mascot-badge {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.hero-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #92400e;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-speech-bubble {
+    background: #fffbeb;
+    border: 2px dashed #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+    color: #78350f;
+    font-size: 1.05rem;
+}
+
+/* Formulario */
+.onboarding-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    text-align: left;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.label-icon {
+    font-size: 1.3rem;
+}
+
+/* Campo de Texto */
+.text-input {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    border: 2px solid #d1d5db;
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: all 0.2s;
+    background-color: #fafafa;
+}
+
+.text-input:focus {
+    border-color: var(--primary);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+/* Selector de Grados (1º a 6º) */
+.grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.85rem;
+}
+
+.grade-card {
+    background: #ffffff;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.grade-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.grade-card.active {
+    border-color: var(--primary);
+    background-color: #fffbeb;
+    border-width: 3px;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+    transform: scale(1.03);
+}
+
+.grade-emoji {
+    font-size: 2rem;
+    margin-bottom: 0.35rem;
+}
+
+.grade-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+.grade-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* Botones */
+.btn-hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.1rem 2rem;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.35);
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.45);
+}
+
+.btn-hero:active {
+    transform: translateY(1px);
+}
+
+.btn-arrow {
+    font-size: 1.3rem;
+}
+
+/* ========================================================
+   PANTALLA DEL TABLERO (DASHBOARD)
+   ======================================================== */
+
+.dashboard-header {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
+
+.user-greeting-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-icon {
+    font-size: 2.4rem;
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    padding: 0.3rem 0.6rem;
+}
+
+.user-greeting-box h2 {
+    font-size: 1.4rem;
+    color: #111827;
+}
+
+.highlight-name {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.grade-status {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.grade-status strong {
+    color: var(--accent);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Vitrina de Medallas */
+.badges-panel {
+    background: #fffbeb;
+    border: 2px solid #fde68a;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.badges-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.badges-header h3 {
+    font-size: 1.15rem;
+    color: #78350f;
+}
+
+.badge-counter {
+    background: #f59e0b;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.7rem;
+    border-radius: 9999px;
+}
+
+.badges-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.badge-item {
+    background: #ffffff;
+    border: 1.5px solid #f59e0b;
+    border-radius: 9999px;
+    padding: 0.35rem 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #92400e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.empty-badges {
+    font-size: 0.9rem;
+    color: #92400e;
+    font-style: italic;
+}
+
+/* Navegador de pestañas por grado escolar */
+.grade-tabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.tabs-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.tabs-list {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.tab-btn:hover, .tab-btn.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+}
+
+/* Historias y Misiones */
+.stories-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.section-title-row h3 {
+    font-size: 1.3rem;
+    color: #111827;
+}
+
+.stories-grid {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-/* Header */
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+.story-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
 }
 
-.app-header h1 {
-    font-size: 1.8rem;
+.story-card.completed-mission {
+    border-color: var(--success);
+    background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.story-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.story-icon {
+    font-size: 2.2rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 0.4rem 0.6rem;
+}
+
+.story-header-text h4 {
+    font-size: 1.3rem;
+    color: #111827;
+}
+
+.story-period {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+}
+
+.status-badge-earned {
+    margin-left: auto;
+    background: var(--success-light);
+    color: var(--success);
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.story-summary {
+    font-size: 1.05rem;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.fun-fact-box {
+    background: #eff6ff;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: 0.85rem 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: #1e40af;
+}
+
+.fact-icon {
+    font-size: 1.4rem;
+}
+
+/* Trivia / Reto */
+.story-trivia {
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+}
+
+.trivia-header {
+    margin-bottom: 0.85rem;
+}
+
+.trivia-badge {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.35rem;
+}
+
+.trivia-question {
+    font-size: 1.05rem;
     font-weight: 700;
     color: #111827;
 }
 
-.subtitle {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-}
-
-/* Badges */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.82rem;
-    font-weight: 600;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.badge-online {
-    background-color: #ecfdf5;
-    color: #065f46;
-}
-
-.badge-online .status-dot {
-    background-color: var(--success);
-    box-shadow: 0 0 6px var(--success);
-}
-
-.badge-offline {
-    background-color: #fef2f2;
-    color: #991b1b;
-}
-
-.badge-offline .status-dot {
-    background-color: var(--danger);
-}
-
-/* Stats Row */
-.stats-row {
+.trivia-options-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-}
-
-.stat-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    padding: 1rem;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.stat-num {
-    display: block;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.stat-label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* Cards */
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-}
-
-.card h2 {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-/* Form */
-.form-group {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.form-group input {
-    flex: 1;
-    min-width: 220px;
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.form-group input:focus {
-    border-color: var(--primary);
-}
-
-.form-group select {
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: #fff;
-    font-size: 0.95rem;
-    outline: none;
-    cursor: pointer;
-}
-
-.btn {
-    padding: 0.7rem 1.4rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.btn:active {
-    transform: scale(0.98);
-}
-
-.btn-primary {
-    background-color: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-hover);
-}
-
-/* Task List */
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    grid-template-columns: 1fr;
     gap: 0.5rem;
 }
 
-.list-header h2 {
-    margin-bottom: 0;
-}
-
-.filter-buttons {
-    display: flex;
-    gap: 0.4rem;
-}
-
-.filter-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.82rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: all 0.2s;
-}
-
-.filter-btn.active, .filter-btn:hover {
-    background-color: #e0e7ff;
-    border-color: var(--primary);
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.task-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-.task-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 1rem;
-    border: 1px solid var(--border-color);
+.trivia-option-btn {
+    background: #ffffff;
+    border: 1.5px solid var(--border);
     border-radius: 8px;
-    background-color: #fafafa;
-    transition: background-color 0.2s;
-}
-
-.task-item:hover {
-    background-color: #f5f5f5;
-}
-
-.task-info {
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex: 1;
-}
-
-.task-checkbox {
-    width: 18px;
-    height: 18px;
+    text-align: left;
     cursor: pointer;
+    font-size: 0.95rem;
+    color: #1f2937;
+    transition: all 0.2s;
 }
 
-.task-text-container {
+.trivia-option-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background-color: #fffbeb;
+    transform: translateX(4px);
+}
+
+.trivia-option-btn.correct {
+    border-color: var(--success);
+    background-color: var(--success-light);
+    color: #065f46;
+    font-weight: 700;
+}
+
+.option-bullet {
+    background: #e5e7eb;
+    color: #374151;
+    font-weight: 700;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.85rem;
 }
 
-.task-title {
+.trivia-option-btn.correct .option-bullet {
+    background: var(--success);
+    color: #ffffff;
+}
+
+.trivia-feedback {
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
     font-size: 0.95rem;
-    color: var(--text-primary);
+    animation: fadeIn 0.3s;
 }
 
-.task-item.completed .task-title {
-    text-decoration: line-through;
-    color: var(--text-secondary);
+.feedback-success {
+    background: var(--success-light);
+    border: 1px solid var(--success);
+    color: #065f46;
 }
 
-.task-category-tag {
-    font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    background-color: #e5e7eb;
-    color: #4b5563;
-    font-weight: 500;
-}
-
-.tag-desarrollo { background-color: #dbeafe; color: #1e40af; }
-.tag-estudios { background-color: #fef3c7; color: #92400e; }
-.tag-personal { background-color: #fce7f3; color: #9d174d; }
-
-.btn-delete {
-    background: transparent;
-    border: none;
-    color: #9ca3af;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    transition: color 0.2s, background-color 0.2s;
-}
-
-.btn-delete:hover {
-    color: var(--danger);
-    background-color: #fee2e2;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
+.feedback-error {
+    background: var(--error-light);
+    border: 1px solid var(--error);
+    color: #991b1b;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* Footer */
 .app-footer {
     text-align: center;
-    color: var(--text-secondary);
+    margin-top: 2.5rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    padding: 1rem;
+}
+
+.connection-status {
     font-size: 0.8rem;
-    margin-top: 1rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
 }

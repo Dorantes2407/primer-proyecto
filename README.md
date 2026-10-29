@@ -1,30 +1,26 @@
-# Gestor de Tareas y Notas Local
+# 📜 Historia Divertida ✨
 
-Aplicación local desarrollada con **Python** (backend y servidor HTTP local) y **HTML5 + JavaScript + CSS3** (frontend interactivo).
+Una aplicación web educativa y local diseñada especialmente para **pequeños historiadores** de educación primaria (1º a 6º de primaria).
 
 ## 🚀 Características
-- **Cero dependencias externas**: Funciona directamente con la librería estándar de Python (`http.server`, `json`, `webbrowser`). No requiere `pip install`.
-- **Apertura automática**: Al iniciar el servidor, abre automáticamente tu navegador predeterminado en `http://localhost:5000`.
-- **Persistencia local**: Guarda y lee los datos en un archivo local `data.json`.
-- **API REST**: Endpoints `/api/items`, `/api/status`, etc.
-- **Interfaz moderna**: Diseño responsivo, filtros (todas, pendientes, completadas), estadísticas en tiempo real y etiquetas por categoría.
+- **Bienvenida personalizada**: Recibe y acompaña al usuario como **"pequeño historiador"** con su nombre o apodo.
+- **Selector de Grado Escolar**: Aventuras adaptadas de 1º a 6º de primaria:
+  - 🦖 **1º Primaria:** Prehistoria y Dinosaurios
+  - 🏺 **2º Primaria:** Antiguo Egipto y Faraones
+  - 🏛️ **3º Primaria:** Antigua Grecia y el Imperio Romano
+  - 🏰 **4º Primaria:** Culturas Mayas y Castillos Medievales
+  - 🧭 **5º Primaria:** Tenochtitlan y Grandes Navegantes
+  - 🚀 **6º Primaria:** Revolución de las Máquinas y el Viaje a la Luna
+- **Trivias y Salón de Medallas 🏅**: Preguntas interactivas para poner a prueba conocimientos y ganar insignias históricas.
+- **Cero dependencias externas**: Funciona al instante con la librería estándar de Python (`http.server`, `json`, `webbrowser`).
+- **Persistencia local**: Guarda el progreso del pequeño historiador en `data.json`.
 
-## 🛠️ Cómo ejecutar el proyecto
+## 🛠️ Cómo iniciar la aplicación
 
-### Opción 1: Desde la terminal
-Ejecuta el siguiente comando en la carpeta del proyecto:
-```bash
-python app.py
-```
-
-### Opción 2: Desde Visual Studio Code
-1. Abre el archivo `app.py`.
-2. Presiona `F5` o el botón **Run Python File** (ícono de reproducir en la esquina superior derecha).
-3. Tu navegador se abrirá en `http://localhost:5000`.
-
-## 📁 Estructura del Proyecto
-- `app.py`: Servidor backend en Python con API REST y servidor de archivos estáticos.
-- `index.html`: Estructura principal de la interfaz web.
-- `app.js`: Lógica del cliente, llamadas a la API y reactividad.
-- `style.css`: Estilos visuales modernos.
-- `data.json`: Base de datos local en formato JSON (se genera automáticamente).
+1. Abre la terminal en esta carpeta y ejecuta:
+   ```powershell
+   python app.py
+   ```
+   *(o presiona <kbd>F5</kbd> en Visual Studio Code)*.
+2. Tu navegador se abrirá automáticamente en `http://localhost:5000`.
+3. Ingresa tu nombre o apodo, elige tu grado escolar y ¡empieza la aventura en el tiempo!

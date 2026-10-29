@@ -3,86 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi App Local - Gestor de Tareas</title>
+    <title>Historia Divertida - Para Pequeños Historiadores</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Encabezado -->
-        <header class="app-header">
-            <div>
-                <h1>Gestor de Tareas Local</h1>
-                <p class="subtitle">Aplicación local impulsada por Python y JavaScript</p>
-            </div>
-            <div id="backend-badge" class="badge badge-offline">
-                <span class="status-dot"></span>
-                <span id="backend-status-text">Conectando...</span>
-            </div>
-        </header>
+    <div class="app-wrapper">
 
-        <!-- Métricas / Resumen -->
-        <section class="stats-row">
-            <div class="stat-card">
-                <span class="stat-num" id="stat-total">0</span>
-                <span class="stat-label">Total de tareas</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-num" id="stat-pending">0</span>
-                <span class="stat-label">Pendientes</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-num" id="stat-completed">0</span>
-                <span class="stat-label">Completadas</span>
-            </div>
-        </section>
+        <!-- ================= PANTALLA DE INICIO (BIENVENIDA) ================= -->
+        <main id="welcome-screen" class="screen active">
+            <div class="hero-card">
+                <div class="mascot-badge">⏳ 📜 🧭</div>
+                <h1 class="hero-title">¡Historia Divertida!</h1>
+                <p class="hero-subtitle">La máquina del tiempo interactiva para aprender jugando</p>
 
-        <!-- Formulario para agregar nueva tarea -->
-        <section class="card form-card">
-            <h2>Agregar nueva tarea</h2>
-            <form id="task-form">
-                <div class="form-group">
-                    <input 
-                        type="text" 
-                        id="task-title" 
-                        placeholder="¿Qué necesitas hacer hoy?" 
-                        required 
-                        autocomplete="off"
-                    >
-                    <select id="task-category">
-                        <option value="General">General</option>
-                        <option value="Desarrollo">Desarrollo</option>
-                        <option value="Estudios">Estudios</option>
-                        <option value="Personal">Personal</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
+                <div class="welcome-speech-bubble">
+                    <p>👋 ¡Saludos, <strong>pequeño historiador</strong>! El reloj del tiempo está listo para viajar a épocas asombrosas: desde dinosaurios gigantes y faraones de Egipto, hasta castillos medievales y naves espaciales. ¡Dinos quién eres para preparar tu pasaporte temporal!</p>
                 </div>
-            </form>
-        </section>
 
-        <!-- Lista de tareas -->
-        <section class="card list-card">
-            <div class="list-header">
-                <h2>Mis Tareas</h2>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all">Todas</button>
-                    <button class="filter-btn" data-filter="pending">Pendientes</button>
-                    <button class="filter-btn" data-filter="completed">Completadas</button>
+                <!-- Formulario de Ingreso -->
+                <form id="onboarding-form" class="onboarding-form">
+                    
+                    <!-- 1. Campo de Nombre o Apodo -->
+                    <div class="input-section">
+                        <label for="explorer-name" class="section-label">
+                            <span class="label-icon">👤</span> ¿Cuál es tu nombre o apodo, pequeño historiador?
+                        </label>
+                        <div class="input-with-button">
+                            <input 
+                                type="text" 
+                                id="explorer-name" 
+                                class="text-input" 
+                                placeholder="Ej. Mateo el Explorador, Valentina la Sabia..." 
+                                required
+                                autocomplete="off"
+                                maxlength="30"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- 2. Selector de Grado Escolar (1º a 6º de Primaria) -->
+                    <div class="grade-section">
+                        <label class="section-label">
+                            <span class="label-icon">🎒</span> Selecciona tu grado escolar (1º a 6º de Primaria):
+                        </label>
+                        <div class="grade-grid" id="grade-selector-container">
+                            <button type="button" class="grade-card active" data-grade="1">
+                                <span class="grade-emoji">🦖</span>
+                                <span class="grade-name">1º Primaria</span>
+                                <span class="grade-desc">Dinosaurios y Fuego</span>
+                            </button>
+                            <button type="button" class="grade-card" data-grade="2">
+                                <span class="grade-emoji">🏺</span>
+                                <span class="grade-name">2º Primaria</span>
+                                <span class="grade-desc">Egipto y Faraones</span>
+                            </button>
+                            <button type="button" class="grade-card" data-grade="3">
+                                <span class="grade-emoji">🏛️</span>
+                                <span class="grade-name">3º Primaria</span>
+                                <span class="grade-desc">Grecia y Roma</span>
+                            </button>
+                            <button type="button" class="grade-card" data-grade="4">
+                                <span class="grade-emoji">🏰</span>
+                                <span class="grade-name">4º Primaria</span>
+                                <span class="grade-desc">Mayas y Castillos</span>
+                            </button>
+                            <button type="button" class="grade-card" data-grade="5">
+                                <span class="grade-emoji">🧭</span>
+                                <span class="grade-name">5º Primaria</span>
+                                <span class="grade-desc">Navegantes y Lagos</span>
+                            </button>
+                            <button type="button" class="grade-card" data-grade="6">
+                                <span class="grade-emoji">🚀</span>
+                                <span class="grade-name">6º Primaria</span>
+                                <span class="grade-desc">Inventos y la Luna</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="selected-grade" value="1">
+                    </div>
+
+                    <!-- Botón para Iniciar -->
+                    <button type="submit" class="btn btn-hero" id="btn-start-adventure">
+                        <span>¡Comenzar mi Aventura en el Tiempo!</span>
+                        <span class="btn-arrow">✨ ➔</span>
+                    </button>
+                </form>
+            </div>
+        </main>
+
+        <!-- ================= PANTALLA PRINCIPAL (TABLERO DE AVENTURAS) ================= -->
+        <main id="dashboard-screen" class="screen">
+            <!-- Barra superior personalizada -->
+            <header class="dashboard-header">
+                <div class="user-greeting-box">
+                    <span class="avatar-icon">🧭</span>
+                    <div>
+                        <h2>¡Hola de nuevo, pequeño historiador <span id="display-historian-name" class="highlight-name">Explorador</span>!</h2>
+                        <p class="grade-status">
+                            Actualmente explorando las misiones de: <strong id="display-grade-text">1º de Primaria</strong>
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <ul id="task-list" class="task-list">
-                <!-- Se llena dinámicamente con app.js -->
-            </ul>
+                <div class="header-actions">
+                    <button id="btn-switch-historian" class="btn btn-secondary" title="Cambiar nombre o grado escolar">
+                        🔄 Cambiar Pequeño Historiador
+                    </button>
+                </div>
+            </header>
 
-            <div id="empty-state" class="empty-state hidden">
-                <p>🎉 No hay tareas pendientes en esta sección.</p>
-            </div>
-        </section>
+            <!-- Vitrina de Medallas e Insignias -->
+            <section class="badges-panel">
+                <div class="badges-header">
+                    <h3>🏆 Salón de Medallas del Pequeño Historiador</h3>
+                    <span class="badge-counter" id="badge-count">0 Medallas Ganadas</span>
+                </div>
+                <div class="badges-list" id="badges-container">
+                    <p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas!</p>
+                </div>
+            </section>
 
-        <!-- Pie de página con información del sistema -->
+            <!-- Navegador de Grados Escolares -->
+            <nav class="grade-tabs-nav">
+                <span class="tabs-label">Viajar a otro grado:</span>
+                <div class="tabs-list" id="dashboard-grade-tabs">
+                    <button class="tab-btn active" data-grade="1">1º Primaria</button>
+                    <button class="tab-btn" data-grade="2">2º Primaria</button>
+                    <button class="tab-btn" data-grade="3">3º Primaria</button>
+                    <button class="tab-btn" data-grade="4">4º Primaria</button>
+                    <button class="tab-btn" data-grade="5">5º Primaria</button>
+                    <button class="tab-btn" data-grade="6">6º Primaria</button>
+                </div>
+            </nav>
+
+            <!-- Misiones y Relatos Históricos -->
+            <section class="stories-section">
+                <div class="section-title-row">
+                    <h3 id="current-period-title">📜 Relatos y Retos para Pequeños Historiadores</h3>
+                </div>
+
+                <div class="stories-grid" id="stories-container">
+                    <!-- Se inyecta dinámicamente con app.js -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Pie de página -->
         <footer class="app-footer">
-            <p id="system-info">Cargando información del entorno local...</p>
+            <p>🌟 <strong>Historia Divertida</strong> | Una aventura educativa local para pequeños historiadores</p>
+            <p class="connection-status" id="server-status">Conectado con el servidor Python local</p>
         </footer>
+
     </div>
 
     <script src="app.js"></script>
