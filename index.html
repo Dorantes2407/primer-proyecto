@@ -105,6 +105,9 @@
                 </div>
 
                 <div class="header-actions">
+                    <button id="btn-view-stats" class="btn btn-stats" title="Ver mis estadísticas y nivel">
+                        📊 Mis Estadísticas
+                    </button>
                     <button id="btn-switch-historian" class="btn btn-secondary" title="Cambiar nombre o grado escolar">
                         🔄 Cambiar Pequeño Historiador
                     </button>
@@ -145,6 +148,89 @@
                     <!-- Se inyecta dinámicamente con app.js -->
                 </div>
             </section>
+        </main>
+
+        <!-- ================= PANTALLA DE ESTADÍSTICAS Y NIVEL ================= -->
+        <main id="stats-screen" class="screen">
+            <!-- Encabezado de la pantalla de estadísticas -->
+            <header class="stats-header">
+                <div>
+                    <h2>📊 Diario Histórico de <span id="stats-historian-name" class="highlight-name">Pequeño Historiador</span></h2>
+                    <p class="subtitle">Descubre tus temas dominados, los que necesitan práctica y el avance de tu nivel</p>
+                </div>
+                <div>
+                    <button id="btn-back-to-dashboard" class="btn btn-primary-action">
+                        ⬅️ Volver a mis Relatos
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tarjeta de Nivel y Barra de Progreso -->
+            <section class="level-card">
+                <div class="level-card-top">
+                    <div class="level-badge-container">
+                        <span class="level-icon" id="stats-level-icon">🐣</span>
+                        <div>
+                            <span class="level-title-label">Nivel del Pequeño Historiador</span>
+                            <h3 class="level-title" id="stats-level-title">Nivel 1: Novato del Tiempo</h3>
+                        </div>
+                    </div>
+                    <div class="level-xp-box">
+                        <span class="xp-value" id="stats-xp-value">0 ⭐</span>
+                        <span class="xp-label">Puntos Históricos</span>
+                    </div>
+                </div>
+
+                <!-- Pequeña Barra de Nivel -->
+                <div class="level-progress-wrapper">
+                    <div class="level-progress-bar-bg">
+                        <div class="level-progress-bar-fill" id="stats-level-bar-fill" style="width: 0%;">
+                            <span class="bar-shine"></span>
+                        </div>
+                    </div>
+                    <div class="level-progress-footer">
+                        <span class="progress-percent" id="stats-progress-percent">0% Dominado</span>
+                        <span class="next-target-text" id="stats-next-target">Completa 1 misión para subir de nivel</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dos Columnas: Temas que domina vs Temas que no domina tanto -->
+            <div class="stats-columns-grid">
+
+                <!-- Columna 1: Temas que Dominas -->
+                <section class="topics-column mastered-column">
+                    <div class="column-header">
+                        <div class="column-header-title">
+                            <span class="column-icon">🌟</span>
+                            <h3>Temas que Dominas</h3>
+                        </div>
+                        <span class="counter-pill counter-success" id="mastered-count">0 temas</span>
+                    </div>
+                    <p class="column-desc">¡Excelente trabajo! Has demostrado tu sabiduría en estas épocas históricas:</p>
+
+                    <div class="topics-list" id="mastered-topics-list">
+                        <!-- Generado por app.js -->
+                    </div>
+                </section>
+
+                <!-- Columna 2: Temas que no tanto / Por reforzar -->
+                <section class="topics-column needs-practice-column">
+                    <div class="column-header">
+                        <div class="column-header-title">
+                            <span class="column-icon">📖</span>
+                            <h3>Temas que no dominas tanto</h3>
+                        </div>
+                        <span class="counter-pill counter-warning" id="not-mastered-count">12 temas</span>
+                    </div>
+                    <p class="column-desc">Épocas que necesitan un repaso o que aún esperan ser descubiertas por ti:</p>
+
+                    <div class="topics-list" id="not-mastered-topics-list">
+                        <!-- Generado por app.js -->
+                    </div>
+                </section>
+
+            </div>
         </main>
 
         <!-- Pie de página -->

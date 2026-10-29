@@ -1,5 +1,8 @@
 {
-  "current_historian": null,
+  "current_historian": {
+    "name": "ñaña",
+    "grade": "1"
+  },
   "badges": [],
   "completed_stories": []
 }

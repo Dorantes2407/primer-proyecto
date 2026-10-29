@@ -190,26 +190,135 @@ STORIES_DATA = {
 
 
 def load_database():
-    """Carga los datos del pequeño historiador y sus insignias."""
+    """Carga los datos del pequeño historiador, sus insignias y estadísticas."""
     if not DATA_FILE.exists():
         initial = {
             "current_historian": None,  # {"name": "...", "grade": "1..6"}
             "badges": [],               # lista de insignias ganadas
-            "completed_stories": []     # lista de IDs de historias completadas
+            "completed_stories": [],    # lista de IDs de historias completadas
+            "attempted_stories": {}     # registro de intentos por historia
         }
         save_database(initial)
         return initial
 
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            data.setdefault("current_historian", None)
+            data.setdefault("badges", [])
+            data.setdefault("completed_stories", [])
+            data.setdefault("attempted_stories", {})
+            return data
     except Exception:
-        return {"current_historian": None, "badges": [], "completed_stories": []}
+        return {
+            "current_historian": None,
+            "badges": [],
+            "completed_stories": [],
+            "attempted_stories": {}
+        }
 
 
 def save_database(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def calculate_stats(db):
+    """Calcula el nivel, progreso y temas dominados vs no dominados."""
+    completed_ids = set(db.get("completed_stories", []))
+    attempted = db.get("attempted_stories", {})
+
+    all_stories = []
+    for grade_str, story_list in STORIES_DATA.items():
+        for s in story_list:
+            all_stories.append({
+                "id": s["id"],
+                "grade": grade_str,
+                "title": s["title"],
+                "period": s["period"],
+                "icon": s["icon"],
+                "trivia_question": s["trivia"]["question"]
+            })
+
+    total = len(all_stories)
+    completed_count = len(completed_ids)
+    percent = round((completed_count / total) * 100) if total > 0 else 0
+
+    # Sistema de niveles para el pequeño historiador
+    if completed_count == 0:
+        level_num = 1
+        level_title = "Novato del Tiempo"
+        level_icon = "🐣"
+        next_target = "Completa 1 misión histórica para subir al Nivel 2"
+    elif completed_count < 3:
+        level_num = 2
+        level_title = "Explorador Curioso"
+        level_icon = "🧭"
+        next_target = f"¡Te faltan {3 - completed_count} misión(es) para el Nivel 3!"
+    elif completed_count < 6:
+        level_num = 3
+        level_title = "Guardián de Civilizaciones"
+        level_icon = "🛡️"
+        next_target = f"¡Te faltan {6 - completed_count} misión(es) para el Nivel 4!"
+    elif completed_count < 9:
+        level_num = 4
+        level_title = "Cronista de la Historia"
+        level_icon = "📜"
+        next_target = f"¡Te faltan {9 - completed_count} misión(es) para el Nivel 5!"
+    elif completed_count < 12:
+        level_num = 5
+        level_title = "Maestro de las Eras"
+        level_icon = "🏛️"
+        next_target = f"¡Te faltan {12 - completed_count} misión(es) para el Nivel Máximo!"
+    else:
+        level_num = 6
+        level_title = "Gran Sabio del Tiempo Universal"
+        level_icon = "👑"
+        next_target = "¡Felicidades, has alcanzado la máxima maestría histórica!"
+
+    mastered = []
+    not_mastered = []
+
+    for s in all_stories:
+        sid = s["id"]
+        if sid in completed_ids:
+            mastered.append({
+                "id": s["id"],
+                "grade": s["grade"],
+                "title": s["title"],
+                "period": s["period"],
+                "icon": s["icon"],
+                "status_badge": "¡Tema Dominado! 🌟"
+            })
+        else:
+            att = attempted.get(sid, {})
+            needs_practice = att.get("wrong_count", 0) > 0
+            not_mastered.append({
+                "id": s["id"],
+                "grade": s["grade"],
+                "title": s["title"],
+                "period": s["period"],
+                "icon": s["icon"],
+                "status_type": "needs_practice" if needs_practice else "pending",
+                "status_badge": "Necesita repaso 🤔" if needs_practice else "Por explorar 🔍",
+                "reason": "Has tenido dudas en este reto" if needs_practice else "Aún no has explorado esta época"
+            })
+
+    return {
+        "historian": db.get("current_historian"),
+        "total_missions": total,
+        "completed_count": completed_count,
+        "percent": percent,
+        "xp": completed_count * 100,
+        "level": {
+            "num": level_num,
+            "title": level_title,
+            "icon": level_icon,
+            "next_target": next_target
+        },
+        "mastered": mastered,
+        "not_mastered": not_mastered
+    }
 
 
 class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
@@ -243,6 +352,12 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                 "badges": db.get("badges", []),
                 "completed_stories": db.get("completed_stories", [])
             })
+            return
+
+        if parsed.path == "/api/stats":
+            db = load_database()
+            stats = calculate_stats(db)
+            self._send_json(200, stats)
             return
 
         if parsed.path == "/api/stories":
@@ -315,15 +430,23 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             correct_index = found_story["trivia"]["answer"]
             is_correct = (selected_option == correct_index)
 
+            # Registrar intento
+            db.setdefault("attempted_stories", {})
+            att = db["attempted_stories"].setdefault(story_id, {"attempts": 0, "wrong_count": 0, "correct": False})
+            att["attempts"] = att.get("attempts", 0) + 1
+
             if is_correct:
+                att["correct"] = True
                 if story_id not in db.get("completed_stories", []):
                     db.setdefault("completed_stories", []).append(story_id)
 
                 badge_name = f"Medalla de {found_story['period']}"
                 if badge_name not in db.get("badges", []):
                     db.setdefault("badges", []).append(badge_name)
+            else:
+                att["wrong_count"] = att.get("wrong_count", 0) + 1
 
-                save_database(db)
+            save_database(db)
 
             self._send_json(200, {
                 "correct": is_correct,
