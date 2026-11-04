@@ -1,11 +1,6 @@
 """
 Módulo de Base de Datos para 'Historia Divertida' compatible con Turso (LibSQL) y SQLite local.
-
-Permite:
-1. Conectar a Turso en la nube usando TURSO_DATABASE_URL y TURSO_AUTH_TOKEN.
-2. Si no están configuradas las variables de Turso, funciona automáticamente
-   con SQLite local (historia.db) sin necesidad de instalar librerías externas.
-3. Importar o migrar el historial existente de 'data.json' a la base de datos.
+Optimizado para eliminar consultas N+1 y mejorar drásticamente el rendimiento en la nube.
 """
 
 import json
@@ -52,7 +47,6 @@ class TursoHttpClient:
     """Cliente HTTP ligero para Turso (LibSQL v2 pipeline) con urllib estándar."""
 
     def __init__(self, db_url, auth_token):
-        # Convertir libsql:// a https://
         clean_url = db_url.replace("libsql://", "https://")
         if not clean_url.startswith("http"):
             clean_url = f"https://{clean_url}"
@@ -66,7 +60,6 @@ class TursoHttpClient:
             sql = stmt[0] if isinstance(stmt, (tuple, list)) else stmt
             args = stmt[1] if isinstance(stmt, (tuple, list)) and len(stmt) > 1 else []
 
-            # Mapear parámetros a formato de Turso
             formatted_args = []
             for arg in args:
                 if arg is None:
@@ -196,7 +189,6 @@ def init_database():
         db.execute_script(schema_sql)
         print("✅ Base de datos SQLite local inicializada (historia.db)")
     else:
-        # En Turso separamos las sentencias por punto y coma
         statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
         for stmt in statements:
             db.execute(stmt)
@@ -204,7 +196,7 @@ def init_database():
 
 
 def load_all_users_from_db():
-    """Carga todos los usuarios con sus medallas, historias e intentos."""
+    """Carga todos los usuarios con sus medallas, historias e intentos de forma altamente optimizada."""
     db = get_db()
 
     try:
@@ -214,37 +206,60 @@ def load_all_users_from_db():
         init_database()
         users = db.execute("SELECT id, name, grade, created_at, last_active FROM users ORDER BY last_active DESC")
 
+    if not users:
+        return {}
+
+    # 🚀 OPTIMIZACIÓN: Descargar todas las relaciones de una sola vez (evitando consultas N+1)
+    try:
+        all_badges = db.execute("SELECT user_id, badge_name FROM badges ORDER BY id ASC")
+    except Exception:
+        all_badges = []
+
+    try:
+        all_completed = db.execute("SELECT user_id, story_id FROM completed_stories ORDER BY id ASC")
+    except Exception:
+        all_completed = []
+
+    try:
+        all_attempted = db.execute("SELECT user_id, story_id, attempts, wrong_count, correct FROM attempted_stories")
+    except Exception:
+        all_attempted = []
+
+    # Agrupar medallas por usuario en memoria
+    badges_map = {}
+    for b in all_badges:
+        uid = b["user_id"]
+        badges_map.setdefault(uid, []).append(b["badge_name"])
+
+    # Agrupar historias completadas por usuario en memoria
+    completed_map = {}
+    for c in all_completed:
+        uid = c["user_id"]
+        completed_map.setdefault(uid, []).append(c["story_id"])
+
+    # Agrupar intentos por usuario en memoria
+    attempted_map = {}
+    for a in all_attempted:
+        uid = a["user_id"]
+        attempted_map.setdefault(uid, {})[a["story_id"]] = {
+            "attempts": a["attempts"],
+            "wrong_count": a["wrong_count"],
+            "correct": bool(a["correct"])
+        }
+
+    # Construir el diccionario final combinando los mapas
     users_dict = {}
     for u in users:
         uid = u["id"]
-
-        # Medallas
-        badges_rows = db.execute("SELECT badge_name FROM badges WHERE user_id = ? ORDER BY id ASC", [uid])
-        badges = [b["badge_name"] for b in badges_rows]
-
-        # Historias completadas
-        completed_rows = db.execute("SELECT story_id FROM completed_stories WHERE user_id = ? ORDER BY id ASC", [uid])
-        completed = [c["story_id"] for c in completed_rows]
-
-        # Intentos
-        attempted_rows = db.execute("SELECT story_id, attempts, wrong_count, correct FROM attempted_stories WHERE user_id = ?", [uid])
-        attempted = {}
-        for a in attempted_rows:
-            attempted[a["story_id"]] = {
-                "attempts": a["attempts"],
-                "wrong_count": a["wrong_count"],
-                "correct": bool(a["correct"])
-            }
-
         users_dict[uid] = {
             "id": uid,
             "name": u["name"],
             "grade": u["grade"],
             "created_at": u["created_at"],
             "last_active": u["last_active"],
-            "badges": badges,
-            "completed_stories": completed,
-            "attempted_stories": attempted
+            "badges": badges_map.get(uid, []),
+            "completed_stories": completed_map.get(uid, []),
+            "attempted_stories": attempted_map.get(uid, {})
         }
 
     return users_dict
@@ -283,19 +298,16 @@ def record_mission_completed(user_id, story_id, badge_name):
     uid = user_id.strip().lower()
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    # Registrar historia completada
     db.execute(
         "INSERT OR IGNORE INTO completed_stories (user_id, story_id, completed_at) VALUES (?, ?, ?)",
         [uid, story_id, now_str]
     )
 
-    # Registrar medalla
     db.execute(
         "INSERT OR IGNORE INTO badges (user_id, badge_name, earned_at) VALUES (?, ?, ?)",
         [uid, badge_name, now_str]
     )
 
-    # Actualizar intento como correcto
     db.execute(
         """
         INSERT INTO attempted_stories (user_id, story_id, attempts, wrong_count, correct)
@@ -307,7 +319,6 @@ def record_mission_completed(user_id, story_id, badge_name):
         [uid, story_id]
     )
 
-    # Actualizar última actividad del usuario
     db.execute("UPDATE users SET last_active = ? WHERE id = ?", [now_str, uid])
 
 
@@ -339,7 +350,6 @@ def migrate_json_to_db(json_path=BASE_DIR / "data.json"):
 
     users = data.get("users", {})
     if not users and data.get("current_historian"):
-        # Formato anterior
         ch = data["current_historian"]
         uid = ch["name"].strip().lower()
         users[uid] = {

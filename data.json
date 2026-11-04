@@ -1,12 +1,37 @@
 {
-  "current_user": "alex",
+  "current_user": "alexis",
   "users": {
+    "alexis": {
+      "id": "alexis",
+      "name": "alexis",
+      "grade": "2",
+      "created_at": "04/11/2026 11:13",
+      "last_active": "04/11/2026 11:23",
+      "badges": [
+        "Medalla de Antiguo Egipto"
+      ],
+      "completed_stories": [
+        "2-1"
+      ],
+      "attempted_stories": {
+        "2-1": {
+          "attempts": 9,
+          "wrong_count": 5,
+          "correct": true
+        },
+        "2-2": {
+          "attempts": 8,
+          "wrong_count": 8,
+          "correct": false
+        }
+      }
+    },
     "alex": {
       "id": "alex",
       "name": "ALEX",
       "grade": "1",
       "created_at": "04/11/2026 11:03",
-      "last_active": "04/11/2026 11:12",
+      "last_active": "04/11/2026 11:13",
       "badges": [
         "Medalla de Prehistoria",
         "Medalla de Edad de Piedra"
@@ -22,7 +47,7 @@
           "correct": true
         },
         "1-2": {
-          "attempts": 4,
+          "attempts": 6,
           "wrong_count": 0,
           "correct": true
         }
