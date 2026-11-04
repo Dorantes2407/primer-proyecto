@@ -1,6 +1,6 @@
 """
 Servidor local para 'Historia Divertida'
-Aplicación interactiva con historial multiusuario para pequeños historiadores de primaria (1º a 6º).
+Aplicación interactiva con soporte para Turso (LibSQL en la nube) y SQLite local.
 """
 
 import http.server
@@ -12,6 +12,8 @@ import urllib.parse
 import webbrowser
 from datetime import datetime
 from pathlib import Path
+
+import turso_db
 
 PORT = 5000
 BASE_DIR = Path(__file__).parent.resolve()
@@ -209,57 +211,38 @@ GRADE_NAMES = {
 
 
 def load_database():
-    """Carga y migra la base de datos de usuarios con su avance individual."""
-    if not DATA_FILE.exists():
-        initial = {
-            "current_user": None,
-            "users": {}
-        }
-        save_database(initial)
-        return initial
-
+    """Carga los usuarios desde Turso/SQLite con respaldo en data.json."""
     try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        users = turso_db.load_all_users_from_db()
+    except Exception as e:
+        print(f"Aviso al cargar de la base de datos: {e}")
+        users = {}
 
-        # Migración automática si venía del formato de usuario único
-        if "users" not in data:
-            users = {}
-            old_hist = data.get("current_historian")
-            if old_hist and old_hist.get("name"):
-                name = old_hist["name"].strip()
-                uid = name.lower()
-                users[uid] = {
-                    "id": uid,
-                    "name": name,
-                    "grade": str(old_hist.get("grade", "1")),
-                    "badges": data.get("badges", []),
-                    "completed_stories": data.get("completed_stories", []),
-                    "attempted_stories": data.get("attempted_stories", {}),
-                    "created_at": datetime.now().strftime("%d/%m/%Y %H:%M"),
-                    "last_active": datetime.now().strftime("%d/%m/%Y %H:%M")
-                }
-                data["current_user"] = uid
-            else:
-                data["current_user"] = None
+    current_user = None
+    if DATA_FILE.exists():
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                backup = json.load(f)
+                current_user = backup.get("current_user")
+                # Si la base de datos estaba vacía, rescatamos de data.json
+                if not users and backup.get("users"):
+                    users = backup.get("users")
+        except Exception:
+            pass
 
-            data["users"] = users
-            save_database(data)
-
-        data.setdefault("users", {})
-        data.setdefault("current_user", None)
-        return data
-
-    except Exception:
-        return {
-            "current_user": None,
-            "users": {}
-        }
+    return {
+        "current_user": current_user,
+        "users": users
+    }
 
 
-def save_database(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+def save_backup(data):
+    """Guarda copia de respaldo local en data.json."""
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Aviso al escribir data.json: {e}")
 
 
 def get_current_user_data(db):
@@ -398,10 +381,13 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
 
         if parsed.path == "/api/status":
+            is_turso = turso_db.is_turso_configured()
             self._send_json(200, {
                 "status": "online",
                 "app": "Historia Divertida",
-                "python_version": sys.version.split()[0]
+                "python_version": sys.version.split()[0],
+                "database_mode": "Turso en la Nube (LibSQL)" if is_turso else "SQLite Local (historia.db)",
+                "turso_configured": is_turso
             })
             return
 
@@ -426,7 +412,7 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                     "last_active": u.get("last_active", u.get("created_at", "Reciente"))
                 })
 
-            # Ordenar por último activo o mayor progreso
+            # Ordenar por mayor porcentaje completado
             users_list.sort(key=lambda x: x["percent"], reverse=True)
 
             self._send_json(200, {
@@ -506,8 +492,10 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             db["current_user"] = found_user["id"]
-            found_user["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-            save_database(db)
+            save_backup(db)
+
+            # Actualizar última actividad en base de datos
+            turso_db.save_user_profile(found_user["name"], found_user.get("grade", "1"))
 
             self._send_json(200, {
                 "success": True,
@@ -532,36 +520,19 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             if grade not in ["1", "2", "3", "4", "5", "6"]:
                 grade = "1"
 
-            uid = name.lower()
-            users = db.setdefault("users", {})
-
-            if uid in users:
-                # Si ya existe, actualizamos su grado si cambió y última actividad
-                users[uid]["grade"] = grade
-                users[uid]["name"] = name
-                users[uid]["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-            else:
-                # Nuevo pequeño historiador
-                now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
-                users[uid] = {
-                    "id": uid,
-                    "name": name,
-                    "grade": grade,
-                    "badges": [],
-                    "completed_stories": [],
-                    "attempted_stories": {},
-                    "created_at": now_str,
-                    "last_active": now_str
-                }
+            # Guardar en base de datos Turso / SQLite
+            uid = turso_db.save_user_profile(name, grade)
 
             db["current_user"] = uid
-            save_database(db)
+            # Recargar de DB y respaldar
+            db["users"] = turso_db.load_all_users_from_db()
+            save_backup(db)
 
             self._send_json(200, {
                 "success": True,
                 "historian": {
-                    "name": users[uid]["name"],
-                    "grade": users[uid]["grade"]
+                    "name": name,
+                    "grade": grade
                 }
             })
             return
@@ -593,55 +564,45 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             correct_index = found_story["trivia"]["answer"]
             is_correct = (selected_option == correct_index)
 
-            # Registrar intento en el historial del usuario
-            user.setdefault("attempted_stories", {})
-            att = user["attempted_stories"].setdefault(story_id, {"attempts": 0, "wrong_count": 0, "correct": False})
-            att["attempts"] = att.get("attempts", 0) + 1
-
             if is_correct:
-                att["correct"] = True
-                user.setdefault("completed_stories", [])
-                if story_id not in user["completed_stories"]:
-                    user["completed_stories"].append(story_id)
-
                 badge_name = f"Medalla de {found_story['period']}"
-                user.setdefault("badges", [])
-                if badge_name not in user["badges"]:
-                    user["badges"].append(badge_name)
+                turso_db.record_mission_completed(user["id"], story_id, badge_name)
             else:
-                att["wrong_count"] = att.get("wrong_count", 0) + 1
+                turso_db.record_mission_wrong(user["id"], story_id)
 
-            user["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-            save_database(db)
+            # Recargar estado actualizado desde la BD
+            updated_users = turso_db.load_all_users_from_db()
+            updated_user = updated_users.get(user["id"], user)
+            db["users"] = updated_users
+            save_backup(db)
 
             self._send_json(200, {
                 "correct": is_correct,
                 "correct_option": correct_index,
-                "badges": user.get("badges", []),
-                "completed_stories": user.get("completed_stories", [])
+                "badges": updated_user.get("badges", []),
+                "completed_stories": updated_user.get("completed_stories", [])
             })
             return
 
         # 4. Eliminar perfil de un usuario
         if parsed.path == "/api/users/delete":
             target_id = str(payload.get("id") or payload.get("name", "")).strip().lower()
-            users = db.get("users", {})
 
-            if target_id in users:
-                del users[target_id]
-                if db.get("current_user") == target_id:
-                    db["current_user"] = None
-                save_database(db)
-                self._send_json(200, {"success": True, "deleted": target_id})
-                return
+            turso_db.delete_user_from_db(target_id)
 
-            self._send_json(404, {"error": "Usuario no encontrado"})
+            if db.get("current_user") == target_id:
+                db["current_user"] = None
+
+            db["users"] = turso_db.load_all_users_from_db()
+            save_backup(db)
+
+            self._send_json(200, {"success": True, "deleted": target_id})
             return
 
         # 5. Salir del perfil (volver a pantalla de selección)
         if parsed.path == "/api/reset-profile":
             db["current_user"] = None
-            save_database(db)
+            save_backup(db)
             self._send_json(200, {"success": True})
             return
 
@@ -652,13 +613,23 @@ def start_server():
     server_address = ("", PORT)
     socketserver.TCPServer.allow_reuse_address = True
 
+    # Inicializar base de datos
+    turso_db.init_database()
+
+    is_turso = turso_db.is_turso_configured()
+    db_name = "☁️ Turso Cloud (LibSQL)" if is_turso else "📁 SQLite Local (historia.db)"
+
     with socketserver.TCPServer(server_address, HistoryAppHandler) as httpd:
         url = f"http://localhost:{PORT}"
-        print("=" * 60)
+        print("=" * 65)
         print("📜 ¡Bienvenido a Historia Divertida! 🏰✨")
         print(f"🌟 Servidor local para Pequeños Historiadores en: {url}")
+        print(f"🗄️  Base de Datos: {db_name}")
+        if not is_turso:
+            print("💡 Para conectar con Turso en la nube, crea tu base de datos y")
+            print("   agrega tus credenciales en el archivo .env (mira .env.example)")
         print("🛑 Presiona CTRL+C para detener el servidor")
-        print("=" * 60)
+        print("=" * 65)
 
         webbrowser.open(url)
 

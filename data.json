@@ -1,12 +1,12 @@
 {
-  "current_user": "daya",
+  "current_user": null,
   "users": {
     "daya": {
       "id": "daya",
       "name": "daya",
       "grade": "1",
       "created_at": "29/10/2026 13:00",
-      "last_active": "04/11/2026 08:00",
+      "last_active": "04/11/2026 09:22",
       "badges": [
         "Medalla de Prehistoria",
         "Medalla de Edad de Piedra",
@@ -97,6 +97,37 @@
           "correct": true
         }
       }
+    },
+    "ñaña": {
+      "id": "ñaña",
+      "name": "ñaña",
+      "grade": "1",
+      "badges": [],
+      "completed_stories": [],
+      "attempted_stories": {},
+      "created_at": "04/11/2026 09:07",
+      "last_active": "04/11/2026 09:23"
+    }
+  },
+  "current_historian": null,
+  "badges": [
+    "Medalla de Prehistoria",
+    "Medalla de Edad de Piedra"
+  ],
+  "completed_stories": [
+    "1-1",
+    "1-2"
+  ],
+  "attempted_stories": {
+    "1-1": {
+      "attempts": 1,
+      "wrong_count": 0,
+      "correct": true
+    },
+    "1-2": {
+      "attempts": 1,
+      "wrong_count": 0,
+      "correct": true
     }
   }
 }

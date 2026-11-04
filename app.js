@@ -74,8 +74,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupGradeCardSelection();
     setupDashboardTabs();
     setupEventListeners();
+    await checkServerStatus();
     await loadRegisteredUsers();
 });
+
+// Verificar estado y modo de base de datos (Turso o SQLite)
+async function checkServerStatus() {
+    try {
+        const res = await fetch("/api/status");
+        if (res.ok) {
+            const data = await res.json();
+            serverStatus.textContent = `🟢 En línea | BD: ${data.database_mode}`;
+        }
+    } catch (e) {
+        serverStatus.textContent = "Modo demostración local (ejecuta 'python app.py' para sincronizar).";
+    }
+}
 
 // 2. Cargar y visualizar la lista de usuarios ya ingresados
 async function loadRegisteredUsers() {

@@ -3,12 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Environments
+# Environments & Secrets
 .env
+.env.local
 .venv
 env/
 venv/
 ENV/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
 
 # OS generated files
 .DS_Store
