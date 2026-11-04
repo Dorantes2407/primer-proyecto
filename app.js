@@ -1,5 +1,6 @@
 /**
  * Historia Divertida - Lógica de interacción para Pequeños Historiadores
+ * Soporte Multi-usuario con Historial de Avance individual.
  */
 
 let currentHistorian = null;
@@ -7,10 +8,14 @@ let currentGrade = "1";
 let badges = [];
 let completedStories = [];
 
-// Elementos del DOM - Pantalla de Bienvenida
+// Elementos del DOM - Pantalla de Bienvenida y Selección de Usuario
 const welcomeScreen = document.getElementById("welcome-screen");
 const dashboardScreen = document.getElementById("dashboard-screen");
 const statsScreen = document.getElementById("stats-screen");
+
+const existingUsersPanel = document.getElementById("existing-users-panel");
+const existingUsersList = document.getElementById("existing-users-list");
+const existingUsersCount = document.getElementById("existing-users-count");
 
 const onboardingForm = document.getElementById("onboarding-form");
 const explorerNameInput = document.getElementById("explorer-name");
@@ -20,6 +25,8 @@ const gradeCards = document.querySelectorAll(".grade-card");
 // Elementos del DOM - Tablero
 const displayHistorianName = document.getElementById("display-historian-name");
 const displayGradeText = document.getElementById("display-grade-text");
+const displayLevelText = document.getElementById("display-level-text");
+const dashboardUserAvatar = document.getElementById("dashboard-user-avatar");
 const btnSwitchHistorian = document.getElementById("btn-switch-historian");
 const btnViewStats = document.getElementById("btn-view-stats");
 const badgeCount = document.getElementById("badge-count");
@@ -30,6 +37,7 @@ const serverStatus = document.getElementById("server-status");
 
 // Elementos del DOM - Pantalla de Estadísticas
 const btnBackToDashboard = document.getElementById("btn-back-to-dashboard");
+const btnStatsSwitchUser = document.getElementById("btn-stats-switch-user");
 const statsHistorianName = document.getElementById("stats-historian-name");
 const statsLevelIcon = document.getElementById("stats-level-icon");
 const statsLevelTitle = document.getElementById("stats-level-title");
@@ -42,7 +50,7 @@ const notMasteredCount = document.getElementById("not-mastered-count");
 const masteredTopicsList = document.getElementById("mastered-topics-list");
 const notMasteredTopicsList = document.getElementById("not-mastered-topics-list");
 
-// Nombres descriptivos de los grados escolares
+// Mapeos visuales de grado escolar
 const GRADE_NAMES = {
     "1": "1º de Primaria (Prehistoria y Dinosaurios)",
     "2": "2º de Primaria (Antiguo Egipto y Faraones)",
@@ -52,39 +60,174 @@ const GRADE_NAMES = {
     "6": "6º de Primaria (Revoluciones y Viaje a la Luna)"
 };
 
+const GRADE_ICONS = {
+    "1": "🦖",
+    "2": "🏺",
+    "3": "🏛️",
+    "4": "🏰",
+    "5": "🧭",
+    "6": "🚀"
+};
+
 // 1. Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", async () => {
     setupGradeCardSelection();
     setupDashboardTabs();
     setupEventListeners();
-    await checkProfile();
+    await loadRegisteredUsers();
 });
 
-// 2. Comprobar si ya hay un pequeño historiador registrado
-async function checkProfile() {
+// 2. Cargar y visualizar la lista de usuarios ya ingresados
+async function loadRegisteredUsers() {
     try {
-        const response = await fetch("/api/profile");
-        if (!response.ok) throw new Error("No se pudo conectar con el servidor local");
+        const response = await fetch("/api/users");
+        if (!response.ok) throw new Error("Error al consultar usuarios");
 
         const data = await response.json();
-        badges = data.badges || [];
-        completedStories = data.completed_stories || [];
+        const users = data.users || [];
 
-        if (data.historian && data.historian.name) {
-            currentHistorian = data.historian;
-            currentGrade = String(currentHistorian.grade || "1");
-            showDashboard();
-        } else {
-            showWelcomeScreen();
-        }
+        renderExistingUsers(users, data.current_user);
+
+        // Si no hay ningún usuario activo seleccionado, mostramos la pantalla de inicio
+        // para que puedan visualizar y seleccionar a su pequeño historiador
+        showWelcomeScreen();
+
     } catch (error) {
-        console.warn("Servidor local no disponible o cargando modo offline:", error);
-        serverStatus.textContent = "Modo demostración local (ejecuta 'python app.py' para guardar avances).";
+        console.warn("Servidor local no disponible o error al cargar usuarios:", error);
+        serverStatus.textContent = "Modo demostración local (ejecuta 'python app.py' para sincronizar).";
         showWelcomeScreen();
     }
 }
 
-// 3. Selección interactiva de grado escolar en el inicio
+// 3. Renderizar las tarjetas de usuarios en la pantalla de bienvenida
+function renderExistingUsers(users, currentUserId) {
+    if (!users || users.length === 0) {
+        existingUsersPanel.classList.add("hidden");
+        return;
+    }
+
+    existingUsersPanel.classList.remove("hidden");
+    existingUsersCount.textContent = `${users.length} Perfil${users.length === 1 ? '' : 'es'}`;
+
+    existingUsersList.innerHTML = users.map(user => {
+        const isCurrent = user.id === currentUserId;
+        const icon = user.grade_icon || GRADE_ICONS[user.grade] || "🧭";
+
+        return `
+            <div class="user-profile-card ${isCurrent ? 'active-user-card' : ''}" id="user-card-${user.id}">
+                ${isCurrent ? '<span class="current-user-tag">🌟 Última Sesión</span>' : ''}
+                
+                <div class="user-card-header">
+                    <span class="user-card-avatar">${icon}</span>
+                    <div class="user-card-info">
+                        <h4 class="user-card-name">${escapeHtml(user.name)}</h4>
+                        <span class="user-card-grade-tag">${escapeHtml(user.grade_desc)}</span>
+                    </div>
+                    <button class="btn-delete-user" data-user-id="${user.id}" data-user-name="${escapeHtml(user.name)}" title="Eliminar este perfil">
+                        🗑️
+                    </button>
+                </div>
+
+                <!-- Nivel e insignias -->
+                <div class="user-card-level-row">
+                    <span class="user-level-badge">
+                        ${user.level.icon} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
+                    </span>
+                </div>
+
+                <!-- Barra de avance en miniatura -->
+                <div class="user-mini-progress">
+                    <div class="user-mini-progress-bar">
+                        <div class="user-mini-progress-fill" style="width: ${user.percent}%;"></div>
+                    </div>
+                    <div class="user-mini-progress-labels">
+                        <span><strong>${user.percent}%</strong> Dominado</span>
+                        <span>${user.completed_count} de ${user.total_missions} misiones</span>
+                    </div>
+                </div>
+
+                <!-- Resumen de logros -->
+                <div class="user-card-stats-pills">
+                    <span class="stat-pill">🏅 ${user.badges_count} Medallas</span>
+                    <span class="stat-pill">⭐ ${user.xp} XP</span>
+                </div>
+
+                <!-- Botón para seleccionar y continuar -->
+                <button type="button" class="btn btn-select-user" data-user-id="${user.id}">
+                    <span>¡Continuar mi Aventura!</span>
+                    <span class="btn-arrow">➔</span>
+                </button>
+            </div>
+        `;
+    }).join("");
+
+    // Eventos para seleccionar usuario existente
+    const selectButtons = existingUsersList.querySelectorAll(".btn-select-user");
+    selectButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            selectUser(btn.dataset.userId);
+        });
+    });
+
+    // Eventos para eliminar usuario
+    const deleteButtons = existingUsersList.querySelectorAll(".btn-delete-user");
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteUser(btn.dataset.userId, btn.dataset.userName);
+        });
+    });
+}
+
+// 4. Seleccionar un usuario ya existente
+async function selectUser(userId) {
+    try {
+        const response = await fetch("/api/users/select", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: userId })
+        });
+
+        if (!response.ok) throw new Error("No se pudo seleccionar el usuario");
+
+        const data = await response.json();
+        currentHistorian = data.historian;
+        currentGrade = String(currentHistorian.grade || "1");
+        badges = data.badges || [];
+        completedStories = data.completed_stories || [];
+
+        showDashboard();
+
+    } catch (err) {
+        console.error("Error al seleccionar usuario:", err);
+        alert("Ocurrió un error al seleccionar el usuario.");
+    }
+}
+
+// 5. Eliminar un perfil de usuario
+async function deleteUser(userId, userName) {
+    const confirmDelete = confirm(`¿Estás seguro de que deseas eliminar el historial de avance de "${userName}"? Esta acción borrará todas sus medallas y niveles.`);
+    if (!confirmDelete) return;
+
+    try {
+        const response = await fetch("/api/users/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: userId })
+        });
+
+        if (!response.ok) throw new Error("Error al eliminar el perfil");
+
+        // Recargar la lista de usuarios
+        await loadRegisteredUsers();
+
+    } catch (err) {
+        console.error("Error eliminando perfil:", err);
+        alert("No se pudo eliminar el perfil seleccionado.");
+    }
+}
+
+// 6. Selección de grado en el formulario de registro
 function setupGradeCardSelection() {
     gradeCards.forEach(card => {
         card.addEventListener("click", () => {
@@ -96,7 +239,7 @@ function setupGradeCardSelection() {
     });
 }
 
-// 4. Configurar pestañas de grados en el tablero principal
+// 7. Configurar pestañas de grados en el tablero principal
 function setupDashboardTabs() {
     dashboardGradeTabs.forEach(tab => {
         tab.addEventListener("click", () => {
@@ -108,9 +251,9 @@ function setupDashboardTabs() {
     });
 }
 
-// 5. Configurar eventos del formulario y botones
+// 8. Event listeners principales
 function setupEventListeners() {
-    // Enviar formulario de inicio
+    // Formulario para crear un nuevo usuario o ingresar apodo nuevo
     onboardingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = explorerNameInput.value.trim();
@@ -134,7 +277,11 @@ function setupEventListeners() {
             const result = await response.json();
             currentHistorian = result.historian;
             currentGrade = grade;
+
+            // Recargar datos del perfil activo
+            await refreshActiveUserProfile();
             showDashboard();
+
         } catch (error) {
             console.error("Error al guardar perfil:", error);
             currentHistorian = { name, grade };
@@ -143,20 +290,14 @@ function setupEventListeners() {
         }
     });
 
-    // Botón para cambiar de pequeño historiador
+    // Botón para cambiar de usuario (desde Dashboard)
     btnSwitchHistorian.addEventListener("click", async () => {
-        const confirmar = confirm("¿Deseas cambiar o ingresar como otro pequeño historiador?");
-        if (!confirmar) return;
+        await switchToUserSelection();
+    });
 
-        try {
-            await fetch("/api/reset-profile", { method: "POST" });
-        } catch (err) {
-            console.error(err);
-        }
-
-        currentHistorian = null;
-        explorerNameInput.value = "";
-        showWelcomeScreen();
+    // Botón para cambiar de usuario (desde Estadísticas)
+    btnStatsSwitchUser.addEventListener("click", async () => {
+        await switchToUserSelection();
     });
 
     // Botón para ver estadísticas
@@ -170,22 +311,52 @@ function setupEventListeners() {
     });
 }
 
-// 6. Transiciones de pantalla
+// 9. Volver a la pantalla de selección de usuarios
+async function switchToUserSelection() {
+    try {
+        await fetch("/api/reset-profile", { method: "POST" });
+    } catch (err) {
+        console.error(err);
+    }
+    explorerNameInput.value = "";
+    await loadRegisteredUsers();
+    showWelcomeScreen();
+}
+
+// 10. Refrescar el perfil del usuario activo
+async function refreshActiveUserProfile() {
+    try {
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+            const data = await response.json();
+            badges = data.badges || [];
+            completedStories = data.completed_stories || [];
+        }
+    } catch (e) {
+        console.warn("No se pudo refrescar perfil:", e);
+    }
+}
+
+// 11. Transiciones de pantalla
 function showWelcomeScreen() {
     dashboardScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     welcomeScreen.classList.add("active");
-    explorerNameInput.focus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function showDashboard() {
+async function showDashboard() {
     welcomeScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     dashboardScreen.classList.add("active");
 
-    // Actualizar textos con el nombre del usuario
+    // Actualizar saludo y datos del usuario activo
     displayHistorianName.textContent = currentHistorian.name;
     displayGradeText.textContent = GRADE_NAMES[currentGrade] || `${currentGrade}º de Primaria`;
+
+    // Avatar del grado escolar
+    const avatarEmoji = GRADE_ICONS[currentGrade] || "🧭";
+    dashboardUserAvatar.textContent = avatarEmoji;
 
     // Sincronizar pestaña activa
     dashboardGradeTabs.forEach(tab => {
@@ -195,6 +366,17 @@ function showDashboard() {
             tab.classList.remove("active");
         }
     });
+
+    // Obtener nivel actual para mostrar en el encabezado
+    try {
+        const statsRes = await fetch("/api/stats");
+        if (statsRes.ok) {
+            const statsData = await statsRes.json();
+            displayLevelText.textContent = `${statsData.level.icon} Nivel ${statsData.level.num}: ${statsData.level.title}`;
+        }
+    } catch (e) {
+        displayLevelText.textContent = "Novato del Tiempo";
+    }
 
     renderBadges();
     loadStories(currentGrade);
@@ -207,9 +389,10 @@ function showStatsScreen() {
 
     statsHistorianName.textContent = currentHistorian.name;
     loadStats();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// 7. Cargar relatos y trivias por grado escolar
+// 12. Cargar relatos y trivias por grado escolar
 async function loadStories(grade, targetStoryId = null) {
     storiesContainer.innerHTML = `<div class="loading-state">⏳ Viajando en el tiempo al grado ${grade}º...</div>`;
 
@@ -236,7 +419,7 @@ async function loadStories(grade, targetStoryId = null) {
     }
 }
 
-// 8. Renderizar tarjetas de relatos y trivias
+// 13. Renderizar tarjetas de relatos y trivias
 function renderStories(stories) {
     storiesContainer.innerHTML = "";
 
@@ -296,7 +479,7 @@ function renderStories(stories) {
             </div>
         `;
 
-        // Agregar eventos a las opciones de trivia
+        // Eventos en opciones de trivia
         const optionButtons = card.querySelectorAll(".trivia-option-btn");
         optionButtons.forEach(btn => {
             btn.addEventListener("click", () => handleAnswer(story.id, parseInt(btn.dataset.optionIdx, 10), card));
@@ -306,7 +489,7 @@ function renderStories(stories) {
     });
 }
 
-// 9. Manejar la respuesta a la trivia histórica
+// 14. Manejar respuesta a trivia histórica
 async function handleAnswer(storyId, selectedOption, cardElement) {
     const feedbackBox = cardElement.querySelector(`#feedback-${storyId}`);
     const optionButtons = cardElement.querySelectorAll(".trivia-option-btn");
@@ -349,7 +532,7 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
     }
 }
 
-// 10. Renderizar la vitrina de medallas del pequeño historiador
+// 15. Renderizar vitrina de medallas del usuario activo
 function renderBadges() {
     badgeCount.textContent = `${badges.length} Medalla${badges.length === 1 ? '' : 's'} Ganada${badges.length === 1 ? '' : 's'}`;
 
@@ -366,7 +549,7 @@ function renderBadges() {
     `).join("");
 }
 
-// 11. Cargar y renderizar la pantalla de Estadísticas y Nivel
+// 16. Cargar y renderizar la pantalla de Estadísticas y Nivel
 async function loadStats() {
     try {
         const response = await fetch("/api/stats");
@@ -451,7 +634,7 @@ async function loadStats() {
                 `;
             }).join("");
 
-            // Agregar evento a los botones de "Aceptar Reto"
+            // Evento en botones "Aceptar Reto"
             const challengeButtons = notMasteredTopicsList.querySelectorAll(".btn-challenge-action");
             challengeButtons.forEach(btn => {
                 btn.addEventListener("click", () => {

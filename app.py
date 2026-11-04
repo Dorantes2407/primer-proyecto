@@ -1,6 +1,6 @@
 """
 Servidor local para 'Historia Divertida'
-Aplicación interactiva para pequeños historiadores de primaria (1º a 6º).
+Aplicación interactiva con historial multiusuario para pequeños historiadores de primaria (1º a 6º).
 """
 
 import http.server
@@ -10,6 +10,7 @@ import socketserver
 import sys
 import urllib.parse
 import webbrowser
+from datetime import datetime
 from pathlib import Path
 
 PORT = 5000
@@ -188,15 +189,31 @@ STORIES_DATA = {
     ]
 }
 
+GRADE_ICONS = {
+    "1": "🦖",
+    "2": "🏺",
+    "3": "🏛️",
+    "4": "🏰",
+    "5": "🧭",
+    "6": "🚀"
+}
+
+GRADE_NAMES = {
+    "1": "1º de Primaria",
+    "2": "2º de Primaria",
+    "3": "3º de Primaria",
+    "4": "4º de Primaria",
+    "5": "5º de Primaria",
+    "6": "6º de Primaria"
+}
+
 
 def load_database():
-    """Carga los datos del pequeño historiador, sus insignias y estadísticas."""
+    """Carga y migra la base de datos de usuarios con su avance individual."""
     if not DATA_FILE.exists():
         initial = {
-            "current_historian": None,  # {"name": "...", "grade": "1..6"}
-            "badges": [],               # lista de insignias ganadas
-            "completed_stories": [],    # lista de IDs de historias completadas
-            "attempted_stories": {}     # registro de intentos por historia
+            "current_user": None,
+            "users": {}
         }
         save_database(initial)
         return initial
@@ -204,17 +221,39 @@ def load_database():
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-            data.setdefault("current_historian", None)
-            data.setdefault("badges", [])
-            data.setdefault("completed_stories", [])
-            data.setdefault("attempted_stories", {})
-            return data
+
+        # Migración automática si venía del formato de usuario único
+        if "users" not in data:
+            users = {}
+            old_hist = data.get("current_historian")
+            if old_hist and old_hist.get("name"):
+                name = old_hist["name"].strip()
+                uid = name.lower()
+                users[uid] = {
+                    "id": uid,
+                    "name": name,
+                    "grade": str(old_hist.get("grade", "1")),
+                    "badges": data.get("badges", []),
+                    "completed_stories": data.get("completed_stories", []),
+                    "attempted_stories": data.get("attempted_stories", {}),
+                    "created_at": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                    "last_active": datetime.now().strftime("%d/%m/%Y %H:%M")
+                }
+                data["current_user"] = uid
+            else:
+                data["current_user"] = None
+
+            data["users"] = users
+            save_database(data)
+
+        data.setdefault("users", {})
+        data.setdefault("current_user", None)
+        return data
+
     except Exception:
         return {
-            "current_historian": None,
-            "badges": [],
-            "completed_stories": [],
-            "attempted_stories": {}
+            "current_user": None,
+            "users": {}
         }
 
 
@@ -223,10 +262,28 @@ def save_database(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def calculate_stats(db):
-    """Calcula el nivel, progreso y temas dominados vs no dominados."""
-    completed_ids = set(db.get("completed_stories", []))
-    attempted = db.get("attempted_stories", {})
+def get_current_user_data(db):
+    """Devuelve los datos del usuario activo o None."""
+    current_uid = db.get("current_user")
+    if not current_uid:
+        return None
+    users = db.get("users", {})
+    return users.get(current_uid) or users.get(str(current_uid).lower())
+
+
+def calculate_user_stats(user_data):
+    """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
+    if not user_data:
+        user_data = {
+            "name": "Invitado",
+            "grade": "1",
+            "badges": [],
+            "completed_stories": [],
+            "attempted_stories": {}
+        }
+
+    completed_ids = set(user_data.get("completed_stories", []))
+    attempted = user_data.get("attempted_stories", {})
 
     all_stories = []
     for grade_str, story_list in STORIES_DATA.items():
@@ -305,7 +362,10 @@ def calculate_stats(db):
             })
 
     return {
-        "historian": db.get("current_historian"),
+        "historian": {
+            "name": user_data.get("name", "Pequeño Historiador"),
+            "grade": user_data.get("grade", "1")
+        },
         "total_missions": total,
         "completed_count": completed_count,
         "percent": percent,
@@ -345,21 +405,66 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
-        if parsed.path == "/api/profile":
+        # Lista de todos los usuarios registrados con su resumen de avance
+        if parsed.path == "/api/users":
             db = load_database()
+            users_list = []
+            for uid, u in db.get("users", {}).items():
+                st = calculate_user_stats(u)
+                users_list.append({
+                    "id": uid,
+                    "name": u.get("name", uid),
+                    "grade": u.get("grade", "1"),
+                    "grade_desc": GRADE_NAMES.get(u.get("grade", "1"), f"{u.get('grade', '1')}º Primaria"),
+                    "grade_icon": GRADE_ICONS.get(u.get("grade", "1"), "🧭"),
+                    "badges_count": len(u.get("badges", [])),
+                    "completed_count": len(u.get("completed_stories", [])),
+                    "total_missions": st["total_missions"],
+                    "percent": st["percent"],
+                    "level": st["level"],
+                    "xp": st["xp"],
+                    "last_active": u.get("last_active", u.get("created_at", "Reciente"))
+                })
+
+            # Ordenar por último activo o mayor progreso
+            users_list.sort(key=lambda x: x["percent"], reverse=True)
+
             self._send_json(200, {
-                "historian": db.get("current_historian"),
-                "badges": db.get("badges", []),
-                "completed_stories": db.get("completed_stories", [])
+                "current_user": db.get("current_user"),
+                "users": users_list
             })
             return
 
+        # Perfil del usuario activo
+        if parsed.path == "/api/profile":
+            db = load_database()
+            user = get_current_user_data(db)
+            if user:
+                self._send_json(200, {
+                    "historian": {
+                        "name": user["name"],
+                        "grade": user.get("grade", "1")
+                    },
+                    "badges": user.get("badges", []),
+                    "completed_stories": user.get("completed_stories", [])
+                })
+            else:
+                self._send_json(200, {
+                    "historian": None,
+                    "badges": [],
+                    "completed_stories": []
+                })
+            return
+
+        # Estadísticas y nivel del usuario activo
         if parsed.path == "/api/stats":
             db = load_database()
-            stats = calculate_stats(db)
+            user = get_current_user_data(db)
+            stats = calculate_user_stats(user)
             self._send_json(200, stats)
             return
 
+        # Historias por grado escolar
         if parsed.path == "/api/stories":
             query = urllib.parse.parse_qs(parsed.query)
             grade = query.get("grade", ["1"])[0]
@@ -385,7 +490,37 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
 
         db = load_database()
 
-        # 1. Guardar o actualizar perfil del pequeño historiador
+        # 1. Seleccionar un usuario ya existente
+        if parsed.path == "/api/users/select":
+            user_id = str(payload.get("id") or payload.get("name", "")).strip().lower()
+            users = db.get("users", {})
+
+            found_user = None
+            for uid, u in users.items():
+                if uid == user_id or u.get("name", "").strip().lower() == user_id:
+                    found_user = u
+                    break
+
+            if not found_user:
+                self._send_json(404, {"error": "Usuario no encontrado en los registros."})
+                return
+
+            db["current_user"] = found_user["id"]
+            found_user["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+            save_database(db)
+
+            self._send_json(200, {
+                "success": True,
+                "historian": {
+                    "name": found_user["name"],
+                    "grade": found_user.get("grade", "1")
+                },
+                "badges": found_user.get("badges", []),
+                "completed_stories": found_user.get("completed_stories", [])
+            })
+            return
+
+        # 2. Registrar o actualizar perfil del pequeño historiador
         if parsed.path == "/api/profile":
             name = payload.get("name", "").strip()
             grade = str(payload.get("grade", "1"))
@@ -397,19 +532,47 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             if grade not in ["1", "2", "3", "4", "5", "6"]:
                 grade = "1"
 
-            db["current_historian"] = {
-                "name": name,
-                "grade": grade
-            }
+            uid = name.lower()
+            users = db.setdefault("users", {})
+
+            if uid in users:
+                # Si ya existe, actualizamos su grado si cambió y última actividad
+                users[uid]["grade"] = grade
+                users[uid]["name"] = name
+                users[uid]["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+            else:
+                # Nuevo pequeño historiador
+                now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+                users[uid] = {
+                    "id": uid,
+                    "name": name,
+                    "grade": grade,
+                    "badges": [],
+                    "completed_stories": [],
+                    "attempted_stories": {},
+                    "created_at": now_str,
+                    "last_active": now_str
+                }
+
+            db["current_user"] = uid
             save_database(db)
+
             self._send_json(200, {
                 "success": True,
-                "historian": db["current_historian"]
+                "historian": {
+                    "name": users[uid]["name"],
+                    "grade": users[uid]["grade"]
+                }
             })
             return
 
-        # 2. Registrar respuesta a trivia y otorgar medalla
+        # 3. Registrar respuesta a trivia en el perfil del usuario activo
         if parsed.path == "/api/complete-mission":
+            user = get_current_user_data(db)
+            if not user:
+                self._send_json(401, {"error": "No hay ningún pequeño historiador seleccionado."})
+                return
+
             story_id = payload.get("story_id")
             selected_option = payload.get("selected_option")
 
@@ -430,35 +593,54 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             correct_index = found_story["trivia"]["answer"]
             is_correct = (selected_option == correct_index)
 
-            # Registrar intento
-            db.setdefault("attempted_stories", {})
-            att = db["attempted_stories"].setdefault(story_id, {"attempts": 0, "wrong_count": 0, "correct": False})
+            # Registrar intento en el historial del usuario
+            user.setdefault("attempted_stories", {})
+            att = user["attempted_stories"].setdefault(story_id, {"attempts": 0, "wrong_count": 0, "correct": False})
             att["attempts"] = att.get("attempts", 0) + 1
 
             if is_correct:
                 att["correct"] = True
-                if story_id not in db.get("completed_stories", []):
-                    db.setdefault("completed_stories", []).append(story_id)
+                user.setdefault("completed_stories", [])
+                if story_id not in user["completed_stories"]:
+                    user["completed_stories"].append(story_id)
 
                 badge_name = f"Medalla de {found_story['period']}"
-                if badge_name not in db.get("badges", []):
-                    db.setdefault("badges", []).append(badge_name)
+                user.setdefault("badges", [])
+                if badge_name not in user["badges"]:
+                    user["badges"].append(badge_name)
             else:
                 att["wrong_count"] = att.get("wrong_count", 0) + 1
 
+            user["last_active"] = datetime.now().strftime("%d/%m/%Y %H:%M")
             save_database(db)
 
             self._send_json(200, {
                 "correct": is_correct,
                 "correct_option": correct_index,
-                "badges": db.get("badges", []),
-                "completed_stories": db.get("completed_stories", [])
+                "badges": user.get("badges", []),
+                "completed_stories": user.get("completed_stories", [])
             })
             return
 
-        # 3. Reiniciar pequeño historiador
+        # 4. Eliminar perfil de un usuario
+        if parsed.path == "/api/users/delete":
+            target_id = str(payload.get("id") or payload.get("name", "")).strip().lower()
+            users = db.get("users", {})
+
+            if target_id in users:
+                del users[target_id]
+                if db.get("current_user") == target_id:
+                    db["current_user"] = None
+                save_database(db)
+                self._send_json(200, {"success": True, "deleted": target_id})
+                return
+
+            self._send_json(404, {"error": "Usuario no encontrado"})
+            return
+
+        # 5. Salir del perfil (volver a pantalla de selección)
         if parsed.path == "/api/reset-profile":
-            db["current_historian"] = None
+            db["current_user"] = None
             save_database(db)
             self._send_json(200, {"success": True})
             return

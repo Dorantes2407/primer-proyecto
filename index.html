@@ -9,84 +9,117 @@
 <body>
     <div class="app-wrapper">
 
-        <!-- ================= PANTALLA DE INICIO (BIENVENIDA) ================= -->
+        <!-- ================= PANTALLA DE INICIO (BIENVENIDA Y SELECCIÓN DE USUARIO) ================= -->
         <main id="welcome-screen" class="screen active">
             <div class="hero-card">
                 <div class="mascot-badge">⏳ 📜 🧭</div>
                 <h1 class="hero-title">¡Historia Divertida!</h1>
-                <p class="hero-subtitle">La máquina del tiempo interactiva para aprender jugando</p>
+                <p class="hero-subtitle">La máquina del tiempo interactiva para pequeños historiadores</p>
 
                 <div class="welcome-speech-bubble">
-                    <p>👋 ¡Saludos, <strong>pequeño historiador</strong>! El reloj del tiempo está listo para viajar a épocas asombrosas: desde dinosaurios gigantes y faraones de Egipto, hasta castillos medievales y naves espaciales. ¡Dinos quién eres para preparar tu pasaporte temporal!</p>
+                    <p>👋 ¡Saludos, <strong>pequeño historiador</strong>! La máquina del tiempo guarda el avance de cada explorador. Si ya tienes un perfil guardado, selecciónalo abajo para continuar tu aventura; o si es tu primera vez, ingresa tu nombre y grado para recibir tu pasaporte histórico.</p>
                 </div>
 
-                <!-- Formulario de Ingreso -->
-                <form id="onboarding-form" class="onboarding-form">
-                    
-                    <!-- 1. Campo de Nombre o Apodo -->
-                    <div class="input-section">
-                        <label for="explorer-name" class="section-label">
-                            <span class="label-icon">👤</span> ¿Cuál es tu nombre o apodo, pequeño historiador?
-                        </label>
-                        <div class="input-with-button">
-                            <input 
-                                type="text" 
-                                id="explorer-name" 
-                                class="text-input" 
-                                placeholder="Ej. Mateo el Explorador, Valentina la Sabia..." 
-                                required
-                                autocomplete="off"
-                                maxlength="30"
-                            >
+                <!-- SECCIÓN 1: USUARIOS / HISTORIADORES YA REGISTRADOS -->
+                <section id="existing-users-panel" class="existing-users-panel hidden">
+                    <div class="existing-users-header">
+                        <div class="users-header-title">
+                            <span class="users-header-icon">🎒</span>
+                            <div>
+                                <h3>Pequeños Historiadores Registrados</h3>
+                                <p class="users-header-desc">Haz clic en tu nombre o apodo para continuar con tus medallas y nivel:</p>
+                            </div>
                         </div>
+                        <span class="users-count-badge" id="existing-users-count">0 Perfiles</span>
                     </div>
 
-                    <!-- 2. Selector de Grado Escolar (1º a 6º de Primaria) -->
-                    <div class="grade-section">
-                        <label class="section-label">
-                            <span class="label-icon">🎒</span> Selecciona tu grado escolar (1º a 6º de Primaria):
-                        </label>
-                        <div class="grade-grid" id="grade-selector-container">
-                            <button type="button" class="grade-card active" data-grade="1">
-                                <span class="grade-emoji">🦖</span>
-                                <span class="grade-name">1º Primaria</span>
-                                <span class="grade-desc">Dinosaurios y Fuego</span>
-                            </button>
-                            <button type="button" class="grade-card" data-grade="2">
-                                <span class="grade-emoji">🏺</span>
-                                <span class="grade-name">2º Primaria</span>
-                                <span class="grade-desc">Egipto y Faraones</span>
-                            </button>
-                            <button type="button" class="grade-card" data-grade="3">
-                                <span class="grade-emoji">🏛️</span>
-                                <span class="grade-name">3º Primaria</span>
-                                <span class="grade-desc">Grecia y Roma</span>
-                            </button>
-                            <button type="button" class="grade-card" data-grade="4">
-                                <span class="grade-emoji">🏰</span>
-                                <span class="grade-name">4º Primaria</span>
-                                <span class="grade-desc">Mayas y Castillos</span>
-                            </button>
-                            <button type="button" class="grade-card" data-grade="5">
-                                <span class="grade-emoji">🧭</span>
-                                <span class="grade-name">5º Primaria</span>
-                                <span class="grade-desc">Navegantes y Lagos</span>
-                            </button>
-                            <button type="button" class="grade-card" data-grade="6">
-                                <span class="grade-emoji">🚀</span>
-                                <span class="grade-name">6º Primaria</span>
-                                <span class="grade-desc">Inventos y la Luna</span>
-                            </button>
-                        </div>
-                        <input type="hidden" id="selected-grade" value="1">
+                    <!-- Cuadrícula interactiva de perfiles -->
+                    <div class="existing-users-grid" id="existing-users-list">
+                        <!-- Se llena dinámicamente con app.js -->
                     </div>
 
-                    <!-- Botón para Iniciar -->
-                    <button type="submit" class="btn btn-hero" id="btn-start-adventure">
-                        <span>¡Comenzar mi Aventura en el Tiempo!</span>
-                        <span class="btn-arrow">✨ ➔</span>
-                    </button>
-                </form>
+                    <!-- Divisor visual -->
+                    <div class="or-divider">
+                        <span class="or-line"></span>
+                        <span class="or-text">✨ O ingresa con un nuevo nombre o apodo ✨</span>
+                        <span class="or-line"></span>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN 2: FORMULARIO PARA NUEVO USUARIO / HISTORIADOR -->
+                <section class="new-user-section">
+                    <div class="new-user-header">
+                        <h3>🌟 Crear nuevo pasaporte de Pequeño Historiador</h3>
+                        <p>Escribe tu nombre o apodo y elige en qué grado escolar vas:</p>
+                    </div>
+
+                    <form id="onboarding-form" class="onboarding-form">
+                        
+                        <!-- Campo de Nombre o Apodo -->
+                        <div class="input-section">
+                            <label for="explorer-name" class="section-label">
+                                <span class="label-icon">👤</span> ¿Cuál es tu nombre o apodo, pequeño historiador?
+                            </label>
+                            <div class="input-with-button">
+                                <input 
+                                    type="text" 
+                                    id="explorer-name" 
+                                    class="text-input" 
+                                    placeholder="Ej. Mateo el Explorador, Valentina la Sabia, Leo..." 
+                                    required
+                                    autocomplete="off"
+                                    maxlength="30"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Selector de Grado Escolar (1º a 6º de Primaria) -->
+                        <div class="grade-section">
+                            <label class="section-label">
+                                <span class="label-icon">🎒</span> Selecciona tu grado escolar (1º a 6º de Primaria):
+                            </label>
+                            <div class="grade-grid" id="grade-selector-container">
+                                <button type="button" class="grade-card active" data-grade="1">
+                                    <span class="grade-emoji">🦖</span>
+                                    <span class="grade-name">1º Primaria</span>
+                                    <span class="grade-desc">Dinosaurios y Fuego</span>
+                                </button>
+                                <button type="button" class="grade-card" data-grade="2">
+                                    <span class="grade-emoji">🏺</span>
+                                    <span class="grade-name">2º Primaria</span>
+                                    <span class="grade-desc">Egipto y Faraones</span>
+                                </button>
+                                <button type="button" class="grade-card" data-grade="3">
+                                    <span class="grade-emoji">🏛️</span>
+                                    <span class="grade-name">3º Primaria</span>
+                                    <span class="grade-desc">Grecia y Roma</span>
+                                </button>
+                                <button type="button" class="grade-card" data-grade="4">
+                                    <span class="grade-emoji">🏰</span>
+                                    <span class="grade-name">4º Primaria</span>
+                                    <span class="grade-desc">Mayas y Castillos</span>
+                                </button>
+                                <button type="button" class="grade-card" data-grade="5">
+                                    <span class="grade-emoji">🧭</span>
+                                    <span class="grade-name">5º Primaria</span>
+                                    <span class="grade-desc">Navegantes y Lagos</span>
+                                </button>
+                                <button type="button" class="grade-card" data-grade="6">
+                                    <span class="grade-emoji">🚀</span>
+                                    <span class="grade-name">6º Primaria</span>
+                                    <span class="grade-desc">Inventos y la Luna</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="selected-grade" value="1">
+                        </div>
+
+                        <!-- Botón para Iniciar -->
+                        <button type="submit" class="btn btn-hero" id="btn-start-adventure">
+                            <span>¡Comenzar mi Aventura en el Tiempo!</span>
+                            <span class="btn-arrow">✨ ➔</span>
+                        </button>
+                    </form>
+                </section>
             </div>
         </main>
 
@@ -95,11 +128,11 @@
             <!-- Barra superior personalizada -->
             <header class="dashboard-header">
                 <div class="user-greeting-box">
-                    <span class="avatar-icon">🧭</span>
+                    <span class="avatar-icon" id="dashboard-user-avatar">🧭</span>
                     <div>
                         <h2>¡Hola de nuevo, pequeño historiador <span id="display-historian-name" class="highlight-name">Explorador</span>!</h2>
                         <p class="grade-status">
-                            Actualmente explorando las misiones de: <strong id="display-grade-text">1º de Primaria</strong>
+                            Grado escolar: <strong id="display-grade-text">1º de Primaria</strong> | Nivel: <strong id="display-level-text">Novato del Tiempo</strong>
                         </p>
                     </div>
                 </div>
@@ -108,13 +141,13 @@
                     <button id="btn-view-stats" class="btn btn-stats" title="Ver mis estadísticas y nivel">
                         📊 Mis Estadísticas
                     </button>
-                    <button id="btn-switch-historian" class="btn btn-secondary" title="Cambiar nombre o grado escolar">
-                        🔄 Cambiar Pequeño Historiador
+                    <button id="btn-switch-historian" class="btn btn-secondary" title="Ver lista de usuarios y cambiar de pequeño historiador">
+                        👥 Cambiar Historiador
                     </button>
                 </div>
             </header>
 
-            <!-- Vitrina de Medallas e Insignias -->
+            <!-- Vitrina de Medallas e Insignias del usuario activo -->
             <section class="badges-panel">
                 <div class="badges-header">
                     <h3>🏆 Salón de Medallas del Pequeño Historiador</h3>
@@ -127,7 +160,7 @@
 
             <!-- Navegador de Grados Escolares -->
             <nav class="grade-tabs-nav">
-                <span class="tabs-label">Viajar a otro grado:</span>
+                <span class="tabs-label">Viajar a otro grado escolar:</span>
                 <div class="tabs-list" id="dashboard-grade-tabs">
                     <button class="tab-btn active" data-grade="1">1º Primaria</button>
                     <button class="tab-btn" data-grade="2">2º Primaria</button>
@@ -158,9 +191,12 @@
                     <h2>📊 Diario Histórico de <span id="stats-historian-name" class="highlight-name">Pequeño Historiador</span></h2>
                     <p class="subtitle">Descubre tus temas dominados, los que necesitan práctica y el avance de tu nivel</p>
                 </div>
-                <div>
+                <div class="stats-header-actions">
                     <button id="btn-back-to-dashboard" class="btn btn-primary-action">
                         ⬅️ Volver a mis Relatos
+                    </button>
+                    <button id="btn-stats-switch-user" class="btn btn-secondary">
+                        👥 Cambiar Historiador
                     </button>
                 </div>
             </header>
