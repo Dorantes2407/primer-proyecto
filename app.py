@@ -1,643 +1,410 @@
 """
-Servidor local para 'Historia Divertida'
-Aplicación interactiva con soporte para Turso (LibSQL en la nube) y SQLite local.
+Módulo de Base de Datos para 'Historia Divertida' compatible con Turso (LibSQL) y SQLite local.
+Optimizado para eliminar consultas N+1 y mejorar drásticamente el rendimiento en la nube.
 """
 
-import http.server
 import json
 import os
-import socketserver
-import sys
+import sqlite3
+import urllib.error
 import urllib.parse
-import webbrowser
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-import turso_db
-
-PORT = 5000
 BASE_DIR = Path(__file__).parent.resolve()
-DATA_FILE = BASE_DIR / "data.json"
-
-# Historias y misiones educativas adaptadas por grado escolar
-STORIES_DATA = {
-    "1": [
-        {
-            "id": "1-1",
-            "title": "El Gran Viaje con los Dinosaurios",
-            "period": "Prehistoria",
-            "icon": "🦖",
-            "summary": "Hace millones de años, enormes criaturas habitaban la Tierra. ¡Descubre cómo vivía el T-Rex y el Triceratops!",
-            "fun_fact": "¿Sabías que algunos dinosaurios tenían plumas de colores brillantes?",
-            "trivia": {
-                "question": "¿Cuál de estos dinosaurios era famoso por sus 3 cuernos y un gran escudo?",
-                "options": ["Tiranosaurio Rex", "Triceratops", "Velociraptor"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "1-2",
-            "title": "La Primera Fogata de la Humanidad",
-            "period": "Edad de Piedra",
-            "icon": "🔥",
-            "summary": "Los primeros humanos aprendieron a hacer fuego frotando piedras y maderas para calentarse en las cavernas.",
-            "fun_fact": "El fuego no solo daba calor, ¡también servía para contar historias en la noche y protegerse de animales salvajes!",
-            "trivia": {
-                "question": "¿En qué lugares pintaban los primeros seres humanos a los animales?",
-                "options": ["En cuadernos de papel", "En las paredes de las cuevas", "En computadoras"],
-                "answer": 1
-            }
-        }
-    ],
-    "2": [
-        {
-            "id": "2-1",
-            "title": "El Misterio de las Pirámides y Faraones",
-            "period": "Antiguo Egipto",
-            "icon": "🏺",
-            "summary": "A orillas del río Nilo, los antiguos egipcios construyeron monumentos gigantescos que aún asombran al mundo.",
-            "fun_fact": "Los gatos eran tan sagrados en Egipto que se creía que traían buena suerte a las casas de los faraones.",
-            "trivia": {
-                "question": "¿Cómo se llamaba la escritura egipcia hecha con dibujos y símbolos?",
-                "options": ["Jeroglíficos", "Código Morse", "Alfabeto romano"],
-                "answer": 0
-            }
-        },
-        {
-            "id": "2-2",
-            "title": "Navegantes del Nilo",
-            "period": "Egipto y Comercio",
-            "icon": "⛵",
-            "summary": "Gracias a los barcos de papiro, los egipcios podían transportar trigo, piedras enormes y tesoros.",
-            "fun_fact": "El papiro fue el abuelo del papel moderno; se hacía con tallos de plantas acuáticas.",
-            "trivia": {
-                "question": "¿Cuál es el río más famoso donde floreció la civilización egipcia?",
-                "options": ["Río Amazonas", "Río Nilo", "Río Bravo"],
-                "answer": 1
-            }
-        }
-    ],
-    "3": [
-        {
-            "id": "3-1",
-            "title": "El Primer Estadio de los Juegos Olímpicos",
-            "period": "Antigua Grecia",
-            "icon": "🏛️",
-            "summary": "En la ciudad de Olimpia, los atletas competían en carreras y lanzamiento de disco en honor a los dioses griegos.",
-            "fun_fact": "A los campeones no les daban medallas de oro, ¡les colocaban coronas hechas con ramas de olivo silvestre!",
-            "trivia": {
-                "question": "¿Cada cuántos años se celebraban los Juegos Olímpicos en la antigua Grecia?",
-                "options": ["Cada 10 años", "Cada 4 años", "Cada semana"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "3-2",
-            "title": "El Coliseo y los Acueductos Romanos",
-            "period": "Imperio Romano",
-            "icon": "🛡️",
-            "summary": "Los ingenieros romanos inventaron puentes gigantes llamados acueductos para llevar agua limpia a ciudades enteras.",
-            "fun_fact": "Los romanos inventaron un tipo de concreto tan resistente que sus edificios siguen en pie después de 2,000 años.",
-            "trivia": {
-                "question": "¿Cómo se llamaba la prenda de vestir blanca que usaban los ciudadanos de Roma?",
-                "options": ["Sombraje", "Toga", "Armadura de cuero"],
-                "answer": 1
-            }
-        }
-    ],
-    "4": [
-        {
-            "id": "4-1",
-            "title": "Los Astrónomos de Chichén Itzá y Palenque",
-            "period": "Cultura Maya",
-            "icon": "🌽",
-            "summary": "Los sabios mayas contaban los días observando las estrellas y el movimiento de los planetas con asombrosa exactitud.",
-            "fun_fact": "Los mayas fueron de los primeros pueblos en inventar y utilizar el número CERO.",
-            "trivia": {
-                "question": "¿Qué bebida deliciosa y amarga preparaban con semillas de cacao?",
-                "options": ["Té de limón", "Chocolate sagrado (xocolātl)", "Jugo de naranja"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "4-2",
-            "title": "Torneos y Castillos Medievales",
-            "period": "Edad Media",
-            "icon": "🏰",
-            "summary": "Caballeros con pesadas armaduras de metal cuidaban fortalezas con puentes levadizos y altas torres vigía.",
-            "fun_fact": "Una armadura completa de caballero podía llegar a pesar más de 25 kilos.",
-            "trivia": {
-                "question": "¿Qué rodeaba los castillos para evitar que los enemigos se acercaran fácilmente?",
-                "options": ["Un foso con agua", "Una autopista", "Campos de girasoles"],
-                "answer": 0
-            }
-        }
-    ],
-    "5": [
-        {
-            "id": "5-1",
-            "title": "La Gran Tenochtitlan sobre el Lago",
-            "period": "Cultura Mexica",
-            "icon": "🦅",
-            "summary": "Una impresionante ciudad fundada sobre islotes en medio del lago de Texcoco, con calzadas, canales y chinampas flotantes.",
-            "fun_fact": "Las chinampas eran huertos flotantes donde cultivaban maíz, frijol y flores durante todo el año.",
-            "trivia": {
-                "question": "¿Qué señal vieron los mexicas para fundar su ciudad?",
-                "options": ["Un arcoíris doble", "Un águila devorando una serpiente sobre un nopal", "Un cometa de oro"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "5-2",
-            "title": "Grandes Navegantes y Nuevos Horizontes",
-            "period": "Era de las Exploraciones",
-            "icon": "🧭",
-            "summary": "Capitanes valientes cruzaron océanos desconocidos guiados por la brújula y las constelaciones marinas.",
-            "fun_fact": "Para orientarse de noche en alta mar, los marineros usaban un instrumento llamado astrolabio.",
-            "trivia": {
-                "question": "¿Qué instrumento con una aguja imantada siempre apunta hacia el Norte?",
-                "options": ["Telescopio", "Brújula", "Reloj de arena"],
-                "answer": 1
-            }
-        }
-    ],
-    "6": [
-        {
-            "id": "6-1",
-            "title": "La Revolución de las Máquinas de Vapor",
-            "period": "Revolución Industrial",
-            "icon": "🚂",
-            "summary": "El ferrocarril y las locomotoras cambiaron la forma en que los seres humanos viajaban y comerciaban en todo el planeta.",
-            "fun_fact": "Antes de los trenes, un viaje entre dos ciudades podía tardar varias semanas en diligencia o a caballo.",
-            "trivia": {
-                "question": "¿Qué elemento hacía funcionar a las primeras locomotoras de la Revolución Industrial?",
-                "options": ["Vapor de agua generado por carbón", "Baterías de litio", "Gasolina espacial"],
-                "answer": 0
-            }
-        },
-        {
-            "id": "6-2",
-            "title": "El Salto a las Estrellas: Llegada a la Luna",
-            "period": "Historia Contemporánea",
-            "icon": "🚀",
-            "summary": "En 1969, la nave Apolo 11 llevó a los primeros seres humanos a pisar la superficie de la Luna.",
-            "fun_fact": "La computadora del Apolo 11 tenía menos potencia de cálculo que cualquier reloj inteligente de hoy en día.",
-            "trivia": {
-                "question": "¿Quién fue el astronauta que pronunció la famosa frase: 'Un pequeño paso para el hombre, un gran salto para la humanidad'?",
-                "options": ["Neil Armstrong", "Galileo Galilei", "Julio Verne"],
-                "answer": 0
-            }
-        }
-    ]
-}
-
-GRADE_ICONS = {
-    "1": "🦖",
-    "2": "🏺",
-    "3": "🏛️",
-    "4": "🏰",
-    "5": "🧭",
-    "6": "🚀"
-}
-
-GRADE_NAMES = {
-    "1": "1º de Primaria",
-    "2": "2º de Primaria",
-    "3": "3º de Primaria",
-    "4": "4º de Primaria",
-    "5": "5º de Primaria",
-    "6": "6º de Primaria"
-}
+LOCAL_DB_FILE = BASE_DIR / "historia.db"
+SCHEMA_FILE = BASE_DIR / "schema.sql"
+ENV_FILE = BASE_DIR / ".env"
 
 
-def load_database():
-    """Carga los usuarios desde Turso/SQLite con respaldo en data.json."""
-    try:
-        users = turso_db.load_all_users_from_db()
-    except Exception as e:
-        print(f"Aviso al cargar de la base de datos: {e}")
-        users = {}
-
-    current_user = None
-    if DATA_FILE.exists():
+def load_env():
+    """Lee variables del archivo .env si existe."""
+    if ENV_FILE.exists():
         try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                backup = json.load(f)
-                current_user = backup.get("current_user")
-                # Si la base de datos estaba vacía, rescatamos de data.json
-                if not users and backup.get("users"):
-                    users = backup.get("users")
-        except Exception:
-            pass
-
-    return {
-        "current_user": current_user,
-        "users": users
-    }
+            with open(ENV_FILE, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        except Exception as e:
+            print(f"Aviso al leer .env: {e}")
 
 
-def save_backup(data):
-    """Guarda copia de respaldo local en data.json."""
-    try:
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"Aviso al escribir data.json: {e}")
+load_env()
+
+TURSO_URL = os.environ.get("TURSO_DATABASE_URL", "").strip()
+TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
 
 
-def get_current_user_data(db):
-    """Devuelve los datos del usuario activo o None."""
-    current_uid = db.get("current_user")
-    if not current_uid:
-        return None
-    users = db.get("users", {})
-    return users.get(current_uid) or users.get(str(current_uid).lower())
+def is_turso_configured():
+    """Verifica si las credenciales de Turso están configuradas."""
+    return bool(TURSO_URL and TURSO_TOKEN)
 
 
-def calculate_user_stats(user_data):
-    """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
-    if not user_data:
-        user_data = {
-            "name": "Invitado",
-            "grade": "1",
-            "badges": [],
-            "completed_stories": [],
-            "attempted_stories": {}
-        }
+class TursoHttpClient:
+    """Cliente HTTP ligero para Turso (LibSQL v2 pipeline) con urllib estándar."""
 
-    completed_ids = set(user_data.get("completed_stories", []))
-    attempted = user_data.get("attempted_stories", {})
+    def __init__(self, db_url, auth_token):
+        clean_url = db_url.replace("libsql://", "https://")
+        if not clean_url.startswith("http"):
+            clean_url = f"https://{clean_url}"
+        self.endpoint = f"{clean_url.rstrip('/')}/v2/pipeline"
+        self.auth_token = auth_token
 
-    all_stories = []
-    for grade_str, story_list in STORIES_DATA.items():
-        for s in story_list:
-            all_stories.append({
-                "id": s["id"],
-                "grade": grade_str,
-                "title": s["title"],
-                "period": s["period"],
-                "icon": s["icon"],
-                "trivia_question": s["trivia"]["question"]
-            })
+    def execute_batch(self, statements):
+        """Ejecuta una lista de consultas (sql, args) en Turso."""
+        requests_payload = []
+        for stmt in statements:
+            sql = stmt[0] if isinstance(stmt, (tuple, list)) else stmt
+            args = stmt[1] if isinstance(stmt, (tuple, list)) and len(stmt) > 1 else []
 
-    total = len(all_stories)
-    completed_count = len(completed_ids)
-    percent = round((completed_count / total) * 100) if total > 0 else 0
+            formatted_args = []
+            for arg in args:
+                if arg is None:
+                    formatted_args.append({"type": "null"})
+                elif isinstance(arg, int):
+                    formatted_args.append({"type": "integer", "value": str(arg)})
+                elif isinstance(arg, float):
+                    formatted_args.append({"type": "float", "value": arg})
+                else:
+                    formatted_args.append({"type": "text", "value": str(arg)})
 
-    # Sistema de niveles para el pequeño historiador
-    if completed_count == 0:
-        level_num = 1
-        level_title = "Novato del Tiempo"
-        level_icon = "🐣"
-        next_target = "Completa 1 misión histórica para subir al Nivel 2"
-    elif completed_count < 3:
-        level_num = 2
-        level_title = "Explorador Curioso"
-        level_icon = "🧭"
-        next_target = f"¡Te faltan {3 - completed_count} misión(es) para el Nivel 3!"
-    elif completed_count < 6:
-        level_num = 3
-        level_title = "Guardián de Civilizaciones"
-        level_icon = "🛡️"
-        next_target = f"¡Te faltan {6 - completed_count} misión(es) para el Nivel 4!"
-    elif completed_count < 9:
-        level_num = 4
-        level_title = "Cronista de la Historia"
-        level_icon = "📜"
-        next_target = f"¡Te faltan {9 - completed_count} misión(es) para el Nivel 5!"
-    elif completed_count < 12:
-        level_num = 5
-        level_title = "Maestro de las Eras"
-        level_icon = "🏛️"
-        next_target = f"¡Te faltan {12 - completed_count} misión(es) para el Nivel Máximo!"
-    else:
-        level_num = 6
-        level_title = "Gran Sabio del Tiempo Universal"
-        level_icon = "👑"
-        next_target = "¡Felicidades, has alcanzado la máxima maestría histórica!"
-
-    mastered = []
-    not_mastered = []
-
-    for s in all_stories:
-        sid = s["id"]
-        if sid in completed_ids:
-            mastered.append({
-                "id": s["id"],
-                "grade": s["grade"],
-                "title": s["title"],
-                "period": s["period"],
-                "icon": s["icon"],
-                "status_badge": "¡Tema Dominado! 🌟"
-            })
-        else:
-            att = attempted.get(sid, {})
-            needs_practice = att.get("wrong_count", 0) > 0
-            not_mastered.append({
-                "id": s["id"],
-                "grade": s["grade"],
-                "title": s["title"],
-                "period": s["period"],
-                "icon": s["icon"],
-                "status_type": "needs_practice" if needs_practice else "pending",
-                "status_badge": "Necesita repaso 🤔" if needs_practice else "Por explorar 🔍",
-                "reason": "Has tenido dudas en este reto" if needs_practice else "Aún no has explorado esta época"
-            })
-
-    return {
-        "historian": {
-            "name": user_data.get("name", "Pequeño Historiador"),
-            "grade": user_data.get("grade", "1")
-        },
-        "total_missions": total,
-        "completed_count": completed_count,
-        "percent": percent,
-        "xp": completed_count * 100,
-        "level": {
-            "num": level_num,
-            "title": level_title,
-            "icon": level_icon,
-            "next_target": next_target
-        },
-        "mastered": mastered,
-        "not_mastered": not_mastered
-    }
-
-
-class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(BASE_DIR), **kwargs)
-
-    def _send_json(self, status_code, payload):
-        response_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        self.send_response(status_code)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(response_bytes)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(response_bytes)
-
-    def do_GET(self):
-        parsed = urllib.parse.urlparse(self.path)
-
-        if parsed.path == "/api/status":
-            is_turso = turso_db.is_turso_configured()
-            self._send_json(200, {
-                "status": "online",
-                "app": "Historia Divertida",
-                "python_version": sys.version.split()[0],
-                "database_mode": "Turso en la Nube (LibSQL)" if is_turso else "SQLite Local (historia.db)",
-                "turso_configured": is_turso
-            })
-            return
-
-        # Lista de todos los usuarios registrados con su resumen de avance
-        if parsed.path == "/api/users":
-            db = load_database()
-            users_list = []
-            for uid, u in db.get("users", {}).items():
-                st = calculate_user_stats(u)
-                users_list.append({
-                    "id": uid,
-                    "name": u.get("name", uid),
-                    "grade": u.get("grade", "1"),
-                    "grade_desc": GRADE_NAMES.get(u.get("grade", "1"), f"{u.get('grade', '1')}º Primaria"),
-                    "grade_icon": GRADE_ICONS.get(u.get("grade", "1"), "🧭"),
-                    "badges_count": len(u.get("badges", [])),
-                    "completed_count": len(u.get("completed_stories", [])),
-                    "total_missions": st["total_missions"],
-                    "percent": st["percent"],
-                    "level": st["level"],
-                    "xp": st["xp"],
-                    "last_active": u.get("last_active", u.get("created_at", "Reciente"))
-                })
-
-            # Ordenar por mayor porcentaje completado
-            users_list.sort(key=lambda x: x["percent"], reverse=True)
-
-            self._send_json(200, {
-                "current_user": db.get("current_user"),
-                "users": users_list
-            })
-            return
-
-        # Perfil del usuario activo
-        if parsed.path == "/api/profile":
-            db = load_database()
-            user = get_current_user_data(db)
-            if user:
-                self._send_json(200, {
-                    "historian": {
-                        "name": user["name"],
-                        "grade": user.get("grade", "1")
-                    },
-                    "badges": user.get("badges", []),
-                    "completed_stories": user.get("completed_stories", [])
-                })
-            else:
-                self._send_json(200, {
-                    "historian": None,
-                    "badges": [],
-                    "completed_stories": []
-                })
-            return
-
-        # Estadísticas y nivel del usuario activo
-        if parsed.path == "/api/stats":
-            db = load_database()
-            user = get_current_user_data(db)
-            stats = calculate_user_stats(user)
-            self._send_json(200, stats)
-            return
-
-        # Historias por grado escolar
-        if parsed.path == "/api/stories":
-            query = urllib.parse.parse_qs(parsed.query)
-            grade = query.get("grade", ["1"])[0]
-            stories = STORIES_DATA.get(str(grade), STORIES_DATA["1"])
-            self._send_json(200, {"grade": grade, "stories": stories})
-            return
-
-        if parsed.path == "/":
-            self.path = "/index.html"
-
-        super().do_GET()
-
-    def do_POST(self):
-        parsed = urllib.parse.urlparse(self.path)
-        content_length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
-
-        try:
-            payload = json.loads(body)
-        except json.JSONDecodeError:
-            self._send_json(400, {"error": "JSON no válido"})
-            return
-
-        db = load_database()
-
-        # 1. Seleccionar un usuario ya existente
-        if parsed.path == "/api/users/select":
-            user_id = str(payload.get("id") or payload.get("name", "")).strip().lower()
-            users = db.get("users", {})
-
-            found_user = None
-            for uid, u in users.items():
-                if uid == user_id or u.get("name", "").strip().lower() == user_id:
-                    found_user = u
-                    break
-
-            if not found_user:
-                self._send_json(404, {"error": "Usuario no encontrado en los registros."})
-                return
-
-            db["current_user"] = found_user["id"]
-            save_backup(db)
-
-            # Actualizar última actividad en base de datos
-            turso_db.save_user_profile(found_user["name"], found_user.get("grade", "1"))
-
-            self._send_json(200, {
-                "success": True,
-                "historian": {
-                    "name": found_user["name"],
-                    "grade": found_user.get("grade", "1")
-                },
-                "badges": found_user.get("badges", []),
-                "completed_stories": found_user.get("completed_stories", [])
-            })
-            return
-
-        # 2. Registrar o actualizar perfil del pequeño historiador
-        if parsed.path == "/api/profile":
-            name = payload.get("name", "").strip()
-            grade = str(payload.get("grade", "1"))
-
-            if not name:
-                self._send_json(400, {"error": "Debes ingresar tu nombre o apodo, pequeño historiador."})
-                return
-
-            if grade not in ["1", "2", "3", "4", "5", "6"]:
-                grade = "1"
-
-            # Guardar en base de datos Turso / SQLite
-            uid = turso_db.save_user_profile(name, grade)
-
-            db["current_user"] = uid
-            # Recargar de DB y respaldar
-            db["users"] = turso_db.load_all_users_from_db()
-            save_backup(db)
-
-            self._send_json(200, {
-                "success": True,
-                "historian": {
-                    "name": name,
-                    "grade": grade
+            requests_payload.append({
+                "type": "execute",
+                "stmt": {
+                    "sql": sql,
+                    "args": formatted_args
                 }
             })
-            return
 
-        # 3. Registrar respuesta a trivia en el perfil del usuario activo
-        if parsed.path == "/api/complete-mission":
-            user = get_current_user_data(db)
-            if not user:
-                self._send_json(401, {"error": "No hay ningún pequeño historiador seleccionado."})
-                return
+        requests_payload.append({"type": "close"})
 
-            story_id = payload.get("story_id")
-            selected_option = payload.get("selected_option")
-
-            # Buscar la historia correspondiente
-            found_story = None
-            for g_stories in STORIES_DATA.values():
-                for s in g_stories:
-                    if s["id"] == story_id:
-                        found_story = s
-                        break
-                if found_story:
-                    break
-
-            if not found_story:
-                self._send_json(404, {"error": "Misión histórica no encontrada"})
-                return
-
-            correct_index = found_story["trivia"]["answer"]
-            is_correct = (selected_option == correct_index)
-
-            if is_correct:
-                badge_name = f"Medalla de {found_story['period']}"
-                turso_db.record_mission_completed(user["id"], story_id, badge_name)
-            else:
-                turso_db.record_mission_wrong(user["id"], story_id)
-
-            # Recargar estado actualizado desde la BD
-            updated_users = turso_db.load_all_users_from_db()
-            updated_user = updated_users.get(user["id"], user)
-            db["users"] = updated_users
-            save_backup(db)
-
-            self._send_json(200, {
-                "correct": is_correct,
-                "correct_option": correct_index,
-                "badges": updated_user.get("badges", []),
-                "completed_stories": updated_user.get("completed_stories", [])
-            })
-            return
-
-        # 4. Eliminar perfil de un usuario
-        if parsed.path == "/api/users/delete":
-            target_id = str(payload.get("id") or payload.get("name", "")).strip().lower()
-
-            turso_db.delete_user_from_db(target_id)
-
-            if db.get("current_user") == target_id:
-                db["current_user"] = None
-
-            db["users"] = turso_db.load_all_users_from_db()
-            save_backup(db)
-
-            self._send_json(200, {"success": True, "deleted": target_id})
-            return
-
-        # 5. Salir del perfil (volver a pantalla de selección)
-        if parsed.path == "/api/reset-profile":
-            db["current_user"] = None
-            save_backup(db)
-            self._send_json(200, {"success": True})
-            return
-
-        self._send_json(404, {"error": "Ruta no encontrada"})
-
-
-def start_server():
-    server_address = ("", PORT)
-    socketserver.TCPServer.allow_reuse_address = True
-
-    # Inicializar base de datos
-    turso_db.init_database()
-
-    is_turso = turso_db.is_turso_configured()
-    db_name = "☁️ Turso Cloud (LibSQL)" if is_turso else "📁 SQLite Local (historia.db)"
-
-    with socketserver.TCPServer(server_address, HistoryAppHandler) as httpd:
-        url = f"http://localhost:{PORT}"
-        print("=" * 65)
-        print("📜 ¡Bienvenido a Historia Divertida! 🏰✨")
-        print(f"🌟 Servidor local para Pequeños Historiadores en: {url}")
-        print(f"🗄️  Base de Datos: {db_name}")
-        if not is_turso:
-            print("💡 Para conectar con Turso en la nube, crea tu base de datos y")
-            print("   agrega tus credenciales en el archivo .env (mira .env.example)")
-        print("🛑 Presiona CTRL+C para detener el servidor")
-        print("=" * 65)
-
-        webbrowser.open(url)
+        payload_bytes = json.dumps({"requests": requests_payload}).encode("utf-8")
+        req = urllib.request.Request(
+            self.endpoint,
+            data=payload_bytes,
+            headers={
+                "Authorization": f"Bearer {self.auth_token}",
+                "Content-Type": "application/json"
+            },
+            method="POST"
+        )
 
         try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\n🛑 Servidor detenido.")
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                return result.get("results", [])
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode("utf-8", errors="ignore")
+            raise RuntimeError(f"Error HTTP en Turso ({e.code}): {err_msg}")
+        except Exception as e:
+            raise RuntimeError(f"Error de conexión con Turso: {e}")
+
+    def execute(self, sql, args=None):
+        """Ejecuta una sentencia y devuelve filas con nombres de columna."""
+        args = args or []
+        results = self.execute_batch([(sql, args)])
+        if not results:
+            return []
+
+        first_res = results[0]
+        if first_res.get("type") == "error":
+            raise RuntimeError(f"Error en sentencia SQL Turso: {first_res.get('error', {}).get('message')}")
+
+        response = first_res.get("response", {})
+        result_data = response.get("result", {})
+        cols = [c["name"] for c in result_data.get("cols", [])]
+        rows = result_data.get("rows", [])
+
+        parsed_rows = []
+        for r in rows:
+            row_dict = {}
+            for idx, col_name in enumerate(cols):
+                val_obj = r[idx] if idx < len(r) else None
+                if isinstance(val_obj, dict):
+                    val = val_obj.get("value")
+                    val_type = val_obj.get("type")
+                    if val_type == "integer" and val is not None:
+                        val = int(val)
+                    elif val_type == "float" and val is not None:
+                        val = float(val)
+                    elif val_type == "null":
+                        val = None
+                else:
+                    val = val_obj
+                row_dict[col_name] = val
+            parsed_rows.append(row_dict)
+
+        return parsed_rows
+
+
+class LocalSqliteClient:
+    """Cliente para base de datos local SQLite."""
+
+    def __init__(self, db_path=LOCAL_DB_FILE):
+        self.db_path = str(db_path)
+
+    def _get_conn(self):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON;")
+        return conn
+
+    def execute(self, sql, args=None):
+        args = args or []
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, args)
+            conn.commit()
+            if cursor.description:
+                cols = [d[0] for d in cursor.description]
+                return [dict(zip(cols, row)) for row in cursor.fetchall()]
+            return []
+
+    def execute_script(self, sql_script):
+        with self._get_conn() as conn:
+            conn.executescript(sql_script)
+            conn.commit()
+
+
+def get_db():
+    """Obtiene la instancia de cliente activa (Turso o SQLite local)."""
+    if is_turso_configured():
+        return TursoHttpClient(TURSO_URL, TURSO_TOKEN)
+    return LocalSqliteClient()
+
+
+def init_database():
+    """Inicializa las tablas en la base de datos (Turso o local)."""
+    if not SCHEMA_FILE.exists():
+        return
+
+    with open(SCHEMA_FILE, "r", encoding="utf-8") as f:
+        schema_sql = f.read()
+
+    db = get_db()
+    if isinstance(db, LocalSqliteClient):
+        db.execute_script(schema_sql)
+        print("✅ Base de datos SQLite local inicializada (historia.db)")
+    else:
+        statements = [s.strip() for s in schema_sql.split(";") if s.strip()]
+        for stmt in statements:
+            db.execute(stmt)
+        print("✅ Base de datos en la nube Turso inicializada con éxito")
+
+
+def load_all_users_from_db():
+    """Carga todos los usuarios con sus medallas, historias e intentos de forma altamente optimizada."""
+    db = get_db()
+
+    try:
+        users = db.execute("SELECT id, name, grade, created_at, last_active FROM users ORDER BY last_active DESC")
+    except Exception as e:
+        print(f"Tablas no encontradas o vacías, inicializando esquema: {e}")
+        init_database()
+        users = db.execute("SELECT id, name, grade, created_at, last_active FROM users ORDER BY last_active DESC")
+
+    if not users:
+        return {}
+
+    # 🚀 OPTIMIZACIÓN: Descargar todas las relaciones de una sola vez (evitando consultas N+1)
+    try:
+        all_badges = db.execute("SELECT user_id, badge_name FROM badges ORDER BY id ASC")
+    except Exception:
+        all_badges = []
+
+    try:
+        all_completed = db.execute("SELECT user_id, story_id FROM completed_stories ORDER BY id ASC")
+    except Exception:
+        all_completed = []
+
+    try:
+        all_attempted = db.execute("SELECT user_id, story_id, attempts, wrong_count, correct FROM attempted_stories")
+    except Exception:
+        all_attempted = []
+
+    # Agrupar medallas por usuario en memoria
+    badges_map = {}
+    for b in all_badges:
+        uid = b["user_id"]
+        badges_map.setdefault(uid, []).append(b["badge_name"])
+
+    # Agrupar historias completadas por usuario en memoria
+    completed_map = {}
+    for c in all_completed:
+        uid = c["user_id"]
+        completed_map.setdefault(uid, []).append(c["story_id"])
+
+    # Agrupar intentos por usuario en memoria
+    attempted_map = {}
+    for a in all_attempted:
+        uid = a["user_id"]
+        attempted_map.setdefault(uid, {})[a["story_id"]] = {
+            "attempts": a["attempts"],
+            "wrong_count": a["wrong_count"],
+            "correct": bool(a["correct"])
+        }
+
+    # Construir el diccionario final combinando los mapas
+    users_dict = {}
+    for u in users:
+        uid = u["id"]
+        users_dict[uid] = {
+            "id": uid,
+            "name": u["name"],
+            "grade": u["grade"],
+            "created_at": u["created_at"],
+            "last_active": u["last_active"],
+            "badges": badges_map.get(uid, []),
+            "completed_stories": completed_map.get(uid, []),
+            "attempted_stories": attempted_map.get(uid, {})
+        }
+
+    return users_dict
+
+
+def save_user_profile(name, grade):
+    """Crea o actualiza el perfil de un usuario en la base de datos."""
+    db = get_db()
+    uid = name.strip().lower()
+    now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    existing = db.execute("SELECT id, created_at FROM users WHERE id = ?", [uid])
+    if existing:
+        db.execute(
+            "UPDATE users SET name = ?, grade = ?, last_active = ? WHERE id = ?",
+            [name.strip(), grade, now_str, uid]
+        )
+    else:
+        db.execute(
+            "INSERT INTO users (id, name, grade, created_at, last_active) VALUES (?, ?, ?, ?, ?)",
+            [uid, name.strip(), grade, now_str, now_str]
+        )
+
+    return uid
+
+
+def delete_user_from_db(user_id):
+    """Elimina a un usuario y todos sus avances en cascada."""
+    db = get_db()
+    db.execute("DELETE FROM users WHERE id = ?", [user_id.strip().lower()])
+
+
+def record_mission_completed(user_id, story_id, badge_name):
+    """Registra una misión ganada y su medalla en la base de datos."""
+    db = get_db()
+    uid = user_id.strip().lower()
+    now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    db.execute(
+        "INSERT OR IGNORE INTO completed_stories (user_id, story_id, completed_at) VALUES (?, ?, ?)",
+        [uid, story_id, now_str]
+    )
+
+    db.execute(
+        "INSERT OR IGNORE INTO badges (user_id, badge_name, earned_at) VALUES (?, ?, ?)",
+        [uid, badge_name, now_str]
+    )
+
+    db.execute(
+        """
+        INSERT INTO attempted_stories (user_id, story_id, attempts, wrong_count, correct)
+        VALUES (?, ?, 1, 0, 1)
+        ON CONFLICT(user_id, story_id) DO UPDATE SET
+            attempts = attempts + 1,
+            correct = 1
+        """,
+        [uid, story_id]
+    )
+
+    db.execute("UPDATE users SET last_active = ? WHERE id = ?", [now_str, uid])
+
+
+def record_mission_wrong(user_id, story_id):
+    """Registra un intento incorrecto en la base de datos."""
+    db = get_db()
+    uid = user_id.strip().lower()
+
+    db.execute(
+        """
+        INSERT INTO attempted_stories (user_id, story_id, attempts, wrong_count, correct)
+        VALUES (?, ?, 1, 1, 0)
+        ON CONFLICT(user_id, story_id) DO UPDATE SET
+            attempts = attempts + 1,
+            wrong_count = wrong_count + 1
+        """,
+        [uid, story_id]
+    )
+
+
+def migrate_json_to_db(json_path=BASE_DIR / "data.json"):
+    """Copia los datos de data.json a Turso o SQLite local."""
+    if not Path(json_path).exists():
+        print(f"No se encontró {json_path}")
+        return
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    users = data.get("users", {})
+    if not users and data.get("current_historian"):
+        ch = data["current_historian"]
+        uid = ch["name"].strip().lower()
+        users[uid] = {
+            "id": uid,
+            "name": ch["name"],
+            "grade": ch.get("grade", "1"),
+            "created_at": "29/10/2026",
+            "last_active": datetime.now().strftime("%d/%m/%Y %H:%M"),
+            "badges": data.get("badges", []),
+            "completed_stories": data.get("completed_stories", []),
+            "attempted_stories": data.get("attempted_stories", {})
+        }
+
+    init_database()
+    db = get_db()
+
+    for uid, u in users.items():
+        name = u.get("name", uid)
+        grade = str(u.get("grade", "1"))
+        created = u.get("created_at", datetime.now().strftime("%d/%m/%Y %H:%M"))
+        last_active = u.get("last_active", datetime.now().strftime("%d/%m/%Y %H:%M"))
+
+        db.execute(
+            "INSERT OR REPLACE INTO users (id, name, grade, created_at, last_active) VALUES (?, ?, ?, ?, ?)",
+            [uid, name, grade, created, last_active]
+        )
+
+        for b in u.get("badges", []):
+            db.execute(
+                "INSERT OR IGNORE INTO badges (user_id, badge_name) VALUES (?, ?)",
+                [uid, b]
+            )
+
+        for s in u.get("completed_stories", []):
+            db.execute(
+                "INSERT OR IGNORE INTO completed_stories (user_id, story_id) VALUES (?, ?)",
+                [uid, s]
+            )
+
+        for sid, att in u.get("attempted_stories", {}).items():
+            db.execute(
+                """
+                INSERT OR REPLACE INTO attempted_stories (user_id, story_id, attempts, wrong_count, correct)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                [uid, sid, att.get("attempts", 1), att.get("wrong_count", 0), 1 if att.get("correct") else 0]
+            )
+
+    target_name = "Turso en la nube" if is_turso_configured() else "SQLite local (historia.db)"
+    print(f"🎉 Migración exitosa de {len(users)} usuario(s) a {target_name}!")
 
 
 if __name__ == "__main__":
-    start_server()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "migrate":
+        migrate_json_to_db()
+    else:
+        init_database()
