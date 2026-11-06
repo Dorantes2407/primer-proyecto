@@ -6,6 +6,7 @@
 let currentHistorian = null;
 let currentGrade = "1";
 let badges = [];
+let badgesExpanded = false;   // la vitrina arranca plegada si hay muchas medallas
 let completedStories = [];
 
 // Elementos del DOM - Pantalla de Bienvenida y Selección de Usuario
@@ -31,6 +32,8 @@ const btnSwitchHistorian = document.getElementById("btn-switch-historian");
 const btnViewStats = document.getElementById("btn-view-stats");
 const badgeCount = document.getElementById("badge-count");
 const badgesContainer = document.getElementById("badges-container");
+const badgesToggle = document.getElementById("badges-toggle");
+const badgesPanel = badgesContainer.closest(".badges-panel");
 const dashboardGradeTabs = document.querySelectorAll("#dashboard-grade-tabs .tab-btn");
 const storiesContainer = document.getElementById("stories-container");
 const serverStatus = document.getElementById("server-status");
@@ -123,12 +126,12 @@ function renderExistingUsers(users, currentUserId) {
     existingUsersPanel.classList.remove("hidden");
     existingUsersCount.textContent = `${users.length} Perfil${users.length === 1 ? '' : 'es'}`;
 
-    existingUsersList.innerHTML = users.map(user => {
+    existingUsersList.innerHTML = users.map((user, idx) => {
         const isCurrent = user.id === currentUserId;
         const icon = user.grade_icon || GRADE_ICONS[user.grade] || "🧭";
 
         return `
-            <div class="user-profile-card ${isCurrent ? 'active-user-card' : ''}" id="user-card-${user.id}">
+            <div class="user-profile-card ${isCurrent ? 'active-user-card' : ''}" id="user-card-${user.id}" style="--i:${idx}">
                 ${isCurrent ? '<span class="current-user-tag">🌟 Última Sesión</span>' : ''}
                 
                 <div class="user-card-header">
@@ -323,6 +326,12 @@ function setupEventListeners() {
     btnBackToDashboard.addEventListener("click", () => {
         showDashboard();
     });
+
+    // Plegar / desplegar la vitrina de medallas
+    badgesToggle.addEventListener("click", () => {
+        badgesExpanded = !badgesExpanded;
+        updateBadgesToggle();
+    });
 }
 
 // 9. Volver a la pantalla de selección de usuarios
@@ -356,6 +365,7 @@ function showWelcomeScreen() {
     dashboardScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     welcomeScreen.classList.add("active");
+    focusScreen(welcomeScreen);
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -363,6 +373,7 @@ async function showDashboard() {
     welcomeScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     dashboardScreen.classList.add("active");
+    focusScreen(dashboardScreen);
 
     // Actualizar saludo y datos del usuario activo
     displayHistorianName.textContent = currentHistorian.name;
@@ -400,6 +411,7 @@ function showStatsScreen() {
     welcomeScreen.classList.remove("active");
     dashboardScreen.classList.remove("active");
     statsScreen.classList.add("active");
+    focusScreen(statsScreen);
 
     statsHistorianName.textContent = currentHistorian.name;
     loadStats();
@@ -442,12 +454,13 @@ function renderStories(stories) {
         return;
     }
 
-    stories.forEach(story => {
+    stories.forEach((story, idx) => {
         const isCompleted = completedStories.includes(story.id);
 
         const card = document.createElement("article");
         card.className = `story-card ${isCompleted ? "completed-mission" : ""}`;
         card.id = `story-card-${story.id}`;
+        card.style.setProperty("--i", idx);
 
         const optionsHtml = story.trivia.options.map((opt, idx) => `
             <button 
@@ -523,6 +536,7 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             feedbackBox.classList.remove("hidden");
 
             // Marcar botón correcto y deshabilitar opciones
+            const botonElegido = optionButtons[selectedOption];
             optionButtons.forEach((b, idx) => {
                 b.disabled = true;
                 if (idx === result.correct_option) {
@@ -531,36 +545,84 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             });
 
             cardElement.classList.add("completed-mission");
+            if (botonElegido) burstParticles(cardElement, botonElegido);
 
-            // Actualizar medallas
+            // Actualizar medallas (guardamos las anteriores para estampar la nueva)
+            const medallasPrevias = badges;
             badges = result.badges || [];
             completedStories = result.completed_stories || [];
-            renderBadges();
+            renderBadges(medallasPrevias);
+
+            announce(`¡Correcto! Has ganado una medalla. Ya tienes ${formatBadgeCount(badges.length)}.`);
         } else {
             feedbackBox.className = "trivia-feedback feedback-error";
             feedbackBox.innerHTML = `🤔 <em>¡Cerca, pequeño historiador!</em> Inténtalo de nuevo o repasa el relato para encontrar la pista.`;
             feedbackBox.classList.remove("hidden");
+
+            if (!prefersReducedMotion()) {
+                cardElement.classList.add("shake-once");
+                setTimeout(() => cardElement.classList.remove("shake-once"), 400);
+            }
+
+            announce("Respuesta incorrecta. Inténtalo de nuevo o repasa el relato.");
         }
     } catch (err) {
         console.error("Error al verificar respuesta:", err);
     }
 }
 
-// 15. Renderizar vitrina de medallas del usuario activo
-function renderBadges() {
-    badgeCount.textContent = `${badges.length} Medalla${badges.length === 1 ? '' : 's'} Ganada${badges.length === 1 ? '' : 's'}`;
+// Nº de medallas que caben en una fila sin plegar
+const BADGES_VISIBLES = 4;
 
-    if (badges.length === 0) {
+// 15. Renderizar vitrina de medallas del usuario activo
+// `previousBadges` solo se pasa al resolver una trivia: sirve para estampar la recién ganada.
+function renderBadges(previousBadges = null) {
+    const nuevaMedalla = previousBadges
+        ? badges.find(badge => !previousBadges.includes(badge))
+        : null;
+
+    // Al ganar una medalla se despliega la vitrina para que se vea el sello
+    if (nuevaMedalla) badgesExpanded = true;
+
+    const total = badges.length;
+    badgeCount.textContent = formatBadgeCount(total);
+
+    if (previousBadges && total !== previousBadges.length) {
+        countUp(previousBadges.length, total);
+        announce(nuevaMedalla
+            ? `¡Nueva medalla ganada: ${nuevaMedalla}! Ya tienes ${formatBadgeCount(total)}.`
+            : `Ahora tienes ${formatBadgeCount(total)}.`);
+    }
+
+    if (total === 0) {
         badgesContainer.innerHTML = `<p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas de pequeño historiador!</p>`;
+        updateBadgesToggle();
         return;
     }
 
-    badgesContainer.innerHTML = badges.map(badge => `
-        <div class="badge-item">
+    badgesContainer.innerHTML = badges.map((badge, idx) => `
+        <div class="badge-item ${badge === nuevaMedalla ? "badge-new" : ""}" style="--i:${idx}">
             <span class="badge-icon">🏅</span>
             <span class="badge-title">${escapeHtml(badge)}</span>
         </div>
     `).join("");
+
+    updateBadgesToggle();
+}
+
+// Muestra u oculta el botón "Ver todas" y aplica el plegado
+function updateBadgesToggle() {
+    const haySuficientes = badges.length > BADGES_VISIBLES;
+
+    badgesToggle.classList.toggle("hidden", !haySuficientes);
+    badgesPanel.classList.toggle("is-collapsed", haySuficientes && !badgesExpanded);
+
+    if (!haySuficientes) return;
+
+    badgesToggle.textContent = badgesExpanded
+        ? "Ver menos ▴"
+        : `Ver todas (${badges.length}) ▾`;
+    badgesToggle.setAttribute("aria-expanded", String(badgesExpanded));
 }
 
 // 16. Cargar y renderizar la pantalla de Estadísticas y Nivel
@@ -598,8 +660,8 @@ async function loadStats() {
                 </div>
             `;
         } else {
-            masteredTopicsList.innerHTML = data.mastered.map(item => `
-                <div class="topic-item-card topic-mastered">
+            masteredTopicsList.innerHTML = data.mastered.map((item, idx) => `
+                <div class="topic-item-card topic-mastered" style="--i:${idx}">
                     <span class="topic-item-icon">${item.icon}</span>
                     <div class="topic-item-info">
                         <div class="topic-item-top">
@@ -623,10 +685,10 @@ async function loadStats() {
                 </div>
             `;
         } else {
-            notMasteredTopicsList.innerHTML = data.not_mastered.map(item => {
+            notMasteredTopicsList.innerHTML = data.not_mastered.map((item, idx) => {
                 const isNeedPractice = item.status_type === "needs_practice";
                 return `
-                    <div class="topic-item-card ${isNeedPractice ? 'topic-needs-practice' : 'topic-pending'}">
+                    <div class="topic-item-card ${isNeedPractice ? 'topic-needs-practice' : 'topic-pending'}" style="--i:${idx}">
                         <span class="topic-item-icon">${item.icon}</span>
                         <div class="topic-item-info">
                             <div class="topic-item-top">
@@ -672,4 +734,71 @@ function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+}
+
+// --- Utilidades de movimiento y accesibilidad ---
+
+function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function formatBadgeCount(total) {
+    return `${total} Medalla${total === 1 ? '' : 's'} Ganada${total === 1 ? '' : 's'}`;
+}
+
+// Sube el contador de medallas de `desde` a `hasta` en ~700 ms
+function countUp(desde, hasta) {
+    if (prefersReducedMotion() || desde === hasta) {
+        badgeCount.textContent = formatBadgeCount(hasta);
+        return;
+    }
+    const inicio = performance.now();
+    const duracion = 700;
+
+    function paso(ahora) {
+        const avance = Math.min(1, (ahora - inicio) / duracion);
+        const suave = 1 - Math.pow(1 - avance, 3);
+        badgeCount.textContent = formatBadgeCount(Math.round(desde + (hasta - desde) * suave));
+        if (avance < 1) requestAnimationFrame(paso);
+    }
+    requestAnimationFrame(paso);
+}
+
+// Aviso para lectores de pantalla
+function announce(mensaje) {
+    const region = document.getElementById("live-region");
+    if (!region) return;
+    region.textContent = "";
+    setTimeout(() => { region.textContent = mensaje; }, 50);
+}
+
+// 12 partículas de tinta saliendo del botón acertado
+function burstParticles(contenedor, origen) {
+    if (prefersReducedMotion()) return;
+
+    const caja = contenedor.getBoundingClientRect();
+    const punto = origen.getBoundingClientRect();
+
+    const burst = document.createElement("div");
+    burst.className = "particle-burst";
+    burst.style.left = `${punto.left - caja.left + punto.width / 2}px`;
+    burst.style.top = `${punto.top - caja.top + punto.height / 2}px`;
+
+    for (let i = 0; i < 12; i++) {
+        const particula = document.createElement("span");
+        particula.className = "ink-particle";
+        particula.style.setProperty("--a", `${i * 30}deg`);
+        particula.style.setProperty("--d", `${26 + Math.random() * 26}px`);
+        particula.style.animationDelay = `${Math.random() * 60}ms`;
+        burst.appendChild(particula);
+    }
+
+    contenedor.appendChild(burst);
+    setTimeout(() => burst.remove(), 900);
+}
+
+// Al cambiar de pantalla, lleva el foco al contenedor (sin robar scroll)
+function focusScreen(elemento) {
+    elemento.setAttribute("tabindex", "-1");
+    elemento.focus({ preventScroll: true });
 }

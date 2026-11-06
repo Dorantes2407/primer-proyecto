@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historia Divertida - Para Pequeños Historiadores</title>
+    <link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -125,6 +127,8 @@
 
         <!-- ================= PANTALLA PRINCIPAL (TABLERO DE AVENTURAS) ================= -->
         <main id="dashboard-screen" class="screen">
+            <!-- Bloque superior: perfil a la izquierda, salón de medallas a la derecha -->
+            <div class="dashboard-top">
             <!-- Barra superior personalizada -->
             <header class="dashboard-header">
                 <div class="user-greeting-box">
@@ -151,12 +155,19 @@
             <section class="badges-panel">
                 <div class="badges-header">
                     <h3>🏆 Salón de Medallas del Pequeño Historiador</h3>
-                    <span class="badge-counter" id="badge-count">0 Medallas Ganadas</span>
+                    <div class="badges-header-actions">
+                        <span class="badge-counter" id="badge-count">0 Medallas Ganadas</span>
+                        <button type="button" class="badges-toggle hidden" id="badges-toggle"
+                                aria-expanded="false" aria-controls="badges-container">
+                            Ver todas ▾
+                        </button>
+                    </div>
                 </div>
                 <div class="badges-list" id="badges-container">
                     <p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas!</p>
                 </div>
             </section>
+            </div>
 
             <!-- Navegador de Grados Escolares -->
             <nav class="grade-tabs-nav">
@@ -276,6 +287,9 @@
         </footer>
 
     </div>
+
+    <!-- Avisos para lectores de pantalla (nueva medalla, respuesta correcta...) -->
+    <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
 
     <script src="app.js"></script>
 </body>
