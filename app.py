@@ -19,7 +19,7 @@ PORT = 5000
 BASE_DIR = Path(__file__).parent.resolve()
 DATA_FILE = BASE_DIR / "data.json"
 
-# Historias y misiones educativas adaptadas por grado escolar (10 por grado)
+# Historias y misiones educativas adaptadas por grado escolar (100 por grado)
 STORIES_FILE = BASE_DIR / "stories.json"
 
 with open(STORIES_FILE, "r", encoding="utf-8") as f:
@@ -45,14 +45,22 @@ GRADE_NAMES = {
 }
 
 # Niveles: (misiones completadas necesarias, número, título, icono)
+# Umbrales reescalados a los 600 retos actuales (10 por cada grado).
 NIVELES = [
     (0, 1, "Novato del Tiempo", "🐣"),
-    (1, 2, "Explorador Curioso", "🧭"),
-    (5, 3, "Guardián de Civilizaciones", "🛡️"),
-    (12, 4, "Cronista de la Historia", "📜"),
-    (22, 5, "Maestro de las Eras", "🏛️"),
-    (35, 6, "Gran Sabio del Tiempo Universal", "👑"),
+    (10, 2, "Explorador Curioso", "🧭"),
+    (50, 3, "Guardián de Civilizaciones", "🛡️"),
+    (120, 4, "Cronista de la Historia", "📜"),
+    (220, 5, "Maestro de las Eras", "🏛️"),
+    (350, 6, "Gran Sabio del Tiempo Universal", "👑"),
 ]
+
+# Retos que se muestran cada día por grado: lotes de 10 que rotan a diario
+RETOS_POR_DIA = 10
+
+# Tope de temas "por explorar" que devuelve /api/stats. Con 600 retos la lista
+# completa hace la pantalla inmanejable y no aporta nada.
+TOPE_NO_DOMINADOS = 40
 
 
 def load_database():
@@ -143,6 +151,32 @@ def calculate_streak(activity_days):
     }
 
 
+def retos_del_dia(grade, fecha=None):
+    """Los retos que tocan hoy para un grado: lotes de 10 que rotan cada día."""
+    retos = STORIES_DATA.get(str(grade)) or STORIES_DATA.get("1", [])
+    if not retos:
+        return []
+
+    fecha = fecha or date.today()
+    lotes = max(1, (len(retos) + RETOS_POR_DIA - 1) // RETOS_POR_DIA)
+    inicio = (fecha.toordinal() % lotes) * RETOS_POR_DIA
+    return retos[inicio:inicio + RETOS_POR_DIA]
+
+
+def pregunta_diaria(fecha=None):
+    """Un único reto del día, sacado de la pool de todos los grados mezclados."""
+    pool = [
+        {"grade": g, "story": reto}
+        for g in sorted(STORIES_DATA)
+        for reto in STORIES_DATA[g]
+    ]
+    if not pool:
+        return None
+
+    fecha = fecha or date.today()
+    return pool[fecha.toordinal() % len(pool)]
+
+
 def calculate_user_stats(user_data):
     """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
     if not user_data:
@@ -214,6 +248,13 @@ def calculate_user_stats(user_data):
                 "reason": "Has tenido dudas en este reto" if needs_practice else "Aún no has explorado esta época"
             })
 
+    # Con 600 retos, la lista de "por explorar" se hace enorme: priorizamos el
+    # grado activo y los que necesitan repaso, y recortamos el resto.
+    grade_actual = str(user_data.get("grade", "1"))
+    not_mastered.sort(key=lambda s: (s["grade"] != grade_actual, s["status_type"] != "needs_practice"))
+    no_dominados_total = len(not_mastered)
+    not_mastered = not_mastered[:TOPE_NO_DOMINADOS]
+
     return {
         "historian": {
             "name": user_data.get("name", "Pequeño Historiador"),
@@ -231,7 +272,8 @@ def calculate_user_stats(user_data):
         },
         "streak": calculate_streak(user_data.get("activity_days", [])),
         "mastered": mastered,
-        "not_mastered": not_mastered
+        "not_mastered": not_mastered,
+        "not_mastered_total": no_dominados_total
     }
 
 
@@ -322,12 +364,17 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json(200, stats)
             return
 
-        # Historias por grado escolar
+        # Historias del día por grado escolar + pregunta diaria de todos los grados
         if parsed.path == "/api/stories":
             query = urllib.parse.parse_qs(parsed.query)
             grade = query.get("grade", ["1"])[0]
-            stories = STORIES_DATA.get(str(grade), STORIES_DATA["1"])
-            self._send_json(200, {"grade": grade, "stories": stories})
+            if grade not in STORIES_DATA:
+                grade = "1"
+            self._send_json(200, {
+                "grade": grade,
+                "stories": retos_del_dia(grade),
+                "daily": pregunta_diaria()
+            })
             return
 
         if parsed.path == "/":

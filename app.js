@@ -416,6 +416,44 @@ async function showDashboard() {
         renderStreak(null);
     }
 
+    // Pregunta diaria: un reto nuevo sacado de la pool de todos los grados
+    (async function renderDailyQuestion() {
+        try {
+            const resp = await fetch("/api/stories?grade=" + currentGrade + "&daily=1");
+            if (!resp.ok) throw new Error("Error al cargar pregunta diaria");
+            const data = await resp.json();
+
+            const panel = document.getElementById("daily-question-panel");
+            const card = document.getElementById("daily-question-card");
+            const gradeEl = document.getElementById("daily-question-grade");
+            const startBtn = document.getElementById("btn-daily-start");
+            const questionText = document.getElementById("daily-question-text");
+
+            if (!data.daily) {
+                panel.classList.add("hidden");
+                return;
+            }
+
+            const diario = data.daily;
+            gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+            questionText.textContent = diario.trivia.question;
+
+            startBtn.onclick = () => {
+                // Guardar el story_id para navegar a la trivia
+                window.location.hash = `#story-${diario.story.id}`;
+                // Navegar a la pantalla de relatos (o quedar para que app.js la detecte)
+                const storyScreen = document.getElementById("story-screen");
+                if (storyScreen) storyScreen.classList.add("active");
+                dashboardScreen.classList.remove("active");
+            };
+
+            panel.classList.remove("hidden");
+        } catch (e) {
+            console.error("Error renderizando pregunta diaria:", e);
+            document.getElementById("daily-question-panel").classList.add("hidden");
+        }
+    })();
+
     renderBadges();
     loadStories(currentGrade);
 }
