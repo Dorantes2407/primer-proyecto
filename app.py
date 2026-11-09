@@ -10,7 +10,7 @@ import socketserver
 import sys
 import urllib.parse
 import webbrowser
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import turso_db
@@ -101,6 +101,48 @@ def get_current_user_data(db):
     return users.get(current_uid) or users.get(str(current_uid).lower())
 
 
+def calculate_streak(activity_days):
+    """Racha de días consecutivos con actividad, récord histórico y días del calendario."""
+    hoy = date.today()
+    dias = {}
+
+    for item in activity_days or []:
+        try:
+            dia = datetime.strptime(str(item.get("day", "")), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            continue
+        dias[dia] = int(item.get("missions", 0))
+
+    if not dias:
+        return {"current": 0, "best": 0, "days": []}
+
+    ordenados = sorted(dias)
+
+    # Récord histórico: la secuencia más larga de días seguidos
+    best = run = 1
+    for anterior, actual in zip(ordenados, ordenados[1:]):
+        run = run + 1 if (actual - anterior).days == 1 else 1
+        best = max(best, run)
+
+    # Racha actual: sigue viva si el último día activo fue hoy o ayer
+    current = 0
+    if (hoy - ordenados[-1]).days <= 1:
+        current = 1
+        i = len(ordenados) - 1
+        while i > 0 and (ordenados[i] - ordenados[i - 1]).days == 1:
+            current += 1
+            i -= 1
+
+    return {
+        "current": current,
+        "best": best,
+        "days": [
+            {"day": dia.isoformat(), "missions": dias[dia]}
+            for dia in ordenados if (hoy - dia).days <= 365
+        ]
+    }
+
+
 def calculate_user_stats(user_data):
     """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
     if not user_data:
@@ -187,6 +229,7 @@ def calculate_user_stats(user_data):
             "icon": level_icon,
             "next_target": next_target
         },
+        "streak": calculate_streak(user_data.get("activity_days", [])),
         "mastered": mastered,
         "not_mastered": not_mastered
     }
@@ -237,6 +280,7 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                     "percent": st["percent"],
                     "level": st["level"],
                     "xp": st["xp"],
+                    "streak": st["streak"],
                     "last_active": u.get("last_active", u.get("created_at", "Reciente"))
                 })
 

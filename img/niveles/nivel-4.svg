@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Nivel 4: Cronista de la Historia">
+  <title>Nivel 4: Cronista de la Historia</title>
+  <circle cx="64" cy="64" r="60" fill="#B07A2A"/>
+  <circle cx="64" cy="64" r="52" fill="#FFFDF7" stroke="#1E2A4A" stroke-width="2.5"/>
+  <circle cx="120.0" cy="64.0" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="117.3" cy="81.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="109.3" cy="96.9" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="96.9" cy="109.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="81.3" cy="117.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="64.0" cy="120.0" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="46.7" cy="117.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="31.1" cy="109.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="18.7" cy="96.9" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="10.7" cy="81.3" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="8.0" cy="64.0" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="10.7" cy="46.7" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="18.7" cy="31.1" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="31.1" cy="18.7" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="46.7" cy="10.7" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="64.0" cy="8.0" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="81.3" cy="10.7" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="96.9" cy="18.7" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="109.3" cy="31.1" r="1.15" fill="#1E2A4A" opacity=".32"/><circle cx="117.3" cy="46.7" r="1.15" fill="#1E2A4A" opacity=".32"/>
+
+  <!-- Pluma sobre pergamino -->
+  <rect x="32" y="74" width="64" height="20" rx="5" fill="#FFFDF7" stroke="#1E2A4A" stroke-width="3"/>
+  <path d="M41 81h46M41 88h34" stroke="#1E2A4A" stroke-width="2" opacity=".45" stroke-linecap="round"/>
+  <path d="M88 28c-11 1-24 11-31 28-5 11-7 19-6 26 7-1 15-3 23-9 14-10 16-26 14-45z" fill="#E4572E" stroke="#1E2A4A" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M86 33L57 76" stroke="#1E2A4A" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

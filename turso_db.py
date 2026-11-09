@@ -225,6 +225,11 @@ def load_all_users_from_db():
     except Exception:
         all_attempted = []
 
+    try:
+        all_activity = db.execute("SELECT user_id, day, missions FROM activity_days ORDER BY day ASC")
+    except Exception:
+        all_activity = []
+
     # Agrupar medallas por usuario en memoria
     badges_map = {}
     for b in all_badges:
@@ -247,6 +252,14 @@ def load_all_users_from_db():
             "correct": bool(a["correct"])
         }
 
+    # Agrupar días con actividad (racha y calendario de calor)
+    activity_map = {}
+    for a in all_activity:
+        activity_map.setdefault(a["user_id"], []).append({
+            "day": a["day"],
+            "missions": a["missions"]
+        })
+
     # Construir el diccionario final combinando los mapas
     users_dict = {}
     for u in users:
@@ -259,10 +272,33 @@ def load_all_users_from_db():
             "last_active": u["last_active"],
             "badges": badges_map.get(uid, []),
             "completed_stories": completed_map.get(uid, []),
-            "attempted_stories": attempted_map.get(uid, {})
+            "attempted_stories": attempted_map.get(uid, {}),
+            "activity_days": activity_map.get(uid, [])
         }
 
     return users_dict
+
+
+def register_activity(user_id):
+    """Marca el día de hoy como día activo: es lo que enciende y mantiene la racha."""
+    db = get_db()
+
+    db.execute(
+        "INSERT OR IGNORE INTO activity_days (user_id, day, missions) VALUES (?, ?, 0)",
+        [user_id.strip().lower(), datetime.now().strftime("%Y-%m-%d")]
+    )
+
+
+def add_mission_activity(user_id):
+    """Suma una misión al contador de calor del día de hoy."""
+    uid = user_id.strip().lower()
+    register_activity(uid)
+
+    db = get_db()
+    db.execute(
+        "UPDATE activity_days SET missions = missions + 1 WHERE user_id = ? AND day = ?",
+        [uid, datetime.now().strftime("%Y-%m-%d")]
+    )
 
 
 def save_user_profile(name, grade):
@@ -282,6 +318,9 @@ def save_user_profile(name, grade):
             "INSERT INTO users (id, name, grade, created_at, last_active) VALUES (?, ?, ?, ?, ?)",
             [uid, name.strip(), grade, now_str, now_str]
         )
+
+    # Iniciar sesión con este perfil cuenta como día activo (racha)
+    register_activity(uid)
 
     return uid
 
@@ -320,6 +359,9 @@ def record_mission_completed(user_id, story_id, badge_name):
     )
 
     db.execute("UPDATE users SET last_active = ? WHERE id = ?", [now_str, uid])
+
+    # El calendario de calor cuenta las misiones completadas del día
+    add_mission_activity(uid)
 
 
 def record_mission_wrong(user_id, story_id):

@@ -43,10 +43,20 @@ CREATE TABLE IF NOT EXISTS attempted_stories (
     UNIQUE(user_id, story_id)
 );
 
+-- 5. Días con actividad (racha y calendario de calor)
+CREATE TABLE IF NOT EXISTS activity_days (
+    user_id TEXT NOT NULL,
+    day TEXT NOT NULL,                         -- Fecha local en formato YYYY-MM-DD
+    missions INTEGER NOT NULL DEFAULT 0,       -- Misiones completadas ese día
+    PRIMARY KEY (user_id, day),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Índices para optimizar consultas rápidas
 CREATE INDEX IF NOT EXISTS idx_badges_user ON badges(user_id);
 CREATE INDEX IF NOT EXISTS idx_completed_user ON completed_stories(user_id);
 CREATE INDEX IF NOT EXISTS idx_attempted_user ON attempted_stories(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_days(user_id);
 
 -- ========================================================
 -- DATOS INICIALES (MIGRACIÓN DE EJEMPLO DE 'DAYA')

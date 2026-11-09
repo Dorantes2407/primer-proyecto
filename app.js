@@ -7,6 +7,7 @@ let currentHistorian = null;
 let currentGrade = "1";
 let badges = [];
 let badgesExpanded = false;   // la vitrina arranca plegada si hay muchas medallas
+let badgesAutoCollapse = null; // temporizador del plegado automático tras ganar
 let completedStories = [];
 
 // Elementos del DOM - Pantalla de Bienvenida y Selección de Usuario
@@ -37,6 +38,10 @@ const badgesPanel = badgesContainer.closest(".badges-panel");
 const dashboardGradeTabs = document.querySelectorAll("#dashboard-grade-tabs .tab-btn");
 const storiesContainer = document.getElementById("stories-container");
 const serverStatus = document.getElementById("server-status");
+const streakCurrent = document.getElementById("streak-current");
+const streakCurrentLabel = document.getElementById("streak-current-label");
+const streakBest = document.getElementById("streak-best");
+const streakGrid = document.getElementById("streak-grid");
 
 // Elementos del DOM - Pantalla de Estadísticas
 const btnBackToDashboard = document.getElementById("btn-back-to-dashboard");
@@ -148,7 +153,7 @@ function renderExistingUsers(users, currentUserId) {
                 <!-- Nivel e insignias -->
                 <div class="user-card-level-row">
                     <span class="user-level-badge">
-                        ${user.level.icon} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
+                        ${levelSeal(user.level.num)} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
                     </span>
                 </div>
 
@@ -252,6 +257,8 @@ function setupGradeCardSelection() {
             card.classList.add("active");
             const grade = card.dataset.grade;
             selectedGradeInput.value = grade;
+            // Vista previa: el fondo también responde en la pantalla de bienvenida
+            applyGradeTheme(grade);
         });
     });
 }
@@ -329,6 +336,7 @@ function setupEventListeners() {
 
     // Plegar / desplegar la vitrina de medallas
     badgesToggle.addEventListener("click", () => {
+        clearTimeout(badgesAutoCollapse);   // el usuario manda: sin plegado automático
         badgesExpanded = !badgesExpanded;
         updateBadgesToggle();
     });
@@ -383,6 +391,9 @@ async function showDashboard() {
     const avatarEmoji = GRADE_ICONS[currentGrade] || "🧭";
     dashboardUserAvatar.textContent = avatarEmoji;
 
+    // El fondo se funde con la época del grado activo
+    applyGradeTheme(currentGrade);
+
     // Sincronizar pestaña activa
     dashboardGradeTabs.forEach(tab => {
         if (tab.dataset.grade === currentGrade) {
@@ -397,10 +408,12 @@ async function showDashboard() {
         const statsRes = await fetch("/api/stats");
         if (statsRes.ok) {
             const statsData = await statsRes.json();
-            displayLevelText.textContent = `${statsData.level.icon} Nivel ${statsData.level.num}: ${statsData.level.title}`;
+            displayLevelText.innerHTML = `${levelSeal(statsData.level.num)} Nivel ${statsData.level.num}: ${escapeHtml(statsData.level.title)}`;
+            renderStreak(statsData.streak);
         }
     } catch (e) {
         displayLevelText.textContent = "Novato del Tiempo";
+        renderStreak(null);
     }
 
     renderBadges();
@@ -418,8 +431,14 @@ function showStatsScreen() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// 11b. Fondo de la época: los colores viven en style.css (body[data-grade])
+function applyGradeTheme(grade) {
+    document.body.dataset.grade = String(grade || "1");
+}
+
 // 12. Cargar relatos y trivias por grado escolar
 async function loadStories(grade, targetStoryId = null) {
+    applyGradeTheme(grade);
     storiesContainer.innerHTML = `<div class="loading-state">⏳ Viajando en el tiempo al grado ${grade}º...</div>`;
 
     try {
@@ -574,6 +593,9 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
 // Nº de medallas que caben en una fila sin plegar
 const BADGES_VISIBLES = 4;
 
+// Tiempo que la vitrina queda abierta tras ganar una medalla antes de plegarse sola
+const BADGES_AUTOCOLLAPSE_MS = 6000;
+
 // 15. Renderizar vitrina de medallas del usuario activo
 // `previousBadges` solo se pasa al resolver una trivia: sirve para estampar la recién ganada.
 function renderBadges(previousBadges = null) {
@@ -581,8 +603,15 @@ function renderBadges(previousBadges = null) {
         ? badges.find(badge => !previousBadges.includes(badge))
         : null;
 
-    // Al ganar una medalla se despliega la vitrina para que se vea el sello
-    if (nuevaMedalla) badgesExpanded = true;
+    // Al ganar una medalla se despliega la vitrina un momento y se vuelve a plegar sola
+    if (nuevaMedalla) {
+        badgesExpanded = true;
+        clearTimeout(badgesAutoCollapse);
+        badgesAutoCollapse = setTimeout(() => {
+            badgesExpanded = false;
+            updateBadgesToggle();
+        }, BADGES_AUTOCOLLAPSE_MS);
+    }
 
     const total = badges.length;
     badgeCount.textContent = formatBadgeCount(total);
@@ -617,12 +646,69 @@ function updateBadgesToggle() {
     badgesToggle.classList.toggle("hidden", !haySuficientes);
     badgesPanel.classList.toggle("is-collapsed", haySuficientes && !badgesExpanded);
 
-    if (!haySuficientes) return;
+    if (!haySuficientes) {
+        clearTimeout(badgesAutoCollapse);
+        return;
+    }
 
     badgesToggle.textContent = badgesExpanded
         ? "Ver menos ▴"
         : `Ver todas (${badges.length}) ▾`;
     badgesToggle.setAttribute("aria-expanded", String(badgesExpanded));
+}
+
+// 15b. Racha de días seguidos y calendario de calor (8 semanas, estilo GitHub)
+const STREAK_WEEKS = 8;
+
+function renderStreak(streak) {
+    const actual = streak?.current || 0;
+    const record = streak?.best || 0;
+
+    streakCurrent.textContent = actual;
+    streakCurrentLabel.textContent = actual === 1 ? "día seguido" : "días seguidos";
+    streakBest.textContent = record;
+
+    const porDia = new Map((streak?.days || []).map(d => [d.day, d.missions]));
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const diaSemana = (hoy.getDay() + 6) % 7;   // 0 = lunes
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() - diaSemana - (STREAK_WEEKS - 1) * 7);
+
+    const clave = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const hoyClave = clave(hoy);
+
+    const celdas = [];
+    for (let i = 0; i < STREAK_WEEKS * 7; i++) {
+        const dia = new Date(inicio);
+        dia.setDate(inicio.getDate() + i);
+
+        const fecha = clave(dia);
+        const futuro = dia > hoy;
+        const misiones = porDia.get(fecha);
+        // 0 = no entró · 1 = entró sin misiones · 2-4 = 1, 2 y 3+ misiones
+        const nivel = misiones === undefined ? 0 : Math.min(4, misiones + 1);
+
+        let etiqueta = "";
+        if (!futuro) {
+            const fechaTexto = dia.toLocaleDateString("es", { day: "numeric", month: "short" });
+            const actividad = misiones === undefined
+                ? "sin actividad"
+                : misiones === 0
+                    ? "entró sin completar misiones"
+                    : `${misiones} misión${misiones === 1 ? "" : "es"}`;
+            etiqueta = ` title="${fechaTexto} · ${actividad}"`;
+        }
+
+        const clases = ["streak-cell"];
+        if (futuro) clases.push("is-future");
+        else if (fecha === hoyClave) clases.push("is-today");
+
+        celdas.push(`<span class="${clases.join(" ")}" data-level="${nivel}" style="--i:${i}"${etiqueta}></span>`);
+    }
+
+    streakGrid.innerHTML = celdas.join("");
 }
 
 // 16. Cargar y renderizar la pantalla de Estadísticas y Nivel
@@ -634,7 +720,7 @@ async function loadStats() {
         const data = await response.json();
 
         // 1. Nivel y Puntos
-        statsLevelIcon.textContent = data.level.icon;
+        statsLevelIcon.innerHTML = levelSeal(data.level.num);
         statsLevelTitle.textContent = `Nivel ${data.level.num}: ${data.level.title}`;
         statsXpValue.textContent = `${data.xp} ⭐`;
         statsNextTarget.textContent = data.level.next_target;
@@ -726,6 +812,11 @@ async function loadStats() {
     } catch (err) {
         console.error("Error al cargar estadísticas:", err);
     }
+}
+
+// Sello del nivel: SVG local en img/niveles (sin red)
+function levelSeal(num) {
+    return `<img class="level-seal" src="img/niveles/nivel-${num}.svg" alt="" width="128" height="128">`;
 }
 
 // Función auxiliar para escapar texto en HTML

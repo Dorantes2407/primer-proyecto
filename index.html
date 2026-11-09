@@ -166,6 +166,22 @@
                 <div class="badges-list" id="badges-container">
                     <p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas!</p>
                 </div>
+
+                <!-- Racha de días seguidos y calendario de calor (al costado, bajo las medallas) -->
+                <div class="streak-panel">
+                    <div class="streak-summary">
+                        <span class="streak-flame" aria-hidden="true">🔥</span>
+                        <div>
+                            <h3 class="streak-title">
+                                <span id="streak-current">0</span>
+                                <span id="streak-current-label">días seguidos</span>
+                            </h3>
+                            <p class="streak-best">Récord: <strong id="streak-best">0</strong> días</p>
+                        </div>
+                    </div>
+                    <div class="streak-grid" id="streak-grid"
+                         role="img" aria-label="Calendario de actividad de las últimas 8 semanas"></div>
+                </div>
             </section>
             </div>
 
@@ -216,7 +232,7 @@
             <section class="level-card">
                 <div class="level-card-top">
                     <div class="level-badge-container">
-                        <span class="level-icon" id="stats-level-icon">🐣</span>
+                        <span class="level-icon" id="stats-level-icon"><img class="level-seal" src="img/niveles/nivel-1.svg" alt="" width="128" height="128"></span>
                         <div>
                             <span class="level-title-label">Nivel del Pequeño Historiador</span>
                             <h3 class="level-title" id="stats-level-title">Nivel 1: Novato del Tiempo</h3>
