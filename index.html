@@ -199,7 +199,7 @@
             </nav>
 
             <!-- Pregunta diaria -->
-            <div class="daily-question-panel" id="daily-question-panel">
+            <div class="daily-question-panel" id="daily-question-panel" hidden>
                 <div class="daily-question-header">
                     <span class="daily-question-icon" aria-hidden="true">📅</span>
                     <h4 class="daily-question-title">🎯 Pregunta del día</h4>
@@ -210,6 +210,10 @@
                     <button class="btn btn-daily-answer" id="btn-daily-start">Empezar reto</button>
                 </div>
             </div>
+            <!-- FAB: Botón flotante de pregunta del día -->
+            <button class="fab-daily" id="fab-daily" aria-label="Pregunta del día" title="Pregunta del día">
+                <span aria-hidden="true">📅</span>
+            </button>
 
             <!-- Misiones y Relatos Históricos -->
             <section class="stories-section">

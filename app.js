@@ -415,44 +415,8 @@ async function showDashboard() {
         displayLevelText.textContent = "Novato del Tiempo";
         renderStreak(null);
     }
+    initDailyFAB();
 
-    // Pregunta diaria: un reto nuevo sacado de la pool de todos los grados
-    (async function renderDailyQuestion() {
-        try {
-            const resp = await fetch("/api/stories?grade=" + currentGrade + "&daily=1");
-            if (!resp.ok) throw new Error("Error al cargar pregunta diaria");
-            const data = await resp.json();
-
-            const panel = document.getElementById("daily-question-panel");
-            const card = document.getElementById("daily-question-card");
-            const gradeEl = document.getElementById("daily-question-grade");
-            const startBtn = document.getElementById("btn-daily-start");
-            const questionText = document.getElementById("daily-question-text");
-
-            if (!data.daily) {
-                panel.classList.add("hidden");
-                return;
-            }
-
-            const diario = data.daily;
-            gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
-            questionText.textContent = diario.trivia.question;
-
-            startBtn.onclick = () => {
-                // Guardar el story_id para navegar a la trivia
-                window.location.hash = `#story-${diario.story.id}`;
-                // Navegar a la pantalla de relatos (o quedar para que app.js la detecte)
-                const storyScreen = document.getElementById("story-screen");
-                if (storyScreen) storyScreen.classList.add("active");
-                dashboardScreen.classList.remove("active");
-            };
-
-            panel.classList.remove("hidden");
-        } catch (e) {
-            console.error("Error renderizando pregunta diaria:", e);
-            document.getElementById("daily-question-panel").classList.add("hidden");
-        }
-    })();
 
     renderBadges();
     loadStories(currentGrade);
@@ -930,4 +894,85 @@ function burstParticles(contenedor, origen) {
 function focusScreen(elemento) {
     elemento.setAttribute("tabindex", "-1");
     elemento.focus({ preventScroll: true });
+}
+
+/* ========================================================
+   FAB: Inicializar botón flotante de pregunta del día
+   ======================================================== */
+
+function initDailyFAB() {
+    const fab = document.getElementById("fab-daily");
+    const panel = document.getElementById("daily-question-panel");
+    const fabPanel = document.querySelector(".fab-panel");
+
+    if (!fab || !panel) return;
+
+    let dailyData = null;
+
+    // Mostrar u ocultar panel cuando se hace FAB
+    fab.onclick = async () => {
+        if (dailyData) {
+            // Ya tenemos los datos, solo mostramos/ocultamos el panel
+            if (fabPanel) {
+                fabPanel.classList.toggle("active");
+            }
+            panel.hidden = !panel.hidden;
+            return;
+        }
+
+        // Fetch la pregunta diaria
+        try {
+            const resp = await fetch("/api/stories?grade=" + currentGrade + "&daily=1");
+            if (!resp.ok) throw new Error("Error al cargar pregunta diaria");
+            const data = await resp.json();
+
+            dailyData = data;
+
+            if (!data.daily) {
+                panel.hidden = true;
+                if (fabPanel) fabPanel.classList.remove("active");
+                return;
+            }
+
+            const diario = data.daily;
+            // Llenar el panel
+            const gradeEl = panel.querySelector("#daily-question-grade") || document.createElement("p");
+            gradeEl.id = "daily-question-grade";
+            gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+            // Asegurarnos de que gradeEl esté en el DOM
+            const existingGrade = document.getElementById("daily-question-grade");
+            if (!existingGrade) {
+                const p = document.createElement("p");
+                p.id = "daily-question-grade";
+                p.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+                panel.querySelector(".daily-question-card").prepend(p);
+            }
+
+            const qtxt = panel.querySelector("#daily-question-text") || document.createElement("p");
+            qtxt.id = "daily-question-text";
+            qtxt.textContent = diario.trivia.question;
+            if (!existingGrade) panel.querySelector(".daily-question-card").prepend(qtxt);
+
+            // Botón empezar
+            const startBtn = panel.querySelector("#btn-daily-start");
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    window.location.hash = `#story-${diario.story.id}`;
+                    const storyScreen = document.getElementById("story-screen");
+                    if (storyScreen) storyScreen.classList.add("active");
+                    dashboardScreen.classList.remove("active");
+                    panel.hidden = true;
+                    if (fabPanel) fabPanel.classList.remove("active");
+                };
+            }
+
+            // Mostrar panel FAB y panel principal
+            panel.hidden = false;
+            if (fabPanel) fabPanel.classList.add("active");
+        } catch (e) {
+            console.error("Error obteniendo pregunta diaria:", e);
+            panel.hidden = true;
+            if (fabPanel) fabPanel.classList.remove("active");
+        }
+    };
 }

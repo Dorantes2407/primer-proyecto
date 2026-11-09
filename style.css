@@ -2052,3 +2052,72 @@ body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y moder
         font-size: 0.8rem;
     }
 }
+
+/* ========================================================
+   FAB: Botón flotante de pregunta del día
+   ======================================================== */
+
+.fab-daily {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    transition: transform 150ms var(--ease-out);
+    flex-shrink: 0;
+}
+
+.fab-daily:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+.fab-daily:active {
+    transform: scale(0.95);
+}
+
+/* Panel modal que aparece al hacer FAB */
+.fab-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    max-width: 90vw;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1rem 1.5rem;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 150ms var(--ease-out), visibility 150ms var(--ease-out);
+}
+
+.fab-panel.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 560px) {
+    .fab-daily {
+        bottom: 10px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+    }
+    .fab-panel {
+        bottom: 55px;
+        right: 10px;
+        width: calc(100vw - 20px);
+        max-width: none;
+        padding: 0.75rem;
+    }
+}
