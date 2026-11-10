@@ -19,3 +19,14 @@ ENV/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Salidas locales de graphify (no se suben)
+graphify-out/
+graphify-out.bak/
+
+# Instrucciones locales de agentes (no se suben)
+AGENTS.md
+claude.md
+
+# Artefactos locales varios
+mcp_security.log

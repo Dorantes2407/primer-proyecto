@@ -6,6 +6,8 @@
 let currentHistorian = null;
 let currentGrade = "1";
 let badges = [];
+let badgesExpanded = false;   // la vitrina arranca plegada si hay muchas medallas
+let badgesAutoCollapse = null; // temporizador del plegado automático tras ganar
 let completedStories = [];
 
 // Elementos del DOM - Pantalla de Bienvenida y Selección de Usuario
@@ -31,9 +33,15 @@ const btnSwitchHistorian = document.getElementById("btn-switch-historian");
 const btnViewStats = document.getElementById("btn-view-stats");
 const badgeCount = document.getElementById("badge-count");
 const badgesContainer = document.getElementById("badges-container");
+const badgesToggle = document.getElementById("badges-toggle");
+const badgesPanel = badgesContainer.closest(".badges-panel");
 const dashboardGradeTabs = document.querySelectorAll("#dashboard-grade-tabs .tab-btn");
 const storiesContainer = document.getElementById("stories-container");
 const serverStatus = document.getElementById("server-status");
+const streakCurrent = document.getElementById("streak-current");
+const streakCurrentLabel = document.getElementById("streak-current-label");
+const streakBest = document.getElementById("streak-best");
+const streakGrid = document.getElementById("streak-grid");
 
 // Elementos del DOM - Pantalla de Estadísticas
 const btnBackToDashboard = document.getElementById("btn-back-to-dashboard");
@@ -123,12 +131,12 @@ function renderExistingUsers(users, currentUserId) {
     existingUsersPanel.classList.remove("hidden");
     existingUsersCount.textContent = `${users.length} Perfil${users.length === 1 ? '' : 'es'}`;
 
-    existingUsersList.innerHTML = users.map(user => {
+    existingUsersList.innerHTML = users.map((user, idx) => {
         const isCurrent = user.id === currentUserId;
         const icon = user.grade_icon || GRADE_ICONS[user.grade] || "🧭";
 
         return `
-            <div class="user-profile-card ${isCurrent ? 'active-user-card' : ''}" id="user-card-${user.id}">
+            <div class="user-profile-card ${isCurrent ? 'active-user-card' : ''}" id="user-card-${user.id}" style="--i:${idx}">
                 ${isCurrent ? '<span class="current-user-tag">🌟 Última Sesión</span>' : ''}
                 
                 <div class="user-card-header">
@@ -145,7 +153,7 @@ function renderExistingUsers(users, currentUserId) {
                 <!-- Nivel e insignias -->
                 <div class="user-card-level-row">
                     <span class="user-level-badge">
-                        ${user.level.icon} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
+                        ${levelSeal(user.level.num)} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
                     </span>
                 </div>
 
@@ -249,6 +257,8 @@ function setupGradeCardSelection() {
             card.classList.add("active");
             const grade = card.dataset.grade;
             selectedGradeInput.value = grade;
+            // Vista previa: el fondo también responde en la pantalla de bienvenida
+            applyGradeTheme(grade);
         });
     });
 }
@@ -323,6 +333,13 @@ function setupEventListeners() {
     btnBackToDashboard.addEventListener("click", () => {
         showDashboard();
     });
+
+    // Plegar / desplegar la vitrina de medallas
+    badgesToggle.addEventListener("click", () => {
+        clearTimeout(badgesAutoCollapse);   // el usuario manda: sin plegado automático
+        badgesExpanded = !badgesExpanded;
+        updateBadgesToggle();
+    });
 }
 
 // 9. Volver a la pantalla de selección de usuarios
@@ -356,6 +373,7 @@ function showWelcomeScreen() {
     dashboardScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     welcomeScreen.classList.add("active");
+    focusScreen(welcomeScreen);
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -363,6 +381,7 @@ async function showDashboard() {
     welcomeScreen.classList.remove("active");
     statsScreen.classList.remove("active");
     dashboardScreen.classList.add("active");
+    focusScreen(dashboardScreen);
 
     // Actualizar saludo y datos del usuario activo
     displayHistorianName.textContent = currentHistorian.name;
@@ -371,6 +390,9 @@ async function showDashboard() {
     // Avatar del grado escolar
     const avatarEmoji = GRADE_ICONS[currentGrade] || "🧭";
     dashboardUserAvatar.textContent = avatarEmoji;
+
+    // El fondo se funde con la época del grado activo
+    applyGradeTheme(currentGrade);
 
     // Sincronizar pestaña activa
     dashboardGradeTabs.forEach(tab => {
@@ -386,11 +408,15 @@ async function showDashboard() {
         const statsRes = await fetch("/api/stats");
         if (statsRes.ok) {
             const statsData = await statsRes.json();
-            displayLevelText.textContent = `${statsData.level.icon} Nivel ${statsData.level.num}: ${statsData.level.title}`;
+            displayLevelText.innerHTML = `${levelSeal(statsData.level.num)} Nivel ${statsData.level.num}: ${escapeHtml(statsData.level.title)}`;
+            renderStreak(statsData.streak);
         }
     } catch (e) {
         displayLevelText.textContent = "Novato del Tiempo";
+        renderStreak(null);
     }
+    initDailyFAB();
+
 
     renderBadges();
     loadStories(currentGrade);
@@ -400,14 +426,21 @@ function showStatsScreen() {
     welcomeScreen.classList.remove("active");
     dashboardScreen.classList.remove("active");
     statsScreen.classList.add("active");
+    focusScreen(statsScreen);
 
     statsHistorianName.textContent = currentHistorian.name;
     loadStats();
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// 11b. Fondo de la época: los colores viven en style.css (body[data-grade])
+function applyGradeTheme(grade) {
+    document.body.dataset.grade = String(grade || "1");
+}
+
 // 12. Cargar relatos y trivias por grado escolar
 async function loadStories(grade, targetStoryId = null) {
+    applyGradeTheme(grade);
     storiesContainer.innerHTML = `<div class="loading-state">⏳ Viajando en el tiempo al grado ${grade}º...</div>`;
 
     try {
@@ -442,12 +475,13 @@ function renderStories(stories) {
         return;
     }
 
-    stories.forEach(story => {
+    stories.forEach((story, idx) => {
         const isCompleted = completedStories.includes(story.id);
 
         const card = document.createElement("article");
         card.className = `story-card ${isCompleted ? "completed-mission" : ""}`;
         card.id = `story-card-${story.id}`;
+        card.style.setProperty("--i", idx);
 
         const optionsHtml = story.trivia.options.map((opt, idx) => `
             <button 
@@ -523,6 +557,7 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             feedbackBox.classList.remove("hidden");
 
             // Marcar botón correcto y deshabilitar opciones
+            const botonElegido = optionButtons[selectedOption];
             optionButtons.forEach((b, idx) => {
                 b.disabled = true;
                 if (idx === result.correct_option) {
@@ -531,36 +566,151 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             });
 
             cardElement.classList.add("completed-mission");
+            if (botonElegido) burstParticles(cardElement, botonElegido);
 
-            // Actualizar medallas
+            // Actualizar medallas (guardamos las anteriores para estampar la nueva)
+            const medallasPrevias = badges;
             badges = result.badges || [];
             completedStories = result.completed_stories || [];
-            renderBadges();
+            renderBadges(medallasPrevias);
+
+            announce(`¡Correcto! Has ganado una medalla. Ya tienes ${formatBadgeCount(badges.length)}.`);
         } else {
             feedbackBox.className = "trivia-feedback feedback-error";
             feedbackBox.innerHTML = `🤔 <em>¡Cerca, pequeño historiador!</em> Inténtalo de nuevo o repasa el relato para encontrar la pista.`;
             feedbackBox.classList.remove("hidden");
+
+            if (!prefersReducedMotion()) {
+                cardElement.classList.add("shake-once");
+                setTimeout(() => cardElement.classList.remove("shake-once"), 400);
+            }
+
+            announce("Respuesta incorrecta. Inténtalo de nuevo o repasa el relato.");
         }
     } catch (err) {
         console.error("Error al verificar respuesta:", err);
     }
 }
 
-// 15. Renderizar vitrina de medallas del usuario activo
-function renderBadges() {
-    badgeCount.textContent = `${badges.length} Medalla${badges.length === 1 ? '' : 's'} Ganada${badges.length === 1 ? '' : 's'}`;
+// Nº de medallas que caben en una fila sin plegar
+const BADGES_VISIBLES = 4;
 
-    if (badges.length === 0) {
+// Tiempo que la vitrina queda abierta tras ganar una medalla antes de plegarse sola
+const BADGES_AUTOCOLLAPSE_MS = 6000;
+
+// 15. Renderizar vitrina de medallas del usuario activo
+// `previousBadges` solo se pasa al resolver una trivia: sirve para estampar la recién ganada.
+function renderBadges(previousBadges = null) {
+    const nuevaMedalla = previousBadges
+        ? badges.find(badge => !previousBadges.includes(badge))
+        : null;
+
+    // Al ganar una medalla se despliega la vitrina un momento y se vuelve a plegar sola
+    if (nuevaMedalla) {
+        badgesExpanded = true;
+        clearTimeout(badgesAutoCollapse);
+        badgesAutoCollapse = setTimeout(() => {
+            badgesExpanded = false;
+            updateBadgesToggle();
+        }, BADGES_AUTOCOLLAPSE_MS);
+    }
+
+    const total = badges.length;
+    badgeCount.textContent = formatBadgeCount(total);
+
+    if (previousBadges && total !== previousBadges.length) {
+        countUp(previousBadges.length, total);
+        announce(nuevaMedalla
+            ? `¡Nueva medalla ganada: ${nuevaMedalla}! Ya tienes ${formatBadgeCount(total)}.`
+            : `Ahora tienes ${formatBadgeCount(total)}.`);
+    }
+
+    if (total === 0) {
         badgesContainer.innerHTML = `<p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas de pequeño historiador!</p>`;
+        updateBadgesToggle();
         return;
     }
 
-    badgesContainer.innerHTML = badges.map(badge => `
-        <div class="badge-item">
+    badgesContainer.innerHTML = badges.map((badge, idx) => `
+        <div class="badge-item ${badge === nuevaMedalla ? "badge-new" : ""}" style="--i:${idx}">
             <span class="badge-icon">🏅</span>
             <span class="badge-title">${escapeHtml(badge)}</span>
         </div>
     `).join("");
+
+    updateBadgesToggle();
+}
+
+// Muestra u oculta el botón "Ver todas" y aplica el plegado
+function updateBadgesToggle() {
+    const haySuficientes = badges.length > BADGES_VISIBLES;
+
+    badgesToggle.classList.toggle("hidden", !haySuficientes);
+    badgesPanel.classList.toggle("is-collapsed", haySuficientes && !badgesExpanded);
+
+    if (!haySuficientes) {
+        clearTimeout(badgesAutoCollapse);
+        return;
+    }
+
+    badgesToggle.textContent = badgesExpanded
+        ? "Ver menos ▴"
+        : `Ver todas (${badges.length}) ▾`;
+    badgesToggle.setAttribute("aria-expanded", String(badgesExpanded));
+}
+
+// 15b. Racha de días seguidos y calendario de calor (8 semanas, estilo GitHub)
+const STREAK_WEEKS = 8;
+
+function renderStreak(streak) {
+    const actual = streak?.current || 0;
+    const record = streak?.best || 0;
+
+    streakCurrent.textContent = actual;
+    streakCurrentLabel.textContent = actual === 1 ? "día seguido" : "días seguidos";
+    streakBest.textContent = record;
+
+    const porDia = new Map((streak?.days || []).map(d => [d.day, d.missions]));
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const diaSemana = (hoy.getDay() + 6) % 7;   // 0 = lunes
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() - diaSemana - (STREAK_WEEKS - 1) * 7);
+
+    const clave = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const hoyClave = clave(hoy);
+
+    const celdas = [];
+    for (let i = 0; i < STREAK_WEEKS * 7; i++) {
+        const dia = new Date(inicio);
+        dia.setDate(inicio.getDate() + i);
+
+        const fecha = clave(dia);
+        const futuro = dia > hoy;
+        const misiones = porDia.get(fecha);
+        // 0 = no entró · 1 = entró sin misiones · 2-4 = 1, 2 y 3+ misiones
+        const nivel = misiones === undefined ? 0 : Math.min(4, misiones + 1);
+
+        let etiqueta = "";
+        if (!futuro) {
+            const fechaTexto = dia.toLocaleDateString("es", { day: "numeric", month: "short" });
+            const actividad = misiones === undefined
+                ? "sin actividad"
+                : misiones === 0
+                    ? "entró sin completar misiones"
+                    : `${misiones} misión${misiones === 1 ? "" : "es"}`;
+            etiqueta = ` title="${fechaTexto} · ${actividad}"`;
+        }
+
+        const clases = ["streak-cell"];
+        if (futuro) clases.push("is-future");
+        else if (fecha === hoyClave) clases.push("is-today");
+
+        celdas.push(`<span class="${clases.join(" ")}" data-level="${nivel}" style="--i:${i}"${etiqueta}></span>`);
+    }
+
+    streakGrid.innerHTML = celdas.join("");
 }
 
 // 16. Cargar y renderizar la pantalla de Estadísticas y Nivel
@@ -572,7 +722,7 @@ async function loadStats() {
         const data = await response.json();
 
         // 1. Nivel y Puntos
-        statsLevelIcon.textContent = data.level.icon;
+        statsLevelIcon.innerHTML = levelSeal(data.level.num);
         statsLevelTitle.textContent = `Nivel ${data.level.num}: ${data.level.title}`;
         statsXpValue.textContent = `${data.xp} ⭐`;
         statsNextTarget.textContent = data.level.next_target;
@@ -598,8 +748,8 @@ async function loadStats() {
                 </div>
             `;
         } else {
-            masteredTopicsList.innerHTML = data.mastered.map(item => `
-                <div class="topic-item-card topic-mastered">
+            masteredTopicsList.innerHTML = data.mastered.map((item, idx) => `
+                <div class="topic-item-card topic-mastered" style="--i:${idx}">
                     <span class="topic-item-icon">${item.icon}</span>
                     <div class="topic-item-info">
                         <div class="topic-item-top">
@@ -623,10 +773,10 @@ async function loadStats() {
                 </div>
             `;
         } else {
-            notMasteredTopicsList.innerHTML = data.not_mastered.map(item => {
+            notMasteredTopicsList.innerHTML = data.not_mastered.map((item, idx) => {
                 const isNeedPractice = item.status_type === "needs_practice";
                 return `
-                    <div class="topic-item-card ${isNeedPractice ? 'topic-needs-practice' : 'topic-pending'}">
+                    <div class="topic-item-card ${isNeedPractice ? 'topic-needs-practice' : 'topic-pending'}" style="--i:${idx}">
                         <span class="topic-item-icon">${item.icon}</span>
                         <div class="topic-item-info">
                             <div class="topic-item-top">
@@ -666,10 +816,163 @@ async function loadStats() {
     }
 }
 
+// Sello del nivel: SVG local en img/niveles (sin red)
+function levelSeal(num) {
+    return `<img class="level-seal" src="img/niveles/nivel-${num}.svg" alt="" width="128" height="128">`;
+}
+
 // Función auxiliar para escapar texto en HTML
 function escapeHtml(text) {
     if (!text) return "";
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+}
+
+// --- Utilidades de movimiento y accesibilidad ---
+
+function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function formatBadgeCount(total) {
+    return `${total} Medalla${total === 1 ? '' : 's'} Ganada${total === 1 ? '' : 's'}`;
+}
+
+// Sube el contador de medallas de `desde` a `hasta` en ~700 ms
+function countUp(desde, hasta) {
+    if (prefersReducedMotion() || desde === hasta) {
+        badgeCount.textContent = formatBadgeCount(hasta);
+        return;
+    }
+    const inicio = performance.now();
+    const duracion = 700;
+
+    function paso(ahora) {
+        const avance = Math.min(1, (ahora - inicio) / duracion);
+        const suave = 1 - Math.pow(1 - avance, 3);
+        badgeCount.textContent = formatBadgeCount(Math.round(desde + (hasta - desde) * suave));
+        if (avance < 1) requestAnimationFrame(paso);
+    }
+    requestAnimationFrame(paso);
+}
+
+// Aviso para lectores de pantalla
+function announce(mensaje) {
+    const region = document.getElementById("live-region");
+    if (!region) return;
+    region.textContent = "";
+    setTimeout(() => { region.textContent = mensaje; }, 50);
+}
+
+// 12 partículas de tinta saliendo del botón acertado
+function burstParticles(contenedor, origen) {
+    if (prefersReducedMotion()) return;
+
+    const caja = contenedor.getBoundingClientRect();
+    const punto = origen.getBoundingClientRect();
+
+    const burst = document.createElement("div");
+    burst.className = "particle-burst";
+    burst.style.left = `${punto.left - caja.left + punto.width / 2}px`;
+    burst.style.top = `${punto.top - caja.top + punto.height / 2}px`;
+
+    for (let i = 0; i < 12; i++) {
+        const particula = document.createElement("span");
+        particula.className = "ink-particle";
+        particula.style.setProperty("--a", `${i * 30}deg`);
+        particula.style.setProperty("--d", `${26 + Math.random() * 26}px`);
+        particula.style.animationDelay = `${Math.random() * 60}ms`;
+        burst.appendChild(particula);
+    }
+
+    contenedor.appendChild(burst);
+    setTimeout(() => burst.remove(), 900);
+}
+
+// Al cambiar de pantalla, lleva el foco al contenedor (sin robar scroll)
+function focusScreen(elemento) {
+    elemento.setAttribute("tabindex", "-1");
+    elemento.focus({ preventScroll: true });
+}
+
+/* ========================================================
+   FAB: Inicializar botón flotante de pregunta del día
+   ======================================================== */
+
+function initDailyFAB() {
+    const fab = document.getElementById("fab-daily");
+    const panel = document.getElementById("daily-question-panel");
+    const fabPanel = document.querySelector(".fab-panel");
+
+    if (!fab || !panel) return;
+
+    let dailyData = null;
+
+    // Mostrar u ocultar panel cuando se hace FAB
+    fab.onclick = async () => {
+        if (dailyData) {
+            // Ya tenemos los datos, solo mostramos/ocultamos el panel
+            if (fabPanel) {
+                fabPanel.classList.toggle("active");
+            }
+            panel.hidden = !panel.hidden;
+            return;
+        }
+
+        // Fetch la pregunta diaria
+        try {
+            const resp = await fetch("/api/stories?grade=" + currentGrade + "&daily=1");
+            if (!resp.ok) throw new Error("Error al cargar pregunta diaria");
+            const data = await resp.json();
+
+            dailyData = data;
+
+            if (!data.daily) {
+                panel.hidden = true;
+                if (fabPanel) fabPanel.classList.remove("active");
+                return;
+            }
+
+            const diario = data.daily;
+            // Llenar el panel
+            const gradeEl = panel.querySelector("#daily-question-grade") || document.createElement("p");
+            gradeEl.id = "daily-question-grade";
+            gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+            // Asegurarnos de que gradeEl esté en el DOM
+            const existingGrade = document.getElementById("daily-question-grade");
+            if (!existingGrade) {
+                const p = document.createElement("p");
+                p.id = "daily-question-grade";
+                p.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+                panel.querySelector(".daily-question-card").prepend(p);
+            }
+
+            const qtxt = panel.querySelector("#daily-question-text") || document.createElement("p");
+            qtxt.id = "daily-question-text";
+            qtxt.textContent = diario.trivia.question;
+            if (!existingGrade) panel.querySelector(".daily-question-card").prepend(qtxt);
+
+            // Botón empezar
+            const startBtn = panel.querySelector("#btn-daily-start");
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    window.location.hash = `#story-${diario.story.id}`;
+                    const storyScreen = document.getElementById("story-screen");
+                    if (storyScreen) storyScreen.classList.add("active");
+                    dashboardScreen.classList.remove("active");
+                    panel.hidden = true;
+                    if (fabPanel) fabPanel.classList.remove("active");
+                };
+            }
+
+            // Mostrar panel FAB y panel principal
+            panel.hidden = false;
+            if (fabPanel) fabPanel.classList.add("active");
+        } catch (e) {
+            console.error("Error obteniendo pregunta diaria:", e);
+            panel.hidden = true;
+            if (fabPanel) fabPanel.classList.remove("active");
+        }
+    };
 }

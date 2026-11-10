@@ -1,28 +1,101 @@
 {
-  "current_user": "alexis",
+  "current_user": "daya",
   "users": {
+    "daya": {
+      "id": "daya",
+      "name": "daya",
+      "grade": "1",
+      "created_at": "29/10/2026 13:00",
+      "last_active": "06/11/2026 12:04",
+      "badges": [
+        "Medalla de Prehistoria",
+        "Medalla de Edad de Piedra",
+        "Medalla de Antiguo Egipto",
+        "Medalla de Egipto y Comercio",
+        "Medalla de Antigua Grecia",
+        "Medalla de Imperio Romano",
+        "Medalla de Cultura Maya",
+        "Medalla de Edad Media",
+        "Medalla de Cultura Mexica",
+        "Medalla de Era de las Exploraciones",
+        "Medalla de Revolución Industrial",
+        "Medalla de Historia Contemporánea"
+      ],
+      "completed_stories": [
+        "1-1",
+        "1-2",
+        "2-1",
+        "2-2",
+        "3-1",
+        "3-2",
+        "4-1",
+        "4-2",
+        "5-1",
+        "5-2",
+        "6-1",
+        "6-2"
+      ],
+      "attempted_stories": {}
+    },
     "alexis": {
       "id": "alexis",
       "name": "alexis",
-      "grade": "2",
-      "created_at": "04/11/2026 11:13",
-      "last_active": "04/11/2026 11:23",
+      "grade": "1",
+      "created_at": "06/11/2026 10:40",
+      "last_active": "06/11/2026 11:46",
       "badges": [
-        "Medalla de Antiguo Egipto"
+        "Medalla de Prehistoria",
+        "Medalla de Edad de Piedra",
+        "Medalla de Antiguo Egipto",
+        "Medalla de Egipto y Comercio",
+        "Medalla de Antigua Grecia",
+        "Medalla de Imperio Romano",
+        "Medalla de Cultura Maya"
       ],
       "completed_stories": [
-        "2-1"
+        "1-1",
+        "1-2",
+        "2-1",
+        "2-2",
+        "3-1",
+        "3-2",
+        "4-1"
       ],
       "attempted_stories": {
+        "1-1": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
         "2-1": {
-          "attempts": 9,
-          "wrong_count": 5,
+          "attempts": 1,
+          "wrong_count": 0,
           "correct": true
         },
         "2-2": {
-          "attempts": 8,
-          "wrong_count": 8,
-          "correct": false
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-1": {
+          "attempts": 2,
+          "wrong_count": 1,
+          "correct": true
+        },
+        "3-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-1": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
         }
       }
     },
@@ -62,103 +135,6 @@
       "badges": [],
       "completed_stories": [],
       "attempted_stories": {}
-    },
-    "daya": {
-      "id": "daya",
-      "name": "daya",
-      "grade": "1",
-      "created_at": "29/10/2026 13:00",
-      "last_active": "04/11/2026 09:22",
-      "badges": [
-        "Medalla de Prehistoria",
-        "Medalla de Edad de Piedra",
-        "Medalla de Antiguo Egipto",
-        "Medalla de Egipto y Comercio",
-        "Medalla de Antigua Grecia",
-        "Medalla de Imperio Romano",
-        "Medalla de Cultura Maya",
-        "Medalla de Edad Media",
-        "Medalla de Cultura Mexica",
-        "Medalla de Era de las Exploraciones",
-        "Medalla de Revolución Industrial",
-        "Medalla de Historia Contemporánea"
-      ],
-      "completed_stories": [
-        "1-1",
-        "1-2",
-        "2-1",
-        "2-2",
-        "3-1",
-        "3-2",
-        "4-1",
-        "4-2",
-        "5-1",
-        "5-2",
-        "6-1",
-        "6-2"
-      ],
-      "attempted_stories": {
-        "1-1": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "1-2": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "2-1": {
-          "attempts": 2,
-          "wrong_count": 1,
-          "correct": true
-        },
-        "2-2": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "3-1": {
-          "attempts": 2,
-          "wrong_count": 1,
-          "correct": true
-        },
-        "3-2": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "4-1": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "4-2": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "5-1": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "5-2": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "6-1": {
-          "attempts": 1,
-          "wrong_count": 0,
-          "correct": true
-        },
-        "6-2": {
-          "attempts": 2,
-          "wrong_count": 1,
-          "correct": true
-        }
-      }
     }
   }
 }

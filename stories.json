@@ -1,0 +1,794 @@
+{
+  "1": [
+    {
+      "id": "1-1",
+      "title": "El Gran Viaje con los Dinosaurios",
+      "period": "Prehistoria",
+      "icon": "🦖",
+      "summary": "Hace millones de años, enormes criaturas habitaban la Tierra. ¡Descubre cómo vivía el T-Rex y el Triceratops!",
+      "fun_fact": "¿Sabías que algunos dinosaurios tenían plumas de colores brillantes?",
+      "trivia": {
+        "question": "¿Cuál de estos dinosaurios era famoso por sus 3 cuernos y un gran escudo?",
+        "options": ["Tiranosaurio Rex", "Triceratops", "Velociraptor"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-2",
+      "title": "La Primera Fogata de la Humanidad",
+      "period": "Edad de Piedra",
+      "icon": "🔥",
+      "summary": "Los primeros humanos aprendieron a hacer fuego frotando piedras y maderas para calentarse en las cavernas.",
+      "fun_fact": "El fuego no solo daba calor, ¡también servía para contar historias en la noche y protegerse de animales salvajes!",
+      "trivia": {
+        "question": "¿En qué lugares pintaban los primeros seres humanos a los animales?",
+        "options": ["En cuadernos de papel", "En las paredes de las cuevas", "En computadoras"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-3",
+      "title": "El Mamut Lanudo",
+      "period": "Edad de Hielo",
+      "icon": "🦣",
+      "summary": "El mamut era un pariente gigante del elefante, con pelo largo y unos colmillos curvos enormes.",
+      "fun_fact": "Sus colmillos podían medir más que un coche. ¡Imagina cargar con eso todo el día!",
+      "trivia": {
+        "question": "¿Qué comían los mamuts?",
+        "options": ["Plantas y hierba", "Piedras", "Solo carne"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "1-4",
+      "title": "La Rueda Cambió Todo",
+      "period": "Primeras Invenciones",
+      "icon": "🛞",
+      "summary": "Al principio las personas cargaban todo en sus brazos. Con la rueda pudieron mover cosas pesadas mucho más fácil.",
+      "fun_fact": "Las primeras ruedas eran de madera maciza, sin radios, y giraban muy despacio.",
+      "trivia": {
+        "question": "¿Para qué sirvió inventar la rueda?",
+        "options": ["Para volar", "Para transportar cosas pesadas", "Para hacer fuego"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-5",
+      "title": "Cazadores y Recolectores",
+      "period": "Prehistoria",
+      "icon": "🏹",
+      "summary": "Antes de las tiendas, las familias buscaban su comida cada día: cazaban animales y recogían frutos del bosque.",
+      "fun_fact": "Las puntas de flecha se hacían de piedra tallada, y algunas eran tan finas como una uña.",
+      "trivia": {
+        "question": "¿Qué recogían las personas en el bosque para comer?",
+        "options": ["Frutas y semillas", "Botellas de plástico", "Monedas"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "1-6",
+      "title": "Las Pinturas de las Cuevas",
+      "period": "Arte Rupestre",
+      "icon": "🎨",
+      "summary": "En las paredes de las cuevas, los primeros artistas dibujaron bisontes, ciervos y personas cazando.",
+      "fun_fact": "Usaban tierras de colores y carbón. ¡Sus dibujos tienen más de 15.000 años y siguen ahí!",
+      "trivia": {
+        "question": "¿Con qué pintaban los artistas de las cuevas?",
+        "options": ["Rotuladores", "Tierras de colores y carbón", "Pintura en espray"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-7",
+      "title": "El Perro, Nuestro Mejor Amigo",
+      "period": "Prehistoria",
+      "icon": "🐕",
+      "summary": "Hace mucho tiempo, unos lobos se acercaron a los campamentos humanos buscando restos de comida. Poco a poco se volvieron amigos.",
+      "fun_fact": "El perro fue el primer animal que vivió con las personas, ¡mucho antes que los gatos o las gallinas!",
+      "trivia": {
+        "question": "¿Qué animal fue de los primeros en vivir con las personas?",
+        "options": ["El león", "El perro", "El pingüino"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-8",
+      "title": "La Primera Semilla Plantada",
+      "period": "Agricultura",
+      "icon": "🌾",
+      "summary": "Alguien descubrió que si enterraba una semilla y esperaba, nacía una planta con más comida. ¡Así nació la agricultura!",
+      "fun_fact": "Con la agricultura las familias dejaron de viajar todo el tiempo y construyeron las primeras aldeas.",
+      "trivia": {
+        "question": "¿Qué pasó cuando las personas aprendieron a sembrar?",
+        "options": ["Se fueron a vivir a la Luna", "Dejaron de viajar tanto y formaron aldeas", "Dejaron de comer"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-9",
+      "title": "El Tigre de Dientes de Sable",
+      "period": "Edad de Hielo",
+      "icon": "🐅",
+      "summary": "Este felino prehistórico tenía dos colmillos larguísimos, como dos cuchillos. Era un cazador muy veloz.",
+      "fun_fact": "A pesar de su nombre, no era un tigre de verdad: era un pariente lejano de los gatos actuales.",
+      "trivia": {
+        "question": "¿Qué comía el tigre de dientes de sable?",
+        "options": ["Hierba", "Carne de otros animales", "Frutas del desierto"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "1-10",
+      "title": "Cuando el Mundo Estaba Helado",
+      "period": "Edad de Hielo",
+      "icon": "🧊",
+      "summary": "Durante la Edad de Hielo hacía tanto frío que enormes capas de hielo cubrían parte de la Tierra.",
+      "fun_fact": "Las personas de esa época se abrigaban con pieles de animales y vivían en cuevas o chozas de huesos.",
+      "trivia": {
+        "question": "¿Cómo se llama la época en la que hizo muchísimo frío?",
+        "options": ["Edad de Hielo", "Verano eterno", "Edad de Oro"],
+        "answer": 0
+      }
+    }
+  ],
+  "2": [
+    {
+      "id": "2-1",
+      "title": "El Misterio de las Pirámides y Faraones",
+      "period": "Antiguo Egipto",
+      "icon": "🏺",
+      "summary": "A orillas del río Nilo, los antiguos egipcios construyeron monumentos gigantescos que aún asombran al mundo.",
+      "fun_fact": "Los gatos eran tan sagrados en Egipto que se creía que traían buena suerte a las casas de los faraones.",
+      "trivia": {
+        "question": "¿Cómo se llamaba la escritura egipcia hecha con dibujos y símbolos?",
+        "options": ["Jeroglíficos", "Código Morse", "Alfabeto romano"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "2-2",
+      "title": "Navegantes del Nilo",
+      "period": "Egipto y Comercio",
+      "icon": "⛵",
+      "summary": "Gracias a los barcos de papiro, los egipcios podían transportar trigo, piedras enormes y tesoros.",
+      "fun_fact": "El papiro fue el abuelo del papel moderno; se hacía con tallos de plantas acuáticas.",
+      "trivia": {
+        "question": "¿Cuál es el río más famoso donde floreció la civilización egipcia?",
+        "options": ["Río Amazonas", "Río Nilo", "Río Bravo"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "2-3",
+      "title": "El Faraón, Rey de Egipto",
+      "period": "Antiguo Egipto",
+      "icon": "👑",
+      "summary": "El faraón era la persona más poderosa de Egipto. Llevaba una corona especial y todos lo obedecían.",
+      "fun_fact": "Al faraón se le llamaba 'gran casa', porque vivía en un palacio enorme con muchos sirvientes.",
+      "trivia": {
+        "question": "¿Quién mandaba en el antiguo Egipto?",
+        "options": ["El faraón", "Un pirata", "El alcalde de la aldea"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "2-4",
+      "title": "La Esfinge de Giza",
+      "period": "Antiguo Egipto",
+      "icon": "🦁",
+      "summary": "Junto a las pirámides hay una estatua gigante con cuerpo de león y cabeza de persona. Se llama la Esfinge.",
+      "fun_fact": "La Esfinge fue tallada en una sola roca y mide como un edificio de seis pisos.",
+      "trivia": {
+        "question": "¿Qué animal tiene cuerpo de león y cabeza humana?",
+        "options": ["El dragón", "La Esfinge", "El grifo"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "2-5",
+      "title": "Pan, Cebolla y Cerveza",
+      "period": "Vida Cotidiana en Egipto",
+      "icon": "🍞",
+      "summary": "Los egipcios comían pan hecho de trigo, cebollas, pescado del Nilo y algunas frutas como los dátiles.",
+      "fun_fact": "El pan era tan importante que a los trabajadores les pagaban parte de su sueldo en pan.",
+      "trivia": {
+        "question": "¿Qué alimento era básico para los egipcios?",
+        "options": ["La pizza", "El pan de trigo", "El helado"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "2-6",
+      "title": "El Escritor de Jeroglíficos",
+      "period": "Antiguo Egipto",
+      "icon": "✍️",
+      "summary": "Pocas personas sabían escribir. Los escribas aprendían muchos años y trabajaban para el faraón.",
+      "fun_fact": "Escribían con una caña afilada y tinta sobre hojas de papiro.",
+      "trivia": {
+        "question": "¿Cómo se llamaba la persona que sabía escribir en Egipto?",
+        "options": ["Escriba", "Cocinero", "Carpintero"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "2-7",
+      "title": "Los Gatos Sagrados",
+      "period": "Antiguo Egipto",
+      "icon": "🐈",
+      "summary": "En Egipto los gatos vivían en las casas y eran muy respetados, porque cazaban ratones que comían el grano.",
+      "fun_fact": "Había una diosa con cabeza de gato llamada Bastet, protectora del hogar.",
+      "trivia": {
+        "question": "¿Qué animal era sagrado en el antiguo Egipto?",
+        "options": ["El perro", "El gato", "El caballo"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "2-8",
+      "title": "Piedras del Tamaño de un Autobús",
+      "period": "Antiguo Egipto",
+      "icon": "🧱",
+      "summary": "Las pirámides son tumbas hechas con millones de bloques de piedra muy pesados, apilados uno sobre otro.",
+      "fun_fact": "La Gran Pirámide fue el edificio más alto del mundo durante más de 3.000 años.",
+      "trivia": {
+        "question": "¿Con qué construyeron las pirámides?",
+        "options": ["Con bloques de piedra", "Con madera y papel", "Con hielo"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "2-9",
+      "title": "El Dios Sol y sus Viajes",
+      "period": "Religión Egipcia",
+      "icon": "☀️",
+      "summary": "Los egipcios pensaban que el sol era un dios llamado Ra, que cruzaba el cielo en un barco cada día.",
+      "fun_fact": "Muchos faraones añadían el nombre de Ra al suyo, como Ramsés.",
+      "trivia": {
+        "question": "¿Cómo se llamaba el dios del sol en Egipto?",
+        "options": ["Ra", "Zeus", "Júpiter"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "2-10",
+      "title": "Momias: Conservar el Cuerpo",
+      "period": "Antiguo Egipto",
+      "icon": "⚰️",
+      "summary": "Los egipcios creían en la vida después de la muerte. Por eso cuidaban el cuerpo y lo envolvían en vendas.",
+      "fun_fact": "Tardaban unos 70 días en preparar una momia, y guardaban vendas, joyas y comida en la tumba.",
+      "trivia": {
+        "question": "¿Cómo se llama un cuerpo envuelto en vendas por los egipcios?",
+        "options": ["Momia", "Estatua", "Pintura"],
+        "answer": 0
+      }
+    }
+  ],
+  "3": [
+    {
+      "id": "3-1",
+      "title": "El Primer Estadio de los Juegos Olímpicos",
+      "period": "Antigua Grecia",
+      "icon": "🏛️",
+      "summary": "En la ciudad de Olimpia, los atletas competían en carreras y lanzamiento de disco en honor a los dioses griegos.",
+      "fun_fact": "A los campeones no les daban medallas de oro, ¡les colocaban coronas hechas con ramas de olivo silvestre!",
+      "trivia": {
+        "question": "¿Cada cuántos años se celebraban los Juegos Olímpicos en la antigua Grecia?",
+        "options": ["Cada 10 años", "Cada 4 años", "Cada semana"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "3-2",
+      "title": "El Coliseo y los Acueductos Romanos",
+      "period": "Imperio Romano",
+      "icon": "🛡️",
+      "summary": "Los ingenieros romanos inventaron puentes gigantes llamados acueductos para llevar agua limpia a ciudades enteras.",
+      "fun_fact": "Los romanos inventaron un tipo de concreto tan resistente que sus edificios siguen en pie después de 2,000 años.",
+      "trivia": {
+        "question": "¿Cómo se llamaba la prenda de vestir blanca que usaban los ciudadanos de Roma?",
+        "options": ["Sombraje", "Toga", "Armadura de cuero"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "3-3",
+      "title": "El Teatro Griego",
+      "period": "Antigua Grecia",
+      "icon": "🎭",
+      "summary": "Los griegos inventaron el teatro. Actuaban al aire libre, en gradas de piedra donde cabía muchísima gente.",
+      "fun_fact": "Los actores usaban máscaras grandes para que su voz sonara fuerte y todos vieran si estaban tristes o contentos.",
+      "trivia": {
+        "question": "¿Dónde actuaban los actores griegos?",
+        "options": ["En teatros al aire libre", "En un cine", "Dentro de una cueva"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "3-4",
+      "title": "Los Dioses del Olimpo",
+      "period": "Religión Griega",
+      "icon": "⚡",
+      "summary": "Los griegos contaban historias de dioses que vivían en una montaña llamada Olimpo: Zeus, Atenea, Poseidón...",
+      "fun_fact": "A Zeus se le dibujaba con un rayo en la mano, porque era el dios del cielo y de las tormentas.",
+      "trivia": {
+        "question": "¿Quién era el rey de los dioses griegos?",
+        "options": ["Poseidón", "Zeus", "Hércules"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "3-5",
+      "title": "La Carrera de Maratón",
+      "period": "Grecia y sus Leyendas",
+      "icon": "🏃",
+      "summary": "Cuenta la leyenda que un mensajero corrió muchos kilómetros para dar una buena noticia a su ciudad sin parar.",
+      "fun_fact": "Por esa historia, hoy corremos maratones de más de 42 kilómetros.",
+      "trivia": {
+        "question": "¿Qué hacía el mensajero de la leyenda?",
+        "options": ["Nadar en el mar", "Correr para llevar una noticia", "Volar en globo"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "3-6",
+      "title": "El Ágora, la Plaza Griega",
+      "period": "Vida Cotidiana en Grecia",
+      "icon": "🏺",
+      "summary": "El ágora era la plaza principal. Allí se compraban cosas, se hablaba de política y se escuchaban noticias.",
+      "fun_fact": "En el ágora también se hacían juicios: los ciudadanos votaban y decidían juntos.",
+      "trivia": {
+        "question": "¿Qué era el ágora?",
+        "options": ["Una plaza para comprar y hablar", "Un templo", "Un barco"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "3-7",
+      "title": "Los Gladiadores del Coliseo",
+      "period": "Imperio Romano",
+      "icon": "⚔️",
+      "summary": "El Coliseo era un estadio enorme en Roma donde se hacían espectáculos y luchas ante miles de personas.",
+      "fun_fact": "Cabían más de 50.000 espectadores, ¡y podían entrar y salir por 80 puertas!",
+      "trivia": {
+        "question": "¿Dónde se celebraban las luchas de gladiadores?",
+        "options": ["En el Coliseo", "En la escuela", "En el mercado"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "3-8",
+      "title": "Las Termas Romanas",
+      "period": "Vida Cotidiana en Roma",
+      "icon": "🛁",
+      "summary": "Los romanos iban a las termas a bañarse en agua caliente y fría, y a charlar con sus amigos.",
+      "fun_fact": "Algunas termas eran tan grandes que tenían biblioteca y jardines dentro.",
+      "trivia": {
+        "question": "¿A qué iban los romanos a las termas?",
+        "options": ["A bañarse y conversar", "A hacer la compra", "A dormir"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "3-9",
+      "title": "El Legionario y su Armadura",
+      "period": "Imperio Romano",
+      "icon": "🪖",
+      "summary": "Los legionarios eran los soldados de Roma. Llevaban casco, escudo y una espada corta llamada gladius.",
+      "fun_fact": "Caminaban unos 30 kilómetros al día cargando su mochila, la comida y las herramientas.",
+      "trivia": {
+        "question": "¿Cómo se llamaba el soldado romano?",
+        "options": ["Legionario", "Pirata", "Jinete"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "3-10",
+      "title": "Los Números Romanos",
+      "period": "Legado Romano",
+      "icon": "🔢",
+      "summary": "Los romanos escribían los números con letras: I, V, X, L, C, D y M. ¡Todavía los usamos en los siglos!",
+      "fun_fact": "El número 4 se escribe IV: una I delante de la V significa 'uno menos que cinco'.",
+      "trivia": {
+        "question": "¿Qué número representa la letra X en números romanos?",
+        "options": ["1", "10", "100"],
+        "answer": 1
+      }
+    }
+  ],
+  "4": [
+    {
+      "id": "4-1",
+      "title": "Los Astrónomos de Chichén Itzá y Palenque",
+      "period": "Cultura Maya",
+      "icon": "🌽",
+      "summary": "Los sabios mayas contaban los días observando las estrellas y el movimiento de los planetas con asombrosa exactitud.",
+      "fun_fact": "Los mayas fueron de los primeros pueblos en inventar y utilizar el número CERO.",
+      "trivia": {
+        "question": "¿Qué bebida deliciosa y amarga preparaban con semillas de cacao?",
+        "options": ["Té de limón", "Chocolate sagrado (xocolātl)", "Jugo de naranja"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "4-2",
+      "title": "Torneos y Castillos Medievales",
+      "period": "Edad Media",
+      "icon": "🏰",
+      "summary": "Caballeros con pesadas armaduras de metal cuidaban fortalezas con puentes levadizos y altas torres vigía.",
+      "fun_fact": "Una armadura completa de caballero podía llegar a pesar más de 25 kilos.",
+      "trivia": {
+        "question": "¿Qué rodeaba los castillos para evitar que los enemigos se acercaran fácilmente?",
+        "options": ["Un foso con agua", "Una autopista", "Campos de girasoles"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-3",
+      "title": "El Juego de Pelota Maya",
+      "period": "Cultura Maya",
+      "icon": "🏐",
+      "summary": "Los mayas jugaban a pasar una pelota de hule por un aro, usando la cadera. Era un juego importante y ceremonial.",
+      "fun_fact": "La pelota era de hule natural y botaba mucho, aunque pesaba más que un balón de fútbol.",
+      "trivia": {
+        "question": "¿De qué material era la pelota maya?",
+        "options": ["De hule natural", "De plástico", "De cristal"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-4",
+      "title": "Las Pirámides de Tikal",
+      "period": "Cultura Maya",
+      "icon": "🏛️",
+      "summary": "En medio de la selva, los mayas construyeron pirámides escalonadas para sus templos y ceremonias.",
+      "fun_fact": "Desde lo alto de un templo de Tikal se veían las copas de los árboles por encima de la selva.",
+      "trivia": {
+        "question": "¿Qué edificaban los mayas en sus ciudades?",
+        "options": ["Pirámides y templos", "Rascacielos de vidrio", "Molinos de viento"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-5",
+      "title": "El Maíz, Regalo de los Dioses",
+      "period": "Cultura Maya",
+      "icon": "🌽",
+      "summary": "El maíz era el alimento más importante. Con él hacían tortillas, tamales y hasta bebidas.",
+      "fun_fact": "Los mayas decían que las personas fueron creadas con masa de maíz.",
+      "trivia": {
+        "question": "¿Cuál era el grano sagrado para los mayas?",
+        "options": ["El arroz", "El maíz", "El trigo"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "4-6",
+      "title": "El Caballero y su Caballo",
+      "period": "Edad Media",
+      "icon": "🐎",
+      "summary": "Ser caballero requería años de entrenamiento: montar, usar la espada y cuidar la armadura.",
+      "fun_fact": "Los caballos de guerra también llevaban armadura, llamada barda.",
+      "trivia": {
+        "question": "¿Qué necesitaba un caballero para luchar?",
+        "options": ["Armadura y caballo", "Una bicicleta", "Un disfraz"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-7",
+      "title": "El Foso y el Puente Levadizo",
+      "period": "Edad Media",
+      "icon": "🏯",
+      "summary": "Los castillos tenían un foso con agua alrededor y un puente que se levantaba para que nadie entrara.",
+      "fun_fact": "Las murallas eran tan gruesas que dentro había pasillos secretos para moverse sin ser visto.",
+      "trivia": {
+        "question": "¿Para qué servía el foso del castillo?",
+        "options": ["Para que los enemigos no entraran", "Para pescar", "Para nadar en verano"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-8",
+      "title": "El Molino del Pueblo",
+      "period": "Edad Media",
+      "icon": "💨",
+      "summary": "Los molinos usaban la fuerza del viento o del agua para mover unas piedras que molían el grano.",
+      "fun_fact": "Con la harina del molino se hacía el pan que comía todo el pueblo.",
+      "trivia": {
+        "question": "¿Para qué servía un molino?",
+        "options": ["Para moler el grano y hacer harina", "Para navegar", "Para hacer fuego"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-9",
+      "title": "Los Monjes Copistas",
+      "period": "Edad Media",
+      "icon": "📖",
+      "summary": "Antes de las imprentas, los monjes copiaban los libros a mano en los monasterios, letra por letra.",
+      "fun_fact": "Un solo libro podía tardar meses en copiarse, y algunos se decoraban con letras de oro.",
+      "trivia": {
+        "question": "¿Qué hacían los monjes copistas?",
+        "options": ["Copiar libros a mano", "Construir barcos", "Cocinar para el rey"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "4-10",
+      "title": "Las Ferias Medievales",
+      "period": "Edad Media",
+      "icon": "🎪",
+      "summary": "En las ferias se juntaban mercaderes de muchos lugares a vender telas, especias, herramientas y animales.",
+      "fun_fact": "También había músicos, malabaristas y cuentacuentos que entretenían a la gente.",
+      "trivia": {
+        "question": "¿Qué se hacía en las ferias medievales?",
+        "options": ["Comprar y vender mercancías", "Volar cometas", "Ir a la playa"],
+        "answer": 0
+      }
+    }
+  ],
+  "5": [
+    {
+      "id": "5-1",
+      "title": "La Gran Tenochtitlan sobre el Lago",
+      "period": "Cultura Mexica",
+      "icon": "🦅",
+      "summary": "Una impresionante ciudad fundada sobre islotes en medio del lago de Texcoco, con calzadas, canales y chinampas flotantes.",
+      "fun_fact": "Las chinampas eran huertos flotantes donde cultivaban maíz, frijol y flores durante todo el año.",
+      "trivia": {
+        "question": "¿Qué señal vieron los mexicas para fundar su ciudad?",
+        "options": ["Un arcoíris doble", "Un águila devorando una serpiente sobre un nopal", "Un cometa de oro"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "5-2",
+      "title": "Grandes Navegantes y Nuevos Horizontes",
+      "period": "Era de las Exploraciones",
+      "icon": "🧭",
+      "summary": "Capitanes valientes cruzaron océanos desconocidos guiados por la brújula y las constelaciones marinas.",
+      "fun_fact": "Para orientarse de noche en alta mar, los marineros usaban un instrumento llamado astrolabio.",
+      "trivia": {
+        "question": "¿Qué instrumento con una aguja imantada siempre apunta hacia el Norte?",
+        "options": ["Telescopio", "Brújula", "Reloj de arena"],
+        "answer": 1
+      }
+    },
+    {
+      "id": "5-3",
+      "title": "Las Chinampas Flotantes",
+      "period": "Cultura Mexica",
+      "icon": "🌱",
+      "summary": "Los mexicas hacían islas artificiales con tierra y plantas sobre el agua para sembrar allí sus alimentos.",
+      "fun_fact": "Las raíces de los árboles sujetaban la tierra, así las chinampas no se iban con la corriente.",
+      "trivia": {
+        "question": "¿Qué cultivaban en las chinampas?",
+        "options": ["Maíz y flores", "Café", "Naranjas"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-4",
+      "title": "El Templo Mayor",
+      "period": "Cultura Mexica",
+      "icon": "🛕",
+      "summary": "En el centro de Tenochtitlan estaba el Templo Mayor, una pirámide doble con escaleras para subir a los santuarios.",
+      "fun_fact": "El templo se fue agrandando varias veces, y cada ampliación se construía encima de la anterior.",
+      "trivia": {
+        "question": "¿Dónde estaba el Templo Mayor?",
+        "options": ["En Tenochtitlan", "En Egipto", "En Roma"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-5",
+      "title": "El Mercado de Tlatelolco",
+      "period": "Cultura Mexica",
+      "icon": "🧺",
+      "summary": "El mercado era enorme: se vendían alimentos, telas, plumas, herramientas y hasta animales vivos.",
+      "fun_fact": "Había personas encargadas de vigilar que nadie hiciera trampa al pesar o al vender.",
+      "trivia": {
+        "question": "¿Qué se vendía en el mercado de Tlatelolco?",
+        "options": ["Comida, ropa y herramientas", "Coches", "Teléfonos"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-6",
+      "title": "La Carabela y el Viento",
+      "period": "Era de las Exploraciones",
+      "icon": "⛵",
+      "summary": "Las carabelas eran barcos pequeños y rápidos que usaban el viento para cruzar el océano.",
+      "fun_fact": "Los marineros dormían en hamacas colgadas para no caerse cuando el barco se movía.",
+      "trivia": {
+        "question": "¿Qué hacía mover a las carabelas?",
+        "options": ["El viento en las velas", "Un motor de gasolina", "Remos de metal"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-7",
+      "title": "Dibujar el Mundo: los Mapas",
+      "period": "Era de las Exploraciones",
+      "icon": "🗺️",
+      "summary": "Los mapas se dibujaban a mano con la información que traían los navegantes de cada viaje.",
+      "fun_fact": "Algunos mapas antiguos tenían dibujos de monstruos marinos en las zonas que nadie conocía.",
+      "trivia": {
+        "question": "¿Para qué servía un mapa?",
+        "options": ["Para saber por dónde navegar", "Para cocinar", "Para escribir cartas"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-8",
+      "title": "Del Trueque a las Monedas",
+      "period": "Comercio y Ciudades",
+      "icon": "🪙",
+      "summary": "Antes se cambiaban cosas: un saco de maíz por una manta. Luego se empezaron a usar monedas.",
+      "fun_fact": "En Mesoamérica también se usaban granos de cacao como moneda.",
+      "trivia": {
+        "question": "¿Qué es el trueque?",
+        "options": ["Cambiar una cosa por otra", "Comprar con tarjeta", "Regalar sin recibir nada"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-9",
+      "title": "La Ruta de las Especias",
+      "period": "Era de las Exploraciones",
+      "icon": "🌶️",
+      "summary": "Las especias venían de muy lejos y costaban mucho, porque viajaban en barco durante meses.",
+      "fun_fact": "La pimienta valía tanto que se usaba para pagar alquileres y deudas.",
+      "trivia": {
+        "question": "¿Para qué se usaban las especias?",
+        "options": ["Para dar sabor y conservar la comida", "Para pintar casas", "Para hacer velas"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "5-10",
+      "title": "El Regreso de los Barcos",
+      "period": "Encuentro de Dos Mundos",
+      "icon": "📦",
+      "summary": "Cuando los barcos volvían, traían alimentos que en Europa no se conocían: papa, maíz, tomate y cacao.",
+      "fun_fact": "La papa llegó tan lejos que hoy es comida básica en muchos países del mundo.",
+      "trivia": {
+        "question": "¿Qué alimentos llegaron a Europa desde América?",
+        "options": ["Papa, maíz y tomate", "Arroz y trigo", "Solo pan"],
+        "answer": 0
+      }
+    }
+  ],
+  "6": [
+    {
+      "id": "6-1",
+      "title": "La Revolución de las Máquinas de Vapor",
+      "period": "Revolución Industrial",
+      "icon": "🚂",
+      "summary": "El ferrocarril y las locomotoras cambiaron la forma en que los seres humanos viajaban y comerciaban en todo el planeta.",
+      "fun_fact": "Antes de los trenes, un viaje entre dos ciudades podía tardar varias semanas en diligencia o a caballo.",
+      "trivia": {
+        "question": "¿Qué elemento hacía funcionar a las primeras locomotoras de la Revolución Industrial?",
+        "options": ["Vapor de agua generado por carbón", "Baterías de litio", "Gasolina espacial"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-2",
+      "title": "El Salto a las Estrellas: Llegada a la Luna",
+      "period": "Historia Contemporánea",
+      "icon": "🚀",
+      "summary": "En 1969, la nave Apolo 11 llevó a los primeros seres humanos a pisar la superficie de la Luna.",
+      "fun_fact": "La computadora del Apolo 11 tenía menos potencia de cálculo que cualquier reloj inteligente de hoy en día.",
+      "trivia": {
+        "question": "¿Quién fue el astronauta que pronunció la famosa frase: 'Un pequeño paso para el hombre, un gran salto para la humanidad'?",
+        "options": ["Neil Armstrong", "Galileo Galilei", "Julio Verne"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-3",
+      "title": "Los Telares y las Fábricas",
+      "period": "Revolución Industrial",
+      "icon": "⚙️",
+      "summary": "Las máquinas hicieron que se pudiera fabricar mucha ropa en menos tiempo, dentro de grandes fábricas.",
+      "fun_fact": "Las primeras fábricas usaban la fuerza del agua de los ríos para mover las máquinas.",
+      "trivia": {
+        "question": "¿Qué movía las máquinas de las primeras fábricas?",
+        "options": ["El vapor del agua", "La energía del sol", "Los patinetes"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-4",
+      "title": "La Bombilla de Edison",
+      "period": "Grandes Inventos",
+      "icon": "💡",
+      "summary": "Antes de la electricidad, las casas se alumbraban con velas y lámparas de aceite. Todo cambió con la bombilla.",
+      "fun_fact": "Edison probó cientos de materiales hasta encontrar el filamento que duraba más tiempo encendido.",
+      "trivia": {
+        "question": "¿Qué inventó Thomas Edison?",
+        "options": ["La bombilla eléctrica", "El teléfono", "El avión"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-5",
+      "title": "El Primer Teléfono",
+      "period": "Grandes Inventos",
+      "icon": "☎️",
+      "summary": "El teléfono permitió hablar con alguien que estaba lejos por primera vez en la historia.",
+      "fun_fact": "Las primeras llamadas necesitaban operadoras que conectaban los cables a mano.",
+      "trivia": {
+        "question": "¿Qué permite hacer el teléfono?",
+        "options": ["Hablar con alguien que está lejos", "Volar", "Cocinar"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-6",
+      "title": "El Primer Vuelo en Avión",
+      "period": "Historia Contemporánea",
+      "icon": "✈️",
+      "summary": "Los hermanos Wright construyeron un avión de madera y tela que voló unos segundos, y cambiaron la historia.",
+      "fun_fact": "Ese primer vuelo de 1903 duró 12 segundos: hoy un avión cruza un océano en horas.",
+      "trivia": {
+        "question": "¿Qué lograron los hermanos Wright?",
+        "options": ["Volar en el primer avión", "Llegar a la Luna", "Inventar el tren"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-7",
+      "title": "Los Derechos de Todas las Personas",
+      "period": "Derechos Humanos",
+      "icon": "🕊️",
+      "summary": "Después de las guerras, los países escribieron una lista de derechos para proteger a todas las personas.",
+      "fun_fact": "La Declaración Universal de los Derechos Humanos se aprobó en 1948 y tiene 30 artículos.",
+      "trivia": {
+        "question": "¿Quiénes tienen derechos humanos?",
+        "options": ["Todas las personas", "Solo los adultos", "Solo los reyes"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-8",
+      "title": "Internet y las Computadoras",
+      "period": "Era Digital",
+      "icon": "💻",
+      "summary": "Las computadoras empezaron siendo enormes máquinas y hoy caben en un bolsillo. Internet las conecta a todas.",
+      "fun_fact": "La primera página web se publicó en 1991 y explicaba qué era la propia web.",
+      "trivia": {
+        "question": "¿Para qué sirve internet?",
+        "options": ["Para buscar información y comunicarse", "Para hacer llover", "Para apagar el sol"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-9",
+      "title": "El Telescopio y las Estrellas",
+      "period": "Ciencia y Descubrimientos",
+      "icon": "🔭",
+      "summary": "Con un telescopio, Galileo pudo ver cráteres en la Luna y lunas alrededor de Júpiter.",
+      "fun_fact": "Un telescopio pequeño ya permite ver los anillos de Saturno desde tu ventana.",
+      "trivia": {
+        "question": "¿Para qué sirve un telescopio?",
+        "options": ["Para ver cosas lejanas del cielo", "Para oír música", "Para medir la temperatura"],
+        "answer": 0
+      }
+    },
+    {
+      "id": "6-10",
+      "title": "Robots Explorando Marte",
+      "period": "Exploración Espacial",
+      "icon": "🛰️",
+      "summary": "Los científicos envían robots llamados rovers a Marte para estudiar su suelo y buscar agua.",
+      "fun_fact": "Un rover tarda varios minutos en recibir una orden desde la Tierra, ¡porque la señal viaja por el espacio!",
+      "trivia": {
+        "question": "¿Qué robot explora Marte?",
+        "options": ["Un rover", "Un submarino", "Un tren"],
+        "answer": 0
+      }
+    }
+  ]
+}

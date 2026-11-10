@@ -2,26 +2,55 @@
    HISTORIA DIVERTIDA - ESTILOS PARA PEQUEÑOS HISTORIADORES
    ======================================================== */
 
+/* Fuentes autohospedadas: la app sigue funcionando sin red */
+@font-face {
+    font-family: 'Fraunces';
+    src: url('fonts/fraunces-latin.woff2') format('woff2');
+    font-weight: 600 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('fonts/nunito-latin.woff2') format('woff2');
+    font-weight: 400 800;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
-    --primary: #d97706;          /* Ámbar / Oro histórico */
-    --primary-hover: #b45309;
-    --primary-light: #fef3c7;
-    --accent: #2563eb;           /* Azul aventura */
-    --accent-hover: #1d4ed8;
-    --stats-purple: #4f46e5;
-    --stats-purple-hover: #4338ca;
-    --bg-page: #F4EBD0;          /* Fondo pergamino suave */
-    --card-bg: #ffffff;
-    --text-main: #1f2937;
-    --text-muted: #4b5563;
-    --success: #059669;
-    --success-light: #d1fae5;
-    --error: #dc2626;
-    --error-light: #fee2e2;
-    --border: #e5e7eb;
-    --radius-lg: 16px;
-    --radius-md: 10px;
-    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    /* Paleta "pasaporte del tiempo" */
+    --ink: #1E2A4A;              /* Tinta: texto y líneas */
+    --primary: #8C5A1B;          /* Latón oscuro: acentos y botones (AA sobre blanco) */
+    --primary-hover: #6F4715;
+    --primary-light: #F3E3C3;
+    --brass: #B07A2A;            /* Latón claro: detalles, nunca texto pequeño */
+    --accent: #2F6F6B;           /* Verde atlas */
+    --accent-hover: #245855;
+    --stats-purple: #3F4E8C;
+    --stats-purple-hover: #33406F;
+    --seal: #E4572E;             /* Sello coral: solo logros */
+    --bg-page: #F6ECD6;          /* Papel */
+    --card-bg: #FFFDF7;          /* Papel de tarjeta */
+    --text-main: #1E2A4A;
+    --text-muted: #4A5568;
+    --success: #1F7A5C;
+    --success-light: #DDF1E7;
+    --error: #B93A2B;
+    --error-light: #FBE3DF;
+    --border: #E3D6BC;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow: 0 1px 0 rgba(30, 42, 74, 0.04), 0 10px 24px -12px rgba(30, 42, 74, 0.18);
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Base tipográfica: todo el CSS está en rem, así que este valor escala la app entera */
+html {
+    font-size: 17px;
 }
 
 * {
@@ -31,7 +60,7 @@
 }
 
 body {
-    font-family: 'Comic Neue', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-body);
     background-color: var(--bg-page);
     color: var(--text-main);
     line-height: 1.6;
@@ -65,7 +94,7 @@ body {
 
 .hero-card {
     background: var(--card-bg);
-    border: 3px solid #fde68a;
+    border: 2px solid var(--border);
     border-radius: 24px;
     padding: 2.5rem 2rem;
     box-shadow: var(--shadow);
@@ -77,20 +106,18 @@ body {
 .mascot-badge {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    animation: bounce 2s infinite ease-in-out;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    animation: sway 4s ease-in-out infinite;
+    transform-origin: 50% 90%;
 }
 
 .hero-title {
-    font-size: 2.6rem;
-    font-weight: 800;
-    color: #92400e;
+    font-family: var(--font-display);
+    font-size: 2.7rem;
+    font-weight: 700;
+    color: var(--ink);
     letter-spacing: -0.5px;
-    margin-bottom: 0.25rem;
+    line-height: 1.1;
+    margin-bottom: 0.35rem;
 }
 
 .hero-subtitle {
@@ -102,7 +129,7 @@ body {
 
 .welcome-speech-bubble {
     background: #fffbeb;
-    border: 2px dashed #f59e0b;
+    border: 2px dashed var(--brass);
     border-radius: var(--radius-lg);
     padding: 1.25rem 1.5rem;
     margin-bottom: 2rem;
@@ -122,7 +149,7 @@ body {
     padding: 1.5rem;
     text-align: left;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.08);
+    box-shadow: 0 4px 10px rgba(176, 122, 42, 0.08);
 }
 
 .existing-users-header {
@@ -142,7 +169,7 @@ body {
 
 .users-header-icon {
     font-size: 2.2rem;
-    background: #fef3c7;
+    background: var(--primary-light);
     border-radius: 12px;
     padding: 0.3rem 0.5rem;
 }
@@ -160,7 +187,7 @@ body {
 }
 
 .users-count-badge {
-    background: #f59e0b;
+    background: var(--brass);
     color: #ffffff;
     font-size: 0.82rem;
     font-weight: 700;
@@ -177,7 +204,7 @@ body {
 }
 
 .user-profile-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 2px solid #e5e7eb;
     border-radius: var(--radius-lg);
     padding: 1.25rem;
@@ -192,21 +219,21 @@ body {
 .user-profile-card:hover {
     border-color: var(--primary);
     transform: translateY(-3px);
-    box-shadow: 0 10px 18px -3px rgba(217, 119, 6, 0.18);
+    box-shadow: 0 10px 18px -3px rgba(140, 90, 27, 0.18);
 }
 
 .active-user-card {
-    border-color: #f59e0b;
+    border-color: var(--brass);
     border-width: 2.5px;
     background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    box-shadow: 0 0 0 3px rgba(176, 122, 42, 0.25);
 }
 
 .current-user-tag {
     position: absolute;
     top: -11px;
     right: 14px;
-    background: #d97706;
+    background: var(--primary);
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 800;
@@ -223,7 +250,7 @@ body {
 
 .user-card-avatar {
     font-size: 2rem;
-    background: #fef3c7;
+    background: var(--primary-light);
     border: 2px solid #fde68a;
     border-radius: 50%;
     width: 48px;
@@ -284,7 +311,7 @@ body {
     font-size: 0.8rem;
     font-weight: 700;
     color: #78350f;
-    background: #fef3c7;
+    background: var(--primary-light);
     border: 1px solid #fde68a;
     border-radius: 6px;
     padding: 0.25rem 0.55rem;
@@ -309,7 +336,7 @@ body {
 
 .user-mini-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%);
+    background: linear-gradient(90deg, var(--brass) 0%, var(--accent) 100%);
     border-radius: 9999px;
     transition: width 0.6s ease;
 }
@@ -344,7 +371,7 @@ body {
     gap: 0.5rem;
     width: 100%;
     padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--brass) 0%, var(--primary) 100%);
     color: #ffffff;
     border: none;
     border-radius: var(--radius-md);
@@ -352,13 +379,13 @@ body {
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    box-shadow: 0 4px 10px rgba(140, 90, 27, 0.25);
 }
 
 .btn-select-user:hover {
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(217, 119, 6, 0.35);
+    box-shadow: 0 6px 14px rgba(140, 90, 27, 0.35);
 }
 
 /* Divisor visual entre usuarios existentes y nuevo registro */
@@ -444,7 +471,7 @@ body {
 .text-input:focus {
     border-color: var(--primary);
     background-color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 4px rgba(176, 122, 42, 0.2);
 }
 
 /* Selector de Grados (1º a 6º) */
@@ -455,7 +482,7 @@ body {
 }
 
 .grade-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     padding: 1rem 0.6rem;
@@ -477,7 +504,7 @@ body {
     border-color: var(--primary);
     background-color: #fffbeb;
     border-width: 3px;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 0 3px rgba(176, 122, 42, 0.3);
     transform: scale(1.03);
 }
 
@@ -505,21 +532,21 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 1.1rem 2rem;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--brass) 0%, var(--primary) 100%);
     color: #ffffff;
     font-size: 1.25rem;
     font-weight: 800;
     border: none;
     border-radius: 9999px;
     cursor: pointer;
-    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.35);
+    box-shadow: 0 6px 15px rgba(140, 90, 27, 0.35);
     transition: all 0.2s ease;
     margin-top: 0.5rem;
 }
 
 .btn-hero:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.45);
+    box-shadow: 0 8px 20px rgba(140, 90, 27, 0.45);
 }
 
 .btn-hero:active {
@@ -669,7 +696,7 @@ body {
 }
 
 .badge-counter {
-    background: #f59e0b;
+    background: var(--brass);
     color: #ffffff;
     font-size: 0.8rem;
     font-weight: 700;
@@ -684,8 +711,8 @@ body {
 }
 
 .badge-item {
-    background: #ffffff;
-    border: 1.5px solid #f59e0b;
+    background: var(--card-bg);
+    border: 1.5px solid var(--brass);
     border-radius: 9999px;
     padding: 0.35rem 0.85rem;
     display: inline-flex;
@@ -731,7 +758,7 @@ body {
 }
 
 .tab-btn {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1px solid var(--border);
     padding: 0.4rem 0.8rem;
     border-radius: 8px;
@@ -756,8 +783,10 @@ body {
 }
 
 .section-title-row h3 {
-    font-size: 1.3rem;
-    color: #111827;
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ink);
 }
 
 .stories-grid {
@@ -769,6 +798,7 @@ body {
 .story-card {
     background: var(--card-bg);
     border: 2px solid var(--border);
+    position: relative;
     border-radius: var(--radius-lg);
     padding: 1.75rem;
     box-shadow: var(--shadow);
@@ -781,8 +811,8 @@ body {
 }
 
 .story-card.highlight-pulse {
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.4);
+    border-color: var(--brass);
+    box-shadow: 0 0 0 5px rgba(176, 122, 42, 0.4);
     transform: scale(1.02);
 }
 
@@ -825,7 +855,7 @@ body {
 }
 
 .story-summary {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     color: #374151;
     margin-bottom: 1rem;
 }
@@ -839,7 +869,7 @@ body {
     gap: 0.75rem;
     align-items: center;
     margin-bottom: 1.5rem;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: #1e40af;
 }
 
@@ -861,7 +891,7 @@ body {
 
 .trivia-badge {
     display: inline-block;
-    background: #fef3c7;
+    background: var(--primary-light);
     color: #92400e;
     font-size: 0.78rem;
     font-weight: 700;
@@ -871,7 +901,7 @@ body {
 }
 
 .trivia-question {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #111827;
 }
@@ -883,7 +913,7 @@ body {
 }
 
 .trivia-option-btn {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1.5px solid var(--border);
     border-radius: 8px;
     padding: 0.75rem 1rem;
@@ -892,7 +922,7 @@ body {
     gap: 0.75rem;
     text-align: left;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     color: #1f2937;
     transition: all 0.2s;
 }
@@ -980,7 +1010,7 @@ body {
 
 /* Tarjeta de Nivel y Barra de Progreso */
 .level-card {
-    background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%);
+    background: linear-gradient(135deg, #ffffff 0%, var(--card-bg) 100%);
     border: 2.5px solid #fde68a;
     border-radius: var(--radius-lg);
     padding: 1.5rem 1.75rem;
@@ -1004,14 +1034,25 @@ body {
 }
 
 .level-icon {
-    font-size: 2.5rem;
-    background: #fef3c7;
-    border: 2px solid #f59e0b;
-    border-radius: 50%;
-    padding: 0.35rem 0.65rem;
+    width: 3.6rem;
+    height: 3.6rem;
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Sello del nivel (SVG local): hereda el tamaño del texto donde se incrusta */
+.level-seal {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -0.22em;
+}
+
+.level-icon .level-seal {
+    width: 100%;
+    height: 100%;
+    vertical-align: 0;
 }
 
 .level-title-label {
@@ -1041,7 +1082,7 @@ body {
     display: block;
     font-size: 1.4rem;
     font-weight: 800;
-    color: #d97706;
+    color: var(--primary);
 }
 
 .xp-label {
@@ -1068,7 +1109,7 @@ body {
 
 .level-progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%);
+    background: linear-gradient(90deg, var(--brass) 0%, var(--accent) 100%);
     border-radius: 9999px;
     transition: width 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
@@ -1078,7 +1119,7 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    animation: shine 2.5s infinite;
+    animation: shine 2s var(--ease-out) 1;
 }
 
 @keyframes shine {
@@ -1135,7 +1176,7 @@ body {
 
 .needs-practice-column {
     border: 2px solid #fed7aa;
-    background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+    background: linear-gradient(180deg, #ffffff 0%, var(--primary-light) 100%);
 }
 
 .column-header {
@@ -1190,7 +1231,7 @@ body {
 
 /* Tarjetas de tema individual */
 .topic-item-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
     padding: 0.85rem 1rem;
@@ -1277,7 +1318,7 @@ body {
 }
 
 .status-needs-practice {
-    background: #fff7ed;
+    background: var(--primary-light);
     color: #9a3412;
     border: 1px solid #fed7aa;
 }
@@ -1314,7 +1355,7 @@ body {
 }
 
 .empty-topics-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 2px dashed #cbd5e1;
     border-radius: var(--radius-md);
     padding: 1.5rem 1rem;
@@ -1352,4 +1393,731 @@ body {
     font-size: 0.8rem;
     color: #9ca3af;
     margin-top: 0.25rem;
+}
+
+/* ========================================================
+   PASAPORTE DEL TIEMPO — TIPOGRAFÍA Y MOVIMIENTO
+   Todo es CSS + JS propio: sin librerías ni CDN.
+   ======================================================== */
+
+/* --- Jerarquía tipográfica: la display solo para títulos --- */
+h1, h2, h3, .hero-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+}
+
+h4, .story-header h4, .topic-item-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.1px;
+}
+
+.dashboard-header h2 { font-size: 1.5rem; }
+.badges-header h3,
+.stats-header h2,
+.column-header h3 { font-size: 1.2rem; }
+
+/* Los textos de lectura larga respiran mejor en Nunito */
+.story-summary,
+.story-trivia .trivia-question,
+.welcome-speech-bubble,
+.topic-item-reason {
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+/* --- Suelo de papel: dos halos muy tenues, sin imágenes --- */
+body {
+    background-image:
+        radial-gradient(900px 500px at 10% -10%, rgba(176, 122, 42, 0.07), transparent 70%),
+        radial-gradient(700px 400px at 100% 0%, rgba(47, 111, 107, 0.06), transparent 70%);
+    background-attachment: fixed;
+}
+
+/* --- Entrada de pantalla (sustituye al fadeIn genérico) --- */
+.screen.active {
+    animation: screenIn 240ms var(--ease-out) both;
+}
+
+/* --- Entrada escalonada de tarjetas: --i lo pone app.js --- */
+.user-profile-card,
+.story-card,
+.badge-item,
+.topic-item-card {
+    animation: cardIn 320ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+.topic-item-card {
+    animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+/* --- Tarjeta de perfil: se levanta 2 px, no 3 --- */
+.user-profile-card {
+    transition: transform 160ms var(--ease-out),
+                border-color 160ms var(--ease-out),
+                box-shadow 160ms var(--ease-out);
+}
+
+.user-profile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -12px rgba(30, 42, 74, 0.28);
+}
+
+.user-profile-card:active {
+    transform: translateY(0) scale(0.99);
+}
+
+/* El avatar del perfil elegido late una sola vez */
+.active-user-card .user-card-avatar {
+    animation: pulseOnce 700ms var(--ease-out) 1;
+}
+
+/* --- Sello de medalla recién ganada --- */
+.badge-item.badge-new {
+    animation: stampIn 460ms var(--ease-out) backwards;
+    border-color: var(--seal);
+    color: var(--seal);
+    background: #FFF3EE;
+}
+
+.badge-item.badge-new .badge-icon {
+    animation: pulseOnce 700ms var(--ease-out) 1;
+}
+
+/* --- Botones: 1 px de elevación, sin glow --- */
+.btn,
+.btn-hero,
+.trivia-option-btn,
+.tab-btn,
+.grade-card {
+    transition: transform 130ms var(--ease-out),
+                background-color 130ms var(--ease-out),
+                border-color 130ms var(--ease-out),
+                box-shadow 130ms var(--ease-out),
+                color 130ms var(--ease-out);
+}
+
+.btn:active,
+.btn-hero:active,
+.trivia-option-btn:active,
+.tab-btn:active,
+.grade-card:active {
+    transform: scale(0.98);
+}
+
+.tab-btn:hover { transform: translateY(-1px); }
+.tab-btn.active { transform: none; }
+
+/* --- Opción de trivia correcta / incorrecta --- */
+.trivia-option-btn.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+    color: #14532d;
+    font-weight: 700;
+}
+
+.story-card.shake-once {
+    animation: shakeOnce 260ms ease-in-out 1;
+}
+
+/* --- Partículas de tinta (12, se generan en app.js) --- */
+.particle-burst {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.ink-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--seal);
+    opacity: 0;
+    animation: inkParticle 620ms var(--ease-out) forwards;
+}
+
+.ink-particle:nth-child(3n) { background: var(--brass); }
+.ink-particle:nth-child(3n + 1) { background: var(--accent); }
+
+/* --- Foco visible y accesible en todo lo interactivo --- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+.screen:focus { outline: none; }
+
+/* --- Utilidad para lectores de pantalla --- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========================================================
+   KEYFRAMES
+   ======================================================== */
+
+@keyframes screenIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.995); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* El sello baja, se pasa un poco y se asienta: gesto de estampar */
+@keyframes stampIn {
+    0%   { opacity: 0; transform: scale(1.35) rotate(-12deg); }
+    60%  { opacity: 1; transform: scale(0.96) rotate(2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes shakeOnce {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-3px); }
+    40%      { transform: translateX(3px); }
+    60%      { transform: translateX(-2px); }
+    80%      { transform: translateX(2px); }
+}
+
+@keyframes pulseOnce {
+    0%   { box-shadow: 0 0 0 0 rgba(228, 87, 46, 0.45); }
+    100% { box-shadow: 0 0 0 12px rgba(228, 87, 46, 0); }
+}
+
+@keyframes sway {
+    0%, 100% { transform: rotate(-2deg); }
+    50%      { transform: rotate(2deg); }
+}
+
+@keyframes inkParticle {
+    0%   { opacity: 0.9; transform: rotate(var(--a)) translateY(0) scale(1); }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(0.35); }
+}
+
+/* ========================================================
+   MOVIMIENTO REDUCIDO — se respeta la preferencia del sistema
+   ======================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .particle-burst { display: none; }
+}
+
+/* ========================================================
+   PANTALLAS PEQUEÑAS — la display baja de tamaño sin romper
+   ======================================================== */
+@media (max-width: 560px) {
+    .hero-title { font-size: 2.1rem; }
+    .dashboard-header h2 { font-size: 1.25rem; }
+    .story-card { padding: 1.25rem; }
+}
+
+/* ========================================================
+   DISTRIBUCIÓN DEL TABLERO
+   Perfil + salón de medallas arriba · grados en una barra
+   centrada · relatos en columna centrada
+   ======================================================== */
+
+.dashboard-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 1.25rem;
+    align-items: stretch;
+    margin-bottom: 1.25rem;
+}
+
+.dashboard-top > .dashboard-header,
+.dashboard-top > .badges-panel {
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+/* El perfil se lee de arriba a abajo dentro de su columna */
+.dashboard-top .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.dashboard-top .header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.dashboard-top .header-actions .btn {
+    justify-content: center;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.85rem;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+/* El salón de medallas llena su columna */
+.badges-panel {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+}
+
+.dashboard-top .badges-panel {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.dashboard-top .badges-panel .badges-header { margin-bottom: 0; }
+
+.badges-header h3 { color: var(--ink); }
+.empty-badges { color: var(--text-muted); }
+
+.badges-list {
+    align-content: flex-start;
+}
+
+/* ===== RACHA Y CALENDARIO DE CALOR (estilo GitHub) =====
+   Vive al costado, dentro de la tarjeta de medallas: usa el hueco libre
+   de esa columna y no empuja el contenido central. */
+.streak-panel {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--border);
+}
+
+.streak-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.streak-flame {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.streak-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.15;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.streak-best {
+    margin: 0.1rem 0 0;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.streak-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 0.5rem);
+    grid-auto-flow: column;
+    grid-auto-columns: 0.5rem;
+    gap: 0.12rem;
+}
+
+.streak-cell {
+    border-radius: 2px;
+    background: #EDE3CD;                       /* no entró ese día */
+    border: 1px solid rgba(30, 42, 74, 0.06);
+    animation: streak-in 0.3s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 3ms);
+}
+
+.streak-cell[data-level="1"] { background: #E7D3A6; }  /* entró, sin misiones */
+.streak-cell[data-level="2"] { background: #D6A85F; }  /* 1 misión */
+.streak-cell[data-level="3"] { background: #C07C33; }  /* 2 misiones */
+.streak-cell[data-level="4"] { background: var(--seal); }  /* 3 o más */
+
+.streak-cell.is-today {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+}
+
+.streak-cell.is-future {
+    visibility: hidden;
+}
+
+@keyframes streak-in {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Barra de grados: centrada y con aire de control */
+.grade-tabs-nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 1.75rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.tabs-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.tabs-list {
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.tab-btn {
+    padding: 0.45rem 0.9rem;
+    border-radius: 9999px;
+}
+
+/* Relatos y retos: columna centrada */
+.stories-section {
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.section-title-row { text-align: center; }
+
+.section-title-row h3 {
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-light);
+}
+
+@media (max-width: 820px) {
+    .dashboard-top { grid-template-columns: 1fr; }
+
+    .dashboard-top .dashboard-header {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .dashboard-top .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .dashboard-top .header-actions .btn { flex: 1 1 auto; }
+}
+
+@media (max-width: 560px) {
+    .grade-tabs-nav { width: 100%; padding: 0.75rem 0.6rem; }
+    .tabs-list { gap: 0.3rem; }
+    .tab-btn { padding: 0.4rem 0.65rem; font-size: 0.8rem; }
+    .stories-section { max-width: 100%; }
+}
+
+/* --- Vitrina de medallas plegable --- */
+.badges-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badges-toggle {
+    background: transparent;
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    border-radius: 9999px;
+    padding: 0.2rem 0.7rem;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color 130ms var(--ease-out), color 130ms var(--ease-out);
+}
+
+.badges-toggle:hover {
+    background: var(--primary-light);
+    color: var(--primary-hover);
+}
+
+.badges-list {
+    max-height: 60rem;
+    overflow: hidden;
+    transition: max-height 280ms var(--ease-out);
+}
+
+/* Plegada: una fila completa y un trozo de la siguiente como pista */
+.badges-panel.is-collapsed .badges-list {
+    max-height: 2.7rem;
+}
+
+/* ========================================================
+   APROVECHAR EL ANCHO DE PANTALLA
+   ======================================================== */
+
+.app-wrapper {
+    max-width: 1200px;
+}
+
+/* Portada: el contenedor crece, pero el texto no se estira sin límite */
+.welcome-speech-bubble,
+.onboarding-form,
+.existing-users-panel {
+    max-width: 1040px;
+    margin-inline: auto;
+}
+
+/* Tablero: el salón de medallas gana algo más de sitio que el perfil
+   (solo con ancho suficiente: en móvil manda la regla de una columna) */
+@media (min-width: 821px) {
+    .dashboard-top {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    }
+}
+
+/* Relatos: misma anchura que el resto, dos columnas cuando hay espacio */
+.stories-section {
+    max-width: 100%;
+}
+
+@media (min-width: 1000px) {
+    .stories-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        gap: 1.5rem;
+    }
+}
+
+/* Pantallas medianas: se vuelve al ancho cómodo de una columna */
+@media (max-width: 999px) {
+    .app-wrapper { max-width: 920px; }
+    .stories-section { max-width: 780px; }
+}
+
+@media (max-width: 560px) {
+    .stories-section { max-width: 100%; }
+    .welcome-speech-bubble,
+    .onboarding-form,
+    .existing-users-panel { max-width: 100%; }
+}
+
+/* ========================================================
+   FONDO POR GRADO: cada grado viaja a su propia época
+   ======================================================== */
+
+body {
+    transition: background-color 400ms var(--ease-out);
+}
+
+body[data-grade="1"] { --bg-page: #F7E7D2; }  /* Prehistoria: tierra y fuego */
+body[data-grade="2"] { --bg-page: #F5E6C4; }  /* Egipto: arena y papiro */
+body[data-grade="3"] { --bg-page: #E7EEF6; }  /* Grecia y Roma: azul Egeo */
+body[data-grade="4"] { --bg-page: #E8F1E6; }  /* Edad Media: bosque y castillos */
+body[data-grade="5"] { --bg-page: #FAE4DA; }  /* Mexica y exploradores: adobe */
+body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y modernidad */
+
+/* ========================================================
+   PREGUNTA DIARIA: un reto nuevo cada día
+   ======================================================== */
+
+.daily-question-panel {
+    margin: 1rem 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1rem 1.5rem;
+}
+
+.daily-question-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.daily-question-icon {
+    font-size: 1.2rem;
+}
+
+.daily-question-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ink);
+}
+
+.daily-question-card {
+    background: var(--bg-page);
+}
+
+.daily-question-text {
+    margin: 0.2rem 0 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.daily-question-grade {
+    margin: 0.2rem 0 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+@media (max-width: 560px) {
+    .daily-question-panel {
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+    }
+    .daily-question-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .daily-question-text {
+        font-size: 0.75rem;
+    }
+    .daily-question-grade {
+        text-align: left;
+        margin-top: 0.3rem;
+    }
+}
+
+/* ========================================================
+   RETO DEL DÍA EN LA UI
+   ======================================================== */
+
+.btn-daily-answer {
+    width: 100%;
+    padding: 0.6rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 150ms var(--ease-out);
+    margin-top: 0.5rem;
+}
+
+.btn-daily-answer:hover {
+    background: var(--primary-hover);
+}
+
+@media (max-width: 560px) {
+    .btn-daily-answer {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================================
+   FAB: Botón flotante de pregunta del día
+   ======================================================== */
+
+.fab-daily {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    transition: transform 150ms var(--ease-out);
+    flex-shrink: 0;
+}
+
+.fab-daily:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+.fab-daily:active {
+    transform: scale(0.95);
+}
+
+/* Panel modal que aparece al hacer FAB */
+.fab-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    max-width: 90vw;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1rem 1.5rem;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 150ms var(--ease-out), visibility 150ms var(--ease-out);
+}
+
+.fab-panel.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 560px) {
+    .fab-daily {
+        bottom: 10px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+    }
+    .fab-panel {
+        bottom: 55px;
+        right: 10px;
+        width: calc(100vw - 20px);
+        max-width: none;
+        padding: 0.75rem;
+    }
 }

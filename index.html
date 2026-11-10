@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historia Divertida - Para Pequeños Historiadores</title>
+    <link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -125,6 +127,8 @@
 
         <!-- ================= PANTALLA PRINCIPAL (TABLERO DE AVENTURAS) ================= -->
         <main id="dashboard-screen" class="screen">
+            <!-- Bloque superior: perfil a la izquierda, salón de medallas a la derecha -->
+            <div class="dashboard-top">
             <!-- Barra superior personalizada -->
             <header class="dashboard-header">
                 <div class="user-greeting-box">
@@ -151,12 +155,35 @@
             <section class="badges-panel">
                 <div class="badges-header">
                     <h3>🏆 Salón de Medallas del Pequeño Historiador</h3>
-                    <span class="badge-counter" id="badge-count">0 Medallas Ganadas</span>
+                    <div class="badges-header-actions">
+                        <span class="badge-counter" id="badge-count">0 Medallas Ganadas</span>
+                        <button type="button" class="badges-toggle hidden" id="badges-toggle"
+                                aria-expanded="false" aria-controls="badges-container">
+                            Ver todas ▾
+                        </button>
+                    </div>
                 </div>
                 <div class="badges-list" id="badges-container">
                     <p class="empty-badges">¡Resuelve las trivias históricas para ganar tus primeras medallas!</p>
                 </div>
+
+                <!-- Racha de días seguidos y calendario de calor (al costado, bajo las medallas) -->
+                <div class="streak-panel">
+                    <div class="streak-summary">
+                        <span class="streak-flame" aria-hidden="true">🔥</span>
+                        <div>
+                            <h3 class="streak-title">
+                                <span id="streak-current">0</span>
+                                <span id="streak-current-label">días seguidos</span>
+                            </h3>
+                            <p class="streak-best">Récord: <strong id="streak-best">0</strong> días</p>
+                        </div>
+                    </div>
+                    <div class="streak-grid" id="streak-grid"
+                         role="img" aria-label="Calendario de actividad de las últimas 8 semanas"></div>
+                </div>
             </section>
+            </div>
 
             <!-- Navegador de Grados Escolares -->
             <nav class="grade-tabs-nav">
@@ -170,6 +197,23 @@
                     <button class="tab-btn" data-grade="6">6º Primaria</button>
                 </div>
             </nav>
+
+            <!-- Pregunta diaria -->
+            <div class="daily-question-panel" id="daily-question-panel" hidden>
+                <div class="daily-question-header">
+                    <span class="daily-question-icon" aria-hidden="true">📅</span>
+                    <h4 class="daily-question-title">🎯 Pregunta del día</h4>
+                </div>
+                <div class="daily-question-card" id="daily-question-card">
+                    <p class="daily-question-text">Responde una pregunta histórica para ganar una medalla.</p>
+                    <p class="daily-question-grade" id="daily-question-grade"></p>
+                    <button class="btn btn-daily-answer" id="btn-daily-start">Empezar reto</button>
+                </div>
+            </div>
+            <!-- FAB: Botón flotante de pregunta del día -->
+            <button class="fab-daily" id="fab-daily" aria-label="Pregunta del día" title="Pregunta del día">
+                <span aria-hidden="true">📅</span>
+            </button>
 
             <!-- Misiones y Relatos Históricos -->
             <section class="stories-section">
@@ -205,7 +249,7 @@
             <section class="level-card">
                 <div class="level-card-top">
                     <div class="level-badge-container">
-                        <span class="level-icon" id="stats-level-icon">🐣</span>
+                        <span class="level-icon" id="stats-level-icon"><img class="level-seal" src="img/niveles/nivel-1.svg" alt="" width="128" height="128"></span>
                         <div>
                             <span class="level-title-label">Nivel del Pequeño Historiador</span>
                             <h3 class="level-title" id="stats-level-title">Nivel 1: Novato del Tiempo</h3>
@@ -276,6 +320,9 @@
         </footer>
 
     </div>
+
+    <!-- Avisos para lectores de pantalla (nueva medalla, respuesta correcta...) -->
+    <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
 
     <script src="app.js"></script>
 </body>

@@ -10,7 +10,7 @@ import socketserver
 import sys
 import urllib.parse
 import webbrowser
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import turso_db
@@ -19,177 +19,12 @@ PORT = 5000
 BASE_DIR = Path(__file__).parent.resolve()
 DATA_FILE = BASE_DIR / "data.json"
 
-# Historias y misiones educativas adaptadas por grado escolar
-STORIES_DATA = {
-    "1": [
-        {
-            "id": "1-1",
-            "title": "El Gran Viaje con los Dinosaurios",
-            "period": "Prehistoria",
-            "icon": "🦖",
-            "summary": "Hace millones de años, enormes criaturas habitaban la Tierra. ¡Descubre cómo vivía el T-Rex y el Triceratops!",
-            "fun_fact": "¿Sabías que algunos dinosaurios tenían plumas de colores brillantes?",
-            "trivia": {
-                "question": "¿Cuál de estos dinosaurios era famoso por sus 3 cuernos y un gran escudo?",
-                "options": ["Tiranosaurio Rex", "Triceratops", "Velociraptor"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "1-2",
-            "title": "La Primera Fogata de la Humanidad",
-            "period": "Edad de Piedra",
-            "icon": "🔥",
-            "summary": "Los primeros humanos aprendieron a hacer fuego frotando piedras y maderas para calentarse en las cavernas.",
-            "fun_fact": "El fuego no solo daba calor, ¡también servía para contar historias en la noche y protegerse de animales salvajes!",
-            "trivia": {
-                "question": "¿En qué lugares pintaban los primeros seres humanos a los animales?",
-                "options": ["En cuadernos de papel", "En las paredes de las cuevas", "En computadoras"],
-                "answer": 1
-            }
-        }
-    ],
-    "2": [
-        {
-            "id": "2-1",
-            "title": "El Misterio de las Pirámides y Faraones",
-            "period": "Antiguo Egipto",
-            "icon": "🏺",
-            "summary": "A orillas del río Nilo, los antiguos egipcios construyeron monumentos gigantescos que aún asombran al mundo.",
-            "fun_fact": "Los gatos eran tan sagrados en Egipto que se creía que traían buena suerte a las casas de los faraones.",
-            "trivia": {
-                "question": "¿Cómo se llamaba la escritura egipcia hecha con dibujos y símbolos?",
-                "options": ["Jeroglíficos", "Código Morse", "Alfabeto romano"],
-                "answer": 0
-            }
-        },
-        {
-            "id": "2-2",
-            "title": "Navegantes del Nilo",
-            "period": "Egipto y Comercio",
-            "icon": "⛵",
-            "summary": "Gracias a los barcos de papiro, los egipcios podían transportar trigo, piedras enormes y tesoros.",
-            "fun_fact": "El papiro fue el abuelo del papel moderno; se hacía con tallos de plantas acuáticas.",
-            "trivia": {
-                "question": "¿Cuál es el río más famoso donde floreció la civilización egipcia?",
-                "options": ["Río Amazonas", "Río Nilo", "Río Bravo"],
-                "answer": 1
-            }
-        }
-    ],
-    "3": [
-        {
-            "id": "3-1",
-            "title": "El Primer Estadio de los Juegos Olímpicos",
-            "period": "Antigua Grecia",
-            "icon": "🏛️",
-            "summary": "En la ciudad de Olimpia, los atletas competían en carreras y lanzamiento de disco en honor a los dioses griegos.",
-            "fun_fact": "A los campeones no les daban medallas de oro, ¡les colocaban coronas hechas con ramas de olivo silvestre!",
-            "trivia": {
-                "question": "¿Cada cuántos años se celebraban los Juegos Olímpicos en la antigua Grecia?",
-                "options": ["Cada 10 años", "Cada 4 años", "Cada semana"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "3-2",
-            "title": "El Coliseo y los Acueductos Romanos",
-            "period": "Imperio Romano",
-            "icon": "🛡️",
-            "summary": "Los ingenieros romanos inventaron puentes gigantes llamados acueductos para llevar agua limpia a ciudades enteras.",
-            "fun_fact": "Los romanos inventaron un tipo de concreto tan resistente que sus edificios siguen en pie después de 2,000 años.",
-            "trivia": {
-                "question": "¿Cómo se llamaba la prenda de vestir blanca que usaban los ciudadanos de Roma?",
-                "options": ["Sombraje", "Toga", "Armadura de cuero"],
-                "answer": 1
-            }
-        }
-    ],
-    "4": [
-        {
-            "id": "4-1",
-            "title": "Los Astrónomos de Chichén Itzá y Palenque",
-            "period": "Cultura Maya",
-            "icon": "🌽",
-            "summary": "Los sabios mayas contaban los días observando las estrellas y el movimiento de los planetas con asombrosa exactitud.",
-            "fun_fact": "Los mayas fueron de los primeros pueblos en inventar y utilizar el número CERO.",
-            "trivia": {
-                "question": "¿Qué bebida deliciosa y amarga preparaban con semillas de cacao?",
-                "options": ["Té de limón", "Chocolate sagrado (xocolātl)", "Jugo de naranja"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "4-2",
-            "title": "Torneos y Castillos Medievales",
-            "period": "Edad Media",
-            "icon": "🏰",
-            "summary": "Caballeros con pesadas armaduras de metal cuidaban fortalezas con puentes levadizos y altas torres vigía.",
-            "fun_fact": "Una armadura completa de caballero podía llegar a pesar más de 25 kilos.",
-            "trivia": {
-                "question": "¿Qué rodeaba los castillos para evitar que los enemigos se acercaran fácilmente?",
-                "options": ["Un foso con agua", "Una autopista", "Campos de girasoles"],
-                "answer": 0
-            }
-        }
-    ],
-    "5": [
-        {
-            "id": "5-1",
-            "title": "La Gran Tenochtitlan sobre el Lago",
-            "period": "Cultura Mexica",
-            "icon": "🦅",
-            "summary": "Una impresionante ciudad fundada sobre islotes en medio del lago de Texcoco, con calzadas, canales y chinampas flotantes.",
-            "fun_fact": "Las chinampas eran huertos flotantes donde cultivaban maíz, frijol y flores durante todo el año.",
-            "trivia": {
-                "question": "¿Qué señal vieron los mexicas para fundar su ciudad?",
-                "options": ["Un arcoíris doble", "Un águila devorando una serpiente sobre un nopal", "Un cometa de oro"],
-                "answer": 1
-            }
-        },
-        {
-            "id": "5-2",
-            "title": "Grandes Navegantes y Nuevos Horizontes",
-            "period": "Era de las Exploraciones",
-            "icon": "🧭",
-            "summary": "Capitanes valientes cruzaron océanos desconocidos guiados por la brújula y las constelaciones marinas.",
-            "fun_fact": "Para orientarse de noche en alta mar, los marineros usaban un instrumento llamado astrolabio.",
-            "trivia": {
-                "question": "¿Qué instrumento con una aguja imantada siempre apunta hacia el Norte?",
-                "options": ["Telescopio", "Brújula", "Reloj de arena"],
-                "answer": 1
-            }
-        }
-    ],
-    "6": [
-        {
-            "id": "6-1",
-            "title": "La Revolución de las Máquinas de Vapor",
-            "period": "Revolución Industrial",
-            "icon": "🚂",
-            "summary": "El ferrocarril y las locomotoras cambiaron la forma en que los seres humanos viajaban y comerciaban en todo el planeta.",
-            "fun_fact": "Antes de los trenes, un viaje entre dos ciudades podía tardar varias semanas en diligencia o a caballo.",
-            "trivia": {
-                "question": "¿Qué elemento hacía funcionar a las primeras locomotoras de la Revolución Industrial?",
-                "options": ["Vapor de agua generado por carbón", "Baterías de litio", "Gasolina espacial"],
-                "answer": 0
-            }
-        },
-        {
-            "id": "6-2",
-            "title": "El Salto a las Estrellas: Llegada a la Luna",
-            "period": "Historia Contemporánea",
-            "icon": "🚀",
-            "summary": "En 1969, la nave Apolo 11 llevó a los primeros seres humanos a pisar la superficie de la Luna.",
-            "fun_fact": "La computadora del Apolo 11 tenía menos potencia de cálculo que cualquier reloj inteligente de hoy en día.",
-            "trivia": {
-                "question": "¿Quién fue el astronauta que pronunció la famosa frase: 'Un pequeño paso para el hombre, un gran salto para la humanidad'?",
-                "options": ["Neil Armstrong", "Galileo Galilei", "Julio Verne"],
-                "answer": 0
-            }
-        }
-    ]
-}
+# Historias y misiones educativas adaptadas por grado escolar (100 por grado)
+STORIES_FILE = BASE_DIR / "stories.json"
+
+with open(STORIES_FILE, "r", encoding="utf-8") as f:
+    STORIES_DATA = json.load(f)
+
 
 GRADE_ICONS = {
     "1": "🦖",
@@ -208,6 +43,24 @@ GRADE_NAMES = {
     "5": "5º de Primaria",
     "6": "6º de Primaria"
 }
+
+# Niveles: (misiones completadas necesarias, número, título, icono)
+# Umbrales reescalados a los 600 retos actuales (10 por cada grado).
+NIVELES = [
+    (0, 1, "Novato del Tiempo", "🐣"),
+    (10, 2, "Explorador Curioso", "🧭"),
+    (50, 3, "Guardián de Civilizaciones", "🛡️"),
+    (120, 4, "Cronista de la Historia", "📜"),
+    (220, 5, "Maestro de las Eras", "🏛️"),
+    (350, 6, "Gran Sabio del Tiempo Universal", "👑"),
+]
+
+# Retos que se muestran cada día por grado: lotes de 10 que rotan a diario
+RETOS_POR_DIA = 10
+
+# Tope de temas "por explorar" que devuelve /api/stats. Con 600 retos la lista
+# completa hace la pantalla inmanejable y no aporta nada.
+TOPE_NO_DOMINADOS = 40
 
 
 def load_database():
@@ -256,6 +109,74 @@ def get_current_user_data(db):
     return users.get(current_uid) or users.get(str(current_uid).lower())
 
 
+def calculate_streak(activity_days):
+    """Racha de días consecutivos con actividad, récord histórico y días del calendario."""
+    hoy = date.today()
+    dias = {}
+
+    for item in activity_days or []:
+        try:
+            dia = datetime.strptime(str(item.get("day", "")), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            continue
+        dias[dia] = int(item.get("missions", 0))
+
+    if not dias:
+        return {"current": 0, "best": 0, "days": []}
+
+    ordenados = sorted(dias)
+
+    # Récord histórico: la secuencia más larga de días seguidos
+    best = run = 1
+    for anterior, actual in zip(ordenados, ordenados[1:]):
+        run = run + 1 if (actual - anterior).days == 1 else 1
+        best = max(best, run)
+
+    # Racha actual: sigue viva si el último día activo fue hoy o ayer
+    current = 0
+    if (hoy - ordenados[-1]).days <= 1:
+        current = 1
+        i = len(ordenados) - 1
+        while i > 0 and (ordenados[i] - ordenados[i - 1]).days == 1:
+            current += 1
+            i -= 1
+
+    return {
+        "current": current,
+        "best": best,
+        "days": [
+            {"day": dia.isoformat(), "missions": dias[dia]}
+            for dia in ordenados if (hoy - dia).days <= 365
+        ]
+    }
+
+
+def retos_del_dia(grade, fecha=None):
+    """Los retos que tocan hoy para un grado: lotes de 10 que rotan cada día."""
+    retos = STORIES_DATA.get(str(grade)) or STORIES_DATA.get("1", [])
+    if not retos:
+        return []
+
+    fecha = fecha or date.today()
+    lotes = max(1, (len(retos) + RETOS_POR_DIA - 1) // RETOS_POR_DIA)
+    inicio = (fecha.toordinal() % lotes) * RETOS_POR_DIA
+    return retos[inicio:inicio + RETOS_POR_DIA]
+
+
+def pregunta_diaria(fecha=None):
+    """Un único reto del día, sacado de la pool de todos los grados mezclados."""
+    pool = [
+        {"grade": g, "story": reto}
+        for g in sorted(STORIES_DATA)
+        for reto in STORIES_DATA[g]
+    ]
+    if not pool:
+        return None
+
+    fecha = fecha or date.today()
+    return pool[fecha.toordinal() % len(pool)]
+
+
 def calculate_user_stats(user_data):
     """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
     if not user_data:
@@ -287,35 +208,16 @@ def calculate_user_stats(user_data):
     percent = round((completed_count / total) * 100) if total > 0 else 0
 
     # Sistema de niveles para el pequeño historiador
-    if completed_count == 0:
-        level_num = 1
-        level_title = "Novato del Tiempo"
-        level_icon = "🐣"
-        next_target = "Completa 1 misión histórica para subir al Nivel 2"
-    elif completed_count < 3:
-        level_num = 2
-        level_title = "Explorador Curioso"
-        level_icon = "🧭"
-        next_target = f"¡Te faltan {3 - completed_count} misión(es) para el Nivel 3!"
-    elif completed_count < 6:
-        level_num = 3
-        level_title = "Guardián de Civilizaciones"
-        level_icon = "🛡️"
-        next_target = f"¡Te faltan {6 - completed_count} misión(es) para el Nivel 4!"
-    elif completed_count < 9:
-        level_num = 4
-        level_title = "Cronista de la Historia"
-        level_icon = "📜"
-        next_target = f"¡Te faltan {9 - completed_count} misión(es) para el Nivel 5!"
-    elif completed_count < 12:
-        level_num = 5
-        level_title = "Maestro de las Eras"
-        level_icon = "🏛️"
-        next_target = f"¡Te faltan {12 - completed_count} misión(es) para el Nivel Máximo!"
+    idx = max(i for i, (umbral, *_) in enumerate(NIVELES) if completed_count >= umbral)
+    _, level_num, level_title, level_icon = NIVELES[idx]
+    if idx + 1 < len(NIVELES):
+        siguiente = NIVELES[idx + 1]
+        faltan = siguiente[0] - completed_count
+        next_target = (
+            f"¡Te {'falta' if faltan == 1 else 'faltan'} {faltan} "
+            f"{'misión' if faltan == 1 else 'misiones'} para el Nivel {siguiente[1]}!"
+        )
     else:
-        level_num = 6
-        level_title = "Gran Sabio del Tiempo Universal"
-        level_icon = "👑"
         next_target = "¡Felicidades, has alcanzado la máxima maestría histórica!"
 
     mastered = []
@@ -346,6 +248,13 @@ def calculate_user_stats(user_data):
                 "reason": "Has tenido dudas en este reto" if needs_practice else "Aún no has explorado esta época"
             })
 
+    # Con 600 retos, la lista de "por explorar" se hace enorme: priorizamos el
+    # grado activo y los que necesitan repaso, y recortamos el resto.
+    grade_actual = str(user_data.get("grade", "1"))
+    not_mastered.sort(key=lambda s: (s["grade"] != grade_actual, s["status_type"] != "needs_practice"))
+    no_dominados_total = len(not_mastered)
+    not_mastered = not_mastered[:TOPE_NO_DOMINADOS]
+
     return {
         "historian": {
             "name": user_data.get("name", "Pequeño Historiador"),
@@ -361,8 +270,10 @@ def calculate_user_stats(user_data):
             "icon": level_icon,
             "next_target": next_target
         },
+        "streak": calculate_streak(user_data.get("activity_days", [])),
         "mastered": mastered,
-        "not_mastered": not_mastered
+        "not_mastered": not_mastered,
+        "not_mastered_total": no_dominados_total
     }
 
 
@@ -411,6 +322,7 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                     "percent": st["percent"],
                     "level": st["level"],
                     "xp": st["xp"],
+                    "streak": st["streak"],
                     "last_active": u.get("last_active", u.get("created_at", "Reciente"))
                 })
 
@@ -452,12 +364,17 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json(200, stats)
             return
 
-        # Historias por grado escolar
+        # Historias del día por grado escolar + pregunta diaria de todos los grados
         if parsed.path == "/api/stories":
             query = urllib.parse.parse_qs(parsed.query)
             grade = query.get("grade", ["1"])[0]
-            stories = STORIES_DATA.get(str(grade), STORIES_DATA["1"])
-            self._send_json(200, {"grade": grade, "stories": stories})
+            if grade not in STORIES_DATA:
+                grade = "1"
+            self._send_json(200, {
+                "grade": grade,
+                "stories": retos_del_dia(grade),
+                "daily": pregunta_diaria()
+            })
             return
 
         if parsed.path == "/":
