@@ -1,12 +1,12 @@
 {
-  "current_user": "daya",
+  "current_user": "alexis",
   "users": {
-    "daya": {
-      "id": "daya",
-      "name": "daya",
+    "alexis": {
+      "id": "alexis",
+      "name": "alexis",
       "grade": "1",
-      "created_at": "29/10/2026 13:00",
-      "last_active": "06/11/2026 12:04",
+      "created_at": "06/11/2026 10:40",
+      "last_active": "11/11/2026 13:12",
       "badges": [
         "Medalla de Prehistoria",
         "Medalla de Edad de Piedra",
@@ -15,11 +15,30 @@
         "Medalla de Antigua Grecia",
         "Medalla de Imperio Romano",
         "Medalla de Cultura Maya",
+        "Medalla de Primeras Invenciones",
+        "Medalla de Edad de Hielo",
+        "Medalla de Arte Rupestre",
+        "Medalla de Agricultura",
+        "Medalla de Vida Cotidiana en Egipto",
+        "Medalla de Religión Egipcia",
+        "Medalla de Religión Griega",
+        "Medalla de Grecia y sus Leyendas",
+        "Medalla de Vida Cotidiana en Grecia",
+        "Medalla de Vida Cotidiana en Roma",
+        "Medalla de Legado Romano",
         "Medalla de Edad Media",
         "Medalla de Cultura Mexica",
         "Medalla de Era de las Exploraciones",
+        "Medalla de Comercio y Ciudades",
+        "Medalla de Encuentro de Dos Mundos",
         "Medalla de Revolución Industrial",
-        "Medalla de Historia Contemporánea"
+        "Medalla de Historia Contemporánea",
+        "Medalla de Grandes Inventos",
+        "Medalla de Derechos Humanos",
+        "Medalla de Era Digital",
+        "Medalla de Ciencia y Descubrimientos",
+        "Medalla de Exploración Espacial",
+        "Medalla de Templos"
       ],
       "completed_stories": [
         "1-1",
@@ -29,37 +48,61 @@
         "3-1",
         "3-2",
         "4-1",
+        "1-4",
+        "1-3",
+        "1-5",
+        "1-6",
+        "1-7",
+        "1-8",
+        "1-9",
+        "1-10",
+        "2-3",
+        "2-4",
+        "2-5",
+        "2-6",
+        "2-7",
+        "2-8",
+        "2-9",
+        "2-10",
+        "3-3",
+        "3-4",
+        "3-5",
+        "3-6",
+        "3-7",
+        "3-8",
+        "3-9",
+        "3-10",
         "4-2",
+        "4-3",
+        "4-4",
+        "4-5",
+        "4-6",
+        "4-7",
+        "4-8",
+        "4-9",
+        "4-10",
         "5-1",
         "5-2",
+        "5-3",
+        "5-4",
+        "5-5",
+        "5-6",
+        "5-7",
+        "5-8",
+        "5-9",
+        "5-10",
         "6-1",
-        "6-2"
-      ],
-      "attempted_stories": {}
-    },
-    "alexis": {
-      "id": "alexis",
-      "name": "alexis",
-      "grade": "1",
-      "created_at": "06/11/2026 10:40",
-      "last_active": "06/11/2026 11:46",
-      "badges": [
-        "Medalla de Prehistoria",
-        "Medalla de Edad de Piedra",
-        "Medalla de Antiguo Egipto",
-        "Medalla de Egipto y Comercio",
-        "Medalla de Antigua Grecia",
-        "Medalla de Imperio Romano",
-        "Medalla de Cultura Maya"
-      ],
-      "completed_stories": [
-        "1-1",
-        "1-2",
-        "2-1",
-        "2-2",
-        "3-1",
-        "3-2",
-        "4-1"
+        "6-2",
+        "6-3",
+        "6-4",
+        "6-5",
+        "6-6",
+        "6-7",
+        "6-8",
+        "6-9",
+        "6-10",
+        "2-91",
+        "2-92"
       ],
       "attempted_stories": {
         "1-1": {
@@ -96,22 +139,367 @@
           "attempts": 1,
           "wrong_count": 0,
           "correct": true
+        },
+        "1-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-5": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-6": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "1-10": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-5": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-6": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-10": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-5": {
+          "attempts": 2,
+          "wrong_count": 1,
+          "correct": true
+        },
+        "3-6": {
+          "attempts": 2,
+          "wrong_count": 1,
+          "correct": true
+        },
+        "3-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-10": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-5": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-6": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "4-10": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-1": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-5": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-6": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "5-10": {
+          "attempts": 2,
+          "wrong_count": 1,
+          "correct": true
+        },
+        "6-1": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-3": {
+          "attempts": 2,
+          "wrong_count": 1,
+          "correct": true
+        },
+        "6-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-5": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-6": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-7": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-8": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-9": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "6-10": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-91": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "2-92": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
         }
-      }
+      },
+      "activity_days": [
+        {
+          "day": "2026-11-09",
+          "missions": 2
+        },
+        {
+          "day": "2026-11-11",
+          "missions": 0
+        }
+      ]
+    },
+    "ñaña": {
+      "id": "ñaña",
+      "name": "ñaña",
+      "grade": "1",
+      "created_at": "04/11/2026 09:07",
+      "last_active": "09/11/2026 10:07",
+      "badges": [],
+      "completed_stories": [],
+      "attempted_stories": {},
+      "activity_days": [
+        {
+          "day": "2026-11-09",
+          "missions": 0
+        }
+      ]
+    },
+    "daya": {
+      "id": "daya",
+      "name": "daya",
+      "grade": "1",
+      "created_at": "29/10/2026 13:00",
+      "last_active": "07/11/2026 10:11",
+      "badges": [
+        "Medalla de Prehistoria",
+        "Medalla de Edad de Piedra",
+        "Medalla de Antiguo Egipto",
+        "Medalla de Egipto y Comercio",
+        "Medalla de Antigua Grecia",
+        "Medalla de Imperio Romano",
+        "Medalla de Cultura Maya",
+        "Medalla de Edad Media",
+        "Medalla de Cultura Mexica",
+        "Medalla de Era de las Exploraciones",
+        "Medalla de Revolución Industrial",
+        "Medalla de Historia Contemporánea"
+      ],
+      "completed_stories": [
+        "1-1",
+        "1-2",
+        "2-1",
+        "2-2",
+        "3-1",
+        "3-2",
+        "4-1",
+        "4-2",
+        "5-1",
+        "5-2",
+        "6-1",
+        "6-2"
+      ],
+      "attempted_stories": {},
+      "activity_days": []
     },
     "alex": {
       "id": "alex",
       "name": "ALEX",
       "grade": "1",
       "created_at": "04/11/2026 11:03",
-      "last_active": "04/11/2026 11:13",
+      "last_active": "06/11/2026 17:28",
       "badges": [
         "Medalla de Prehistoria",
-        "Medalla de Edad de Piedra"
+        "Medalla de Edad de Piedra",
+        "Medalla de Antigua Grecia",
+        "Medalla de Imperio Romano",
+        "Medalla de Religión Griega"
       ],
       "completed_stories": [
         "1-1",
-        "1-2"
+        "1-2",
+        "3-1",
+        "3-2",
+        "3-3",
+        "3-4"
       ],
       "attempted_stories": {
         "1-1": {
@@ -123,18 +511,29 @@
           "attempts": 6,
           "wrong_count": 0,
           "correct": true
+        },
+        "3-1": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-2": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-3": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
+        },
+        "3-4": {
+          "attempts": 1,
+          "wrong_count": 0,
+          "correct": true
         }
-      }
-    },
-    "ñaña": {
-      "id": "ñaña",
-      "name": "ñaña",
-      "grade": "1",
-      "created_at": "04/11/2026 09:07",
-      "last_active": "04/11/2026 09:23",
-      "badges": [],
-      "completed_stories": [],
-      "attempted_stories": {}
+      },
+      "activity_days": []
     }
   }
 }

@@ -1438,7 +1438,9 @@ body {
     background-attachment: fixed;
 }
 
-/* --- Entrada de pantalla (sustituye al fadeIn genérico) --- */
+/* --- Entrada de pantalla (sustituye al fadeIn genérico) ---
+   Solo opacidad: un `transform` con fill-mode both dejaría el <main> como
+   bloque contenedor y rompería los `position: fixed` de dentro (FAB). */
 .screen.active {
     animation: screenIn 240ms var(--ease-out) both;
 }
@@ -1578,9 +1580,11 @@ input:focus-visible,
    KEYFRAMES
    ======================================================== */
 
+/* Solo opacidad a propósito: cualquier `transform` crearía un bloque
+   contenedor para los `position: fixed` de dentro (el FAB del reto diario). */
 @keyframes screenIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes cardIn {
@@ -1991,11 +1995,15 @@ body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y moder
 
 .daily-question-card {
     background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
 }
 
 .daily-question-text {
-    margin: 0.2rem 0 0.5rem;
-    font-size: 0.85rem;
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
     color: var(--text-dark);
 }
 
@@ -2064,60 +2072,216 @@ body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y moder
     width: 56px;
     height: 56px;
     border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    line-height: 1;
     background: var(--primary);
     color: white;
     border: none;
     cursor: pointer;
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     z-index: 1000;
-    transition: transform 150ms var(--ease-out);
-    flex-shrink: 0;
+    transition: transform 150ms var(--ease-out), background 150ms var(--ease-out);
+    animation: fab-latido 2.8s ease-out infinite;
+}
+
+@keyframes fab-latido {
+    0%   { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22), 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent); }
+    70%  { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22), 0 0 0 10px color-mix(in srgb, var(--primary) 0%, transparent); }
+    100% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22), 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent); }
 }
 
 .fab-daily:hover {
     background: var(--primary-hover);
-    transform: scale(1.1);
+    transform: scale(1.08);
 }
 
 .fab-daily:active {
     transform: scale(0.95);
 }
 
+.fab-daily:focus-visible {
+    outline: 3px solid var(--primary-hover);
+    outline-offset: 3px;
+}
+
 /* Panel modal que aparece al hacer FAB */
 .fab-panel {
     position: fixed;
-    bottom: 80px;
+    bottom: 86px;
     right: 20px;
-    width: 300px;
-    max-width: 90vw;
+    width: 320px;
+    max-width: calc(100vw - 40px);
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 1rem 1.5rem;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+    padding: 1rem 1.25rem;
     z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 150ms var(--ease-out), visibility 150ms var(--ease-out);
+    display: none;
 }
 
 .fab-panel.active {
-    opacity: 1;
-    visibility: visible;
+    display: block;
+    animation: fab-panel-entrada 180ms var(--ease-out);
+}
+
+@keyframes fab-panel-entrada {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fab-daily,
+    .fab-panel.active { animation: none; }
 }
 
 @media (max-width: 560px) {
     .fab-daily {
         bottom: 10px;
         right: 10px;
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
+        font-size: 1.35rem;
     }
     .fab-panel {
-        bottom: 55px;
+        bottom: 66px;
+        left: 10px;
         right: 10px;
-        width: calc(100vw - 20px);
+        width: auto;
         max-width: none;
-        padding: 0.75rem;
+        padding: 0.85rem;
     }
 }
+
+/* ========================================================
+   RETO DEL DÍA: ventana emergente (modal)
+   ======================================================== */
+
+.daily-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.daily-modal[hidden] {
+    display: none;
+}
+
+.daily-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(28, 20, 10, 0.55);
+}
+
+.daily-modal-dialog {
+    position: relative;
+    width: min(660px, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.25rem 1.4rem 1.5rem;
+    animation: daily-modal-entrada 180ms var(--ease-out);
+}
+
+@keyframes daily-modal-entrada {
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+}
+
+.daily-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.daily-modal-header h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--ink);
+}
+
+.daily-modal-close {
+    flex-shrink: 0;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.daily-modal-close:hover {
+    background: var(--bg-page);
+}
+
+.daily-modal-close:focus-visible {
+    outline: 3px solid var(--primary-hover);
+    outline-offset: 2px;
+}
+
+/* La tarjeta ya vive dentro del diálogo: sin caja doble */
+.daily-modal-body .story-card {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+body.modal-abierto {
+    overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .daily-modal-dialog { animation: none; }
+}
+
+@media (max-width: 560px) {
+    .daily-modal { padding: 0.5rem; }
+    .daily-modal-dialog {
+        max-height: 92vh;
+        padding: 1rem;
+    }
+    .daily-modal-header h3 { font-size: 1.05rem; }
+}
+
+/* ========================================================
+   MEDALLAS: nivel por repeticiones y contador xN
+   ======================================================== */
+
+.badge-item.badge-bronce { border-color: #b45309; color: #92400e; }
+.badge-item.badge-plata  { border-color: #94a3b8; color: #475569; }
+.badge-item.badge-oro    { border-color: #d4a017; color: #8a6d00; }
+
+/* Varias misiones del mismo tema: la medalla se ve apilada, no repetida */
+.badge-item.badge-apilada {
+    box-shadow: 3px 3px 0 -1px var(--card-bg), 3px 3px 0 0 currentColor;
+}
+
+.badge-times {
+    margin-left: 0.1rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 9999px;
+    background: currentColor;
+    color: var(--card-bg);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+}
+
+/* La medalla recién ganada conserva el color de sello */
+.badge-item.badge-new { border-color: var(--seal); color: var(--seal); }

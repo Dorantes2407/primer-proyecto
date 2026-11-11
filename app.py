@@ -6,6 +6,7 @@ Aplicación interactiva con soporte para Turso (LibSQL en la nube) y SQLite loca
 import http.server
 import json
 import os
+import random
 import socketserver
 import sys
 import urllib.parse
@@ -55,7 +56,7 @@ NIVELES = [
     (350, 6, "Gran Sabio del Tiempo Universal", "👑"),
 ]
 
-# Retos que se muestran cada día por grado: lotes de 10 que rotan a diario
+# Retos que se muestran cada día por grado (aleatorios por niño/a)
 RETOS_POR_DIA = 10
 
 # Tope de temas "por explorar" que devuelve /api/stats. Con 600 retos la lista
@@ -151,20 +152,40 @@ def calculate_streak(activity_days):
     }
 
 
-def retos_del_dia(grade, fecha=None):
-    """Los retos que tocan hoy para un grado: lotes de 10 que rotan cada día."""
+def _rng_diario(user_id, grade, fecha, sal):
+    """Generador determinista: mismo niño + grado + día -> mismas preguntas."""
+    return random.Random(f"{user_id}|{grade}|{fecha.toordinal()}|{sal}")
+
+
+def retos_del_dia(grade, user_id="", completados=(), fecha=None):
+    """Los 10 retos de hoy para un grado, distintos en cada perfil.
+
+    Prioriza los que el niño aún no ha completado y rellena con el resto;
+    la semilla por usuario y día mantiene el set estable al recargar.
+    """
     retos = STORIES_DATA.get(str(grade)) or STORIES_DATA.get("1", [])
     if not retos:
         return []
 
     fecha = fecha or date.today()
-    lotes = max(1, (len(retos) + RETOS_POR_DIA - 1) // RETOS_POR_DIA)
-    inicio = (fecha.toordinal() % lotes) * RETOS_POR_DIA
-    return retos[inicio:inicio + RETOS_POR_DIA]
+    rng = _rng_diario(user_id, grade, fecha, "retos")
+    hechos = set(completados)
+
+    pendientes = [r for r in retos if r["id"] not in hechos]
+    rng.shuffle(pendientes)
+    seleccion = pendientes[:RETOS_POR_DIA]
+
+    if len(seleccion) < RETOS_POR_DIA:
+        elegidos = {r["id"] for r in seleccion}
+        resto = [r for r in retos if r["id"] not in elegidos]
+        rng.shuffle(resto)
+        seleccion += resto[:RETOS_POR_DIA - len(seleccion)]
+
+    return seleccion
 
 
-def pregunta_diaria(fecha=None):
-    """Un único reto del día, sacado de la pool de todos los grados mezclados."""
+def pregunta_diaria(user_id="", fecha=None):
+    """Un único reto del día por niño/a, sacado de la pool de todos los grados."""
     pool = [
         {"grade": g, "story": reto}
         for g in sorted(STORIES_DATA)
@@ -174,7 +195,32 @@ def pregunta_diaria(fecha=None):
         return None
 
     fecha = fecha or date.today()
-    return pool[fecha.toordinal() % len(pool)]
+    return _rng_diario(user_id, "todos", fecha, "diaria").choice(pool)
+
+
+def badge_counts(user_data):
+    """Misiones completadas por tema: cuántas veces se ha ganado cada medalla.
+
+    La tabla de medallas guarda una fila por tema; el número de repeticiones
+    sale de las misiones completadas que comparten ese tema.
+    """
+    periodo_por_id = {
+        s["id"]: s.get("period")
+        for lista in STORIES_DATA.values()
+        for s in lista
+    }
+    counts = {}
+    for story_id in (user_data or {}).get("completed_stories", []):
+        periodo = periodo_por_id.get(story_id)
+        if periodo:
+            nombre = f"Medalla de {periodo}"
+            counts[nombre] = counts.get(nombre, 0) + 1
+
+    # Medallas antiguas sin misiones asociadas siguen contando al menos 1
+    for nombre in (user_data or {}).get("badges", []):
+        counts.setdefault(nombre, 1)
+
+    return counts
 
 
 def calculate_user_stats(user_data):
@@ -281,6 +327,11 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(BASE_DIR), **kwargs)
 
+    def end_headers(self):
+        # App local: que el navegador nunca sirva app.js / style.css viejos
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
     def _send_json(self, status_code, payload):
         response_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status_code)
@@ -346,12 +397,14 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                         "grade": user.get("grade", "1")
                     },
                     "badges": user.get("badges", []),
+                    "badge_counts": badge_counts(user),
                     "completed_stories": user.get("completed_stories", [])
                 })
             else:
                 self._send_json(200, {
                     "historian": None,
                     "badges": [],
+                    "badge_counts": {},
                     "completed_stories": []
                 })
             return
@@ -370,17 +423,37 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             grade = query.get("grade", ["1"])[0]
             if grade not in STORIES_DATA:
                 grade = "1"
+            db = load_database()
+            user = get_current_user_data(db)
+            uid = (user or {}).get("id", "")
             self._send_json(200, {
                 "grade": grade,
-                "stories": retos_del_dia(grade),
-                "daily": pregunta_diaria()
+                "stories": retos_del_dia(
+                    grade, uid, (user or {}).get("completed_stories", [])
+                ),
+                "daily": pregunta_diaria(uid)
             })
             return
 
-        if parsed.path == "/":
-            self.path = "/index.html"
+        if parsed.path in ("/", "/index.html"):
+            self._send_index_html()
+            return
 
         super().do_GET()
+
+    def _send_index_html(self):
+        """Sirve index.html con ?v=<mtime> en CSS/JS: un refresco normal
+        trae siempre la versión nueva aunque el navegador tenga cache viejo."""
+        html = (BASE_DIR / "index.html").read_text(encoding="utf-8")
+        for asset in ("style.css", "app.js"):
+            version = int((BASE_DIR / asset).stat().st_mtime)
+            html = html.replace(f'"{asset}"', f'"{asset}?v={version}"')
+        data = html.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -425,6 +498,7 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                     "grade": found_user.get("grade", "1")
                 },
                 "badges": found_user.get("badges", []),
+                "badge_counts": badge_counts(found_user),
                 "completed_stories": found_user.get("completed_stories", [])
             })
             return
@@ -500,6 +574,7 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                 "correct": is_correct,
                 "correct_option": correct_index,
                 "badges": updated_user.get("badges", []),
+                "badge_counts": badge_counts(updated_user),
                 "completed_stories": updated_user.get("completed_stories", [])
             })
             return
