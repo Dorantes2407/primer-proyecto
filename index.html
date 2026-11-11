@@ -199,7 +199,7 @@
             </nav>
 
             <!-- Pregunta diaria -->
-            <div class="daily-question-panel" id="daily-question-panel" hidden>
+            <div class="daily-question-panel fab-panel" id="daily-question-panel">
                 <div class="daily-question-header">
                     <span class="daily-question-icon" aria-hidden="true">📅</span>
                     <h4 class="daily-question-title">🎯 Pregunta del día</h4>
@@ -323,6 +323,19 @@
 
     <!-- Avisos para lectores de pantalla (nueva medalla, respuesta correcta...) -->
     <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
+
+    <!-- Ventana emergente: reto del día -->
+    <div class="daily-modal" id="daily-modal" hidden>
+        <div class="daily-modal-backdrop" data-close-daily></div>
+        <div class="daily-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="daily-modal-title">
+            <div class="daily-modal-header">
+                <h3 id="daily-modal-title">🎯 Reto del día</h3>
+                <button type="button" class="daily-modal-close" data-close-daily
+                        aria-label="Cerrar la ventana del reto del día">✕</button>
+            </div>
+            <div class="daily-modal-body" id="daily-modal-body"></div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

@@ -467,11 +467,11 @@ async function loadStories(grade, targetStoryId = null) {
 }
 
 // 13. Renderizar tarjetas de relatos y trivias
-function renderStories(stories) {
-    storiesContainer.innerHTML = "";
+function renderStories(stories, container = storiesContainer) {
+    container.innerHTML = "";
 
     if (stories.length === 0) {
-        storiesContainer.innerHTML = `<p class="empty-state">No hay misiones disponibles para este grado en este momento.</p>`;
+        container.innerHTML = `<p class="empty-state">No hay misiones disponibles para este grado en este momento.</p>`;
         return;
     }
 
@@ -533,7 +533,7 @@ function renderStories(stories) {
             btn.addEventListener("click", () => handleAnswer(story.id, parseInt(btn.dataset.optionIdx, 10), card));
         });
 
-        storiesContainer.appendChild(card);
+        container.appendChild(card);
     });
 }
 
@@ -900,6 +900,35 @@ function focusScreen(elemento) {
    FAB: Inicializar botón flotante de pregunta del día
    ======================================================== */
 
+/* ========================================================
+   Reto del día: ventana emergente (no toca las tarjetas del grado)
+   ======================================================== */
+
+function abrirRetoDiario() {
+    const modal = document.getElementById("daily-modal");
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.classList.add("modal-abierto");
+    const cerrar = modal.querySelector(".daily-modal-close");
+    if (cerrar) cerrar.focus();
+}
+
+function cerrarRetoDiario() {
+    const modal = document.getElementById("daily-modal");
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove("modal-abierto");
+    const fab = document.getElementById("fab-daily");
+    if (fab) fab.focus();
+}
+
+document.querySelectorAll("[data-close-daily]").forEach((el) => {
+    el.addEventListener("click", cerrarRetoDiario);
+});
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarRetoDiario();
+});
+
 function initDailyFAB() {
     const fab = document.getElementById("fab-daily");
     const panel = document.getElementById("daily-question-panel");
@@ -909,70 +938,58 @@ function initDailyFAB() {
 
     let dailyData = null;
 
+    const setPanel = (abierto) => {
+        fabPanel.classList.toggle("active", abierto);
+        fab.setAttribute("aria-expanded", String(abierto));
+    };
+    fab.setAttribute("aria-controls", "daily-question-panel");
+    setPanel(false);
+
     // Mostrar u ocultar panel cuando se hace FAB
     fab.onclick = async () => {
         if (dailyData) {
             // Ya tenemos los datos, solo mostramos/ocultamos el panel
-            if (fabPanel) {
-                fabPanel.classList.toggle("active");
-            }
-            panel.hidden = !panel.hidden;
+            setPanel(!fabPanel.classList.contains("active"));
             return;
         }
 
         // Fetch la pregunta diaria
         try {
             const resp = await fetch("/api/stories?grade=" + currentGrade + "&daily=1");
-            if (!resp.ok) throw new Error("Error al cargar pregunta diaria");
+            if (!resp.ok) throw new Error("Error al cargar pregunta diaria: " + resp.status);
             const data = await resp.json();
-
             dailyData = data;
 
             if (!data.daily) {
-                panel.hidden = true;
-                if (fabPanel) fabPanel.classList.remove("active");
+                setPanel(false);
                 return;
             }
 
             const diario = data.daily;
+
             // Llenar el panel
-            const gradeEl = panel.querySelector("#daily-question-grade") || document.createElement("p");
-            gradeEl.id = "daily-question-grade";
-            gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
-            // Asegurarnos de que gradeEl esté en el DOM
-            const existingGrade = document.getElementById("daily-question-grade");
-            if (!existingGrade) {
-                const p = document.createElement("p");
-                p.id = "daily-question-grade";
-                p.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
-                panel.querySelector(".daily-question-card").prepend(p);
-            }
+            const gradeEl = panel.querySelector("#daily-question-grade");
+            if (gradeEl) gradeEl.textContent = `Grado ${diario.grade}: ${GRADE_NAMES[diario.grade]}`;
+            const qtxt = panel.querySelector(".daily-question-text");
+            if (qtxt) qtxt.textContent = diario.story.trivia.question;
 
-            const qtxt = panel.querySelector("#daily-question-text") || document.createElement("p");
-            qtxt.id = "daily-question-text";
-            qtxt.textContent = diario.trivia.question;
-            if (!existingGrade) panel.querySelector(".daily-question-card").prepend(qtxt);
-
-            // Botón empezar
+            // Botón empezar: el reto del día sale de los 600, así que casi nunca
+            // está en el lote de 10 del grado; lo pintamos directamente.
             const startBtn = panel.querySelector("#btn-daily-start");
             if (startBtn) {
                 startBtn.onclick = () => {
-                    window.location.hash = `#story-${diario.story.id}`;
-                    const storyScreen = document.getElementById("story-screen");
-                    if (storyScreen) storyScreen.classList.add("active");
-                    dashboardScreen.classList.remove("active");
-                    panel.hidden = true;
-                    if (fabPanel) fabPanel.classList.remove("active");
+                    setPanel(false);
+                    dailyData = null;
+                    renderStories([diario.story], document.getElementById("daily-modal-body"));
+                    abrirRetoDiario();
                 };
             }
 
             // Mostrar panel FAB y panel principal
-            panel.hidden = false;
-            if (fabPanel) fabPanel.classList.add("active");
+            setPanel(true);
         } catch (e) {
             console.error("Error obteniendo pregunta diaria:", e);
-            panel.hidden = true;
-            if (fabPanel) fabPanel.classList.remove("active");
+            setPanel(false);
         }
     };
 }

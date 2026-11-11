@@ -281,6 +281,11 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(BASE_DIR), **kwargs)
 
+    def end_headers(self):
+        # App local: que el navegador nunca sirva app.js / style.css viejos
+        self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
     def _send_json(self, status_code, payload):
         response_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status_code)
@@ -377,10 +382,25 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
-        if parsed.path == "/":
-            self.path = "/index.html"
+        if parsed.path in ("/", "/index.html"):
+            self._send_index_html()
+            return
 
         super().do_GET()
+
+    def _send_index_html(self):
+        """Sirve index.html con ?v=<mtime> en CSS/JS: un refresco normal
+        trae siempre la versión nueva aunque el navegador tenga cache viejo."""
+        html = (BASE_DIR / "index.html").read_text(encoding="utf-8")
+        for asset in ("style.css", "app.js"):
+            version = int((BASE_DIR / asset).stat().st_mtime)
+            html = html.replace(f'"{asset}"', f'"{asset}?v={version}"')
+        data = html.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
