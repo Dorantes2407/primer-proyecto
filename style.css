@@ -2257,3 +2257,31 @@ body.modal-abierto {
     }
     .daily-modal-header h3 { font-size: 1.05rem; }
 }
+
+/* ========================================================
+   MEDALLAS: nivel por repeticiones y contador xN
+   ======================================================== */
+
+.badge-item.badge-bronce { border-color: #b45309; color: #92400e; }
+.badge-item.badge-plata  { border-color: #94a3b8; color: #475569; }
+.badge-item.badge-oro    { border-color: #d4a017; color: #8a6d00; }
+
+/* Varias misiones del mismo tema: la medalla se ve apilada, no repetida */
+.badge-item.badge-apilada {
+    box-shadow: 3px 3px 0 -1px var(--card-bg), 3px 3px 0 0 currentColor;
+}
+
+.badge-times {
+    margin-left: 0.1rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 9999px;
+    background: currentColor;
+    color: var(--card-bg);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+}
+
+/* La medalla recién ganada conserva el color de sello */
+.badge-item.badge-new { border-color: var(--seal); color: var(--seal); }

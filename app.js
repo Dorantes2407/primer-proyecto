@@ -6,6 +6,7 @@
 let currentHistorian = null;
 let currentGrade = "1";
 let badges = [];
+let badgeCounts = {};          // medalla -> nº de misiones completadas de ese tema
 let badgesExpanded = false;   // la vitrina arranca plegada si hay muchas medallas
 let badgesAutoCollapse = null; // temporizador del plegado automático tras ganar
 let completedStories = [];
@@ -216,6 +217,7 @@ async function selectUser(userId) {
         currentHistorian = data.historian;
         currentGrade = String(currentHistorian.grade || "1");
         badges = data.badges || [];
+        badgeCounts = data.badge_counts || {};
         completedStories = data.completed_stories || [];
 
         showDashboard();
@@ -361,6 +363,7 @@ async function refreshActiveUserProfile() {
         if (response.ok) {
             const data = await response.json();
             badges = data.badges || [];
+            badgeCounts = data.badge_counts || {};
             completedStories = data.completed_stories || [];
         }
     } catch (e) {
@@ -570,9 +573,11 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
 
             // Actualizar medallas (guardamos las anteriores para estampar la nueva)
             const medallasPrevias = badges;
+            const conteosPrevios = badgeCounts;
             badges = result.badges || [];
+            badgeCounts = result.badge_counts || {};
             completedStories = result.completed_stories || [];
-            renderBadges(medallasPrevias);
+            renderBadges(medallasPrevias, conteosPrevios);
 
             announce(`¡Correcto! Has ganado una medalla. Ya tienes ${formatBadgeCount(badges.length)}.`);
         } else {
@@ -598,11 +603,22 @@ const BADGES_VISIBLES = 4;
 // Tiempo que la vitrina queda abierta tras ganar una medalla antes de plegarse sola
 const BADGES_AUTOCOLLAPSE_MS = 6000;
 
+// Nivel de la medalla según las misiones completadas de ese tema
+function nivelMedalla(veces) {
+    if (veces >= 6) return { icono: "🥇", clase: "badge-oro", titulo: "oro" };
+    if (veces >= 3) return { icono: "🥈", clase: "badge-plata", titulo: "plata" };
+    return { icono: "🥉", clase: "badge-bronce", titulo: "bronce" };
+}
+
 // 15. Renderizar vitrina de medallas del usuario activo
-// `previousBadges` solo se pasa al resolver una trivia: sirve para estampar la recién ganada.
-function renderBadges(previousBadges = null) {
+// `previousBadges`/`previousCounts` solo se pasan al resolver una trivia:
+// sirven para estampar la medalla recién ganada (aunque repita tema).
+function renderBadges(previousBadges = null, previousCounts = null) {
     const nuevaMedalla = previousBadges
-        ? badges.find(badge => !previousBadges.includes(badge))
+        ? badges.find((badge) =>
+              (badgeCounts[badge] || 1) > ((previousCounts || {})[badge] || 0) &&
+              previousBadges.includes(badge))
+          || badges.find((badge) => !previousBadges.includes(badge))
         : null;
 
     // Al ganar una medalla se despliega la vitrina un momento y se vuelve a plegar sola
@@ -631,12 +647,17 @@ function renderBadges(previousBadges = null) {
         return;
     }
 
-    badgesContainer.innerHTML = badges.map((badge, idx) => `
-        <div class="badge-item ${badge === nuevaMedalla ? "badge-new" : ""}" style="--i:${idx}">
-            <span class="badge-icon">🏅</span>
+    badgesContainer.innerHTML = badges.map((badge, idx) => {
+        const veces = badgeCounts[badge] || 1;
+        const nivel = nivelMedalla(veces);
+        return `
+        <div class="badge-item ${nivel.clase}${veces > 1 ? " badge-apilada" : ""} ${badge === nuevaMedalla ? "badge-new" : ""}" style="--i:${idx}">
+            <span class="badge-icon" role="img" aria-label="Medalla de ${nivel.titulo}">${nivel.icono}</span>
             <span class="badge-title">${escapeHtml(badge)}</span>
+            <span class="badge-times" title="${veces} ${veces === 1 ? "misión" : "misiones"} de este tema">x${veces}</span>
         </div>
-    `).join("");
+    `;
+    }).join("");
 
     updateBadgesToggle();
 }
