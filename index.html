@@ -158,16 +158,77 @@
                 </div>
             </section>
 
+            <!-- ================= TARJETA DE PROGRESIÓN DE GRADO Y REQUISITOS ================= -->
+            <section class="grade-progression-card" id="grade-progression-card">
+                <div class="progression-top-row">
+                    <div class="progression-grade-info">
+                        <span class="progression-grade-icon" id="progression-grade-icon">🦖</span>
+                        <div>
+                            <div class="progression-tag-wrapper">
+                                <span class="progression-status-pill pill-active" id="progression-status-pill">⭐ Grado Activo de la Partida</span>
+                            </div>
+                            <h3 class="progression-grade-title" id="progression-grade-title">1º de Primaria</h3>
+                        </div>
+                    </div>
+                    <div class="progression-badge-stat">
+                        <span class="progression-stat-count" id="progression-stat-count">0 / 2 misiones</span>
+                        <span class="progression-stat-pct" id="progression-stat-pct">0% completado</span>
+                    </div>
+                </div>
+
+                <!-- Barra de progreso del grado escolar activo -->
+                <div class="progression-track">
+                    <div class="progression-fill" id="progression-bar-fill" style="width: 0%;"></div>
+                </div>
+
+                <!-- Mensaje con requisito exacto para desbloquear el siguiente grado -->
+                <div class="progression-requirement-box" id="progression-requirement-box">
+                    <span class="req-icon">🎯</span>
+                    <div class="req-content">
+                        <strong>Requisito para desbloquear el siguiente grado:</strong>
+                        <p id="progression-requirement-text">Completa todas las actividades de este grado escolar para avanzar.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerta visual ante intentos de acceso a grados bloqueados -->
+            <div id="grade-lock-alert" class="grade-lock-alert hidden" role="alert">
+                <span class="lock-alert-icon">🔒</span>
+                <div class="lock-alert-body">
+                    <strong id="lock-alert-title">¡Grado Bloqueado durante la partida!</strong>
+                    <p id="lock-alert-message">Para desbloquear este grado escolar, primero debes completar las actividades de tu grado activo actual.</p>
+                </div>
+                <button type="button" class="btn-close-alert" id="btn-close-lock-alert" aria-label="Cerrar aviso">✕</button>
+            </div>
+
             <!-- Navegador de Grados Escolares -->
             <nav class="grade-tabs-nav">
-                <span class="tabs-label">Viajar a otro grado escolar:</span>
+                <span class="tabs-label">Viaje en el tiempo (Grados de Primaria):</span>
                 <div class="tabs-list" id="dashboard-grade-tabs">
-                    <button class="tab-btn active" data-grade="1">1º Primaria</button>
-                    <button class="tab-btn" data-grade="2">2º Primaria</button>
-                    <button class="tab-btn" data-grade="3">3º Primaria</button>
-                    <button class="tab-btn" data-grade="4">4º Primaria</button>
-                    <button class="tab-btn" data-grade="5">5º Primaria</button>
-                    <button class="tab-btn" data-grade="6">6º Primaria</button>
+                    <button class="tab-btn active" data-grade="1">
+                        <span class="tab-label">1º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-1">🌟 Activo</span>
+                    </button>
+                    <button class="tab-btn" data-grade="2">
+                        <span class="tab-label">2º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-2">🔒 Bloqueado</span>
+                    </button>
+                    <button class="tab-btn" data-grade="3">
+                        <span class="tab-label">3º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-3">🔒 Bloqueado</span>
+                    </button>
+                    <button class="tab-btn" data-grade="4">
+                        <span class="tab-label">4º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-4">🔒 Bloqueado</span>
+                    </button>
+                    <button class="tab-btn" data-grade="5">
+                        <span class="tab-label">5º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-5">🔒 Bloqueado</span>
+                    </button>
+                    <button class="tab-btn" data-grade="6">
+                        <span class="tab-label">6º Primaria</span>
+                        <span class="tab-badge" id="tab-badge-6">🔒 Bloqueado</span>
+                    </button>
                 </div>
             </nav>
 
@@ -268,6 +329,32 @@
 
             </div>
         </main>
+
+        <!-- ================= MODAL DE CELEBRACIÓN DE DESBLOQUEO DE GRADO ================= -->
+        <div id="grade-unlock-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+            <div class="unlock-modal-card">
+                <div class="unlock-confetti">🎉 🏆 🌟 🚀 📜</div>
+                <h2 class="unlock-modal-title" id="unlock-modal-title">¡Grado Desbloqueado!</h2>
+                <p class="unlock-modal-subtitle" id="unlock-modal-subtitle">¡Gran hazaña, pequeño historiador!</p>
+                
+                <div class="unlock-modal-message-box" id="unlock-modal-message">
+                    Has completado todas las actividades requeridas del grado escolar. Tu grado activo se ha actualizado para continuar la partida.
+                </div>
+
+                <div class="unlock-grade-preview">
+                    <span class="unlock-grade-icon" id="unlock-next-icon">🏺</span>
+                    <div class="unlock-grade-text">
+                        <span class="unlock-preview-label">Nuevo Grado Activo:</span>
+                        <h4 id="unlock-next-name">2º de Primaria</h4>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-hero btn-continue-adventure" id="btn-continue-next-grade">
+                    <span>¡Explorar mi Nuevo Grado!</span>
+                    <span class="btn-arrow">✨ ➔</span>
+                </button>
+            </div>
+        </div>
 
         <!-- Pie de página -->
         <footer class="app-footer">

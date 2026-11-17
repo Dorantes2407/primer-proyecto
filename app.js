@@ -1,12 +1,14 @@
 /**
  * Historia Divertida - Lógica de interacción para Pequeños Historiadores
- * Soporte Multi-usuario con Historial de Avance individual.
+ * Soporte Multi-usuario con Historial de Avance individual, Progresión Estricta de Grados y Bloqueo de Navegación.
  */
 
 let currentHistorian = null;
 let currentGrade = "1";
+let userProgression = null;
 let badges = [];
 let completedStories = [];
+let storiesCache = {}; // 🚀 Caché local para optimizar peticiones al consultar relatos
 
 // Elementos del DOM - Pantalla de Bienvenida y Selección de Usuario
 const welcomeScreen = document.getElementById("welcome-screen");
@@ -22,7 +24,7 @@ const explorerNameInput = document.getElementById("explorer-name");
 const selectedGradeInput = document.getElementById("selected-grade");
 const gradeCards = document.querySelectorAll(".grade-card");
 
-// Elementos del DOM - Tablero
+// Elementos del DOM - Tablero Principal
 const displayHistorianName = document.getElementById("display-historian-name");
 const displayGradeText = document.getElementById("display-grade-text");
 const displayLevelText = document.getElementById("display-level-text");
@@ -34,6 +36,31 @@ const badgesContainer = document.getElementById("badges-container");
 const dashboardGradeTabs = document.querySelectorAll("#dashboard-grade-tabs .tab-btn");
 const storiesContainer = document.getElementById("stories-container");
 const serverStatus = document.getElementById("server-status");
+
+// Elementos del DOM - Progresión de Grados y Alertas de Bloqueo
+const gradeProgressionCard = document.getElementById("grade-progression-card");
+const progressionGradeIcon = document.getElementById("progression-grade-icon");
+const progressionStatusPill = document.getElementById("progression-status-pill");
+const progressionGradeTitle = document.getElementById("progression-grade-title");
+const progressionStatCount = document.getElementById("progression-stat-count");
+const progressionStatPct = document.getElementById("progression-stat-pct");
+const progressionBarFill = document.getElementById("progression-bar-fill");
+const progressionRequirementBox = document.getElementById("progression-requirement-box");
+const progressionRequirementText = document.getElementById("progression-requirement-text");
+
+const gradeLockAlert = document.getElementById("grade-lock-alert");
+const lockAlertTitle = document.getElementById("lock-alert-title");
+const lockAlertMessage = document.getElementById("lock-alert-message");
+const btnCloseLockAlert = document.getElementById("btn-close-lock-alert");
+
+// Elementos del DOM - Modal de Celebración de Desbloqueo de Grado
+const gradeUnlockModal = document.getElementById("grade-unlock-modal");
+const unlockModalTitle = document.getElementById("unlock-modal-title");
+const unlockModalSubtitle = document.getElementById("unlock-modal-subtitle");
+const unlockModalMessage = document.getElementById("unlock-modal-message");
+const unlockNextIcon = document.getElementById("unlock-next-icon");
+const unlockNextName = document.getElementById("unlock-next-name");
+const btnContinueNextGrade = document.getElementById("btn-continue-next-grade");
 
 // Elementos del DOM - Pantalla de Estadísticas
 const btnBackToDashboard = document.getElementById("btn-back-to-dashboard");
@@ -69,14 +96,43 @@ const GRADE_ICONS = {
     "6": "🚀"
 };
 
-// 1. Inicialización de la aplicación
+// ========================================================
+// 1. INICIALIZACIÓN DE LA APLICACIÓN
+// ========================================================
 document.addEventListener("DOMContentLoaded", async () => {
     setupGradeCardSelection();
     setupDashboardTabs();
     setupEventListeners();
     await checkServerStatus();
-    await loadRegisteredUsers();
+
+    // Comprobar si hay una sesión activa persistente (por recarga de navegador F5)
+    const sessionRestored = await checkActiveSession();
+    if (!sessionRestored) {
+        await loadRegisteredUsers();
+    }
 });
+
+// Comprobar y restaurar sesión previa si el usuario recarga la página
+async function checkActiveSession() {
+    try {
+        const response = await fetch("/api/profile");
+        if (!response.ok) return false;
+
+        const data = await response.json();
+        if (data.historian && data.historian.name) {
+            currentHistorian = data.historian;
+            userProgression = data.progression;
+            currentGrade = String(userProgression?.active_grade || currentHistorian.grade || "1");
+            badges = data.badges || [];
+            completedStories = data.completed_stories || [];
+            await showDashboard();
+            return true;
+        }
+    } catch (e) {
+        console.warn("No hay sesión previa para restaurar:", e);
+    }
+    return false;
+}
 
 // Verificar estado y modo de base de datos (Turso o SQLite)
 async function checkServerStatus() {
@@ -91,7 +147,11 @@ async function checkServerStatus() {
     }
 }
 
-// 2. Cargar y visualizar la lista de usuarios ya ingresados
+// ========================================================
+// 2. GESTIÓN DE USUARIOS Y PERFILES
+// ========================================================
+
+// Cargar y visualizar la lista de usuarios ya ingresados
 async function loadRegisteredUsers() {
     try {
         const response = await fetch("/api/users");
@@ -101,9 +161,6 @@ async function loadRegisteredUsers() {
         const users = data.users || [];
 
         renderExistingUsers(users, data.current_user);
-
-        // Si no hay ningún usuario activo seleccionado, mostramos la pantalla de inicio
-        // para que puedan visualizar y seleccionar a su pequeño historiador
         showWelcomeScreen();
 
     } catch (error) {
@@ -113,7 +170,7 @@ async function loadRegisteredUsers() {
     }
 }
 
-// 3. Renderizar las tarjetas de usuarios en la pantalla de bienvenida
+// Renderizar las tarjetas de usuarios en la pantalla de bienvenida
 function renderExistingUsers(users, currentUserId) {
     if (!users || users.length === 0) {
         existingUsersPanel.classList.add("hidden");
@@ -142,14 +199,12 @@ function renderExistingUsers(users, currentUserId) {
                     </button>
                 </div>
 
-                <!-- Nivel e insignias -->
                 <div class="user-card-level-row">
                     <span class="user-level-badge">
                         ${user.level.icon} Nivel ${user.level.num}: ${escapeHtml(user.level.title)}
                     </span>
                 </div>
 
-                <!-- Barra de avance en miniatura -->
                 <div class="user-mini-progress">
                     <div class="user-mini-progress-bar">
                         <div class="user-mini-progress-fill" style="width: ${user.percent}%;"></div>
@@ -160,13 +215,11 @@ function renderExistingUsers(users, currentUserId) {
                     </div>
                 </div>
 
-                <!-- Resumen de logros -->
                 <div class="user-card-stats-pills">
                     <span class="stat-pill">🏅 ${user.badges_count} Medallas</span>
                     <span class="stat-pill">⭐ ${user.xp} XP</span>
                 </div>
 
-                <!-- Botón para seleccionar y continuar -->
                 <button type="button" class="btn btn-select-user" data-user-id="${user.id}">
                     <span>¡Continuar mi Aventura!</span>
                     <span class="btn-arrow">➔</span>
@@ -175,17 +228,11 @@ function renderExistingUsers(users, currentUserId) {
         `;
     }).join("");
 
-    // Eventos para seleccionar usuario existente
-    const selectButtons = existingUsersList.querySelectorAll(".btn-select-user");
-    selectButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            selectUser(btn.dataset.userId);
-        });
+    existingUsersList.querySelectorAll(".btn-select-user").forEach(btn => {
+        btn.addEventListener("click", () => selectUser(btn.dataset.userId));
     });
 
-    // Eventos para eliminar usuario
-    const deleteButtons = existingUsersList.querySelectorAll(".btn-delete-user");
-    deleteButtons.forEach(btn => {
+    existingUsersList.querySelectorAll(".btn-delete-user").forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             deleteUser(btn.dataset.userId, btn.dataset.userName);
@@ -193,7 +240,7 @@ function renderExistingUsers(users, currentUserId) {
     });
 }
 
-// 4. Seleccionar un usuario ya existente
+// Seleccionar un usuario ya existente
 async function selectUser(userId) {
     try {
         const response = await fetch("/api/users/select", {
@@ -206,11 +253,13 @@ async function selectUser(userId) {
 
         const data = await response.json();
         currentHistorian = data.historian;
-        currentGrade = String(currentHistorian.grade || "1");
+        userProgression = data.progression;
+        currentGrade = String(userProgression?.active_grade || currentHistorian.grade || "1");
         badges = data.badges || [];
         completedStories = data.completed_stories || [];
 
-        showDashboard();
+        hideLockAlert();
+        await showDashboard();
 
     } catch (err) {
         console.error("Error al seleccionar usuario:", err);
@@ -218,7 +267,7 @@ async function selectUser(userId) {
     }
 }
 
-// 5. Eliminar un perfil de usuario
+// Eliminar un perfil de usuario
 async function deleteUser(userId, userName) {
     const confirmDelete = confirm(`¿Estás seguro de que deseas eliminar el historial de avance de "${userName}"? Esta acción borrará todas sus medallas y niveles.`);
     if (!confirmDelete) return;
@@ -231,8 +280,6 @@ async function deleteUser(userId, userName) {
         });
 
         if (!response.ok) throw new Error("Error al eliminar el perfil");
-
-        // Recargar la lista de usuarios
         await loadRegisteredUsers();
 
     } catch (err) {
@@ -241,33 +288,164 @@ async function deleteUser(userId, userName) {
     }
 }
 
-// 6. Selección de grado en el formulario de registro
+// Selección de grado en el formulario de bienvenida para nuevos usuarios
 function setupGradeCardSelection() {
     gradeCards.forEach(card => {
         card.addEventListener("click", () => {
             gradeCards.forEach(c => c.classList.remove("active"));
             card.classList.add("active");
-            const grade = card.dataset.grade;
-            selectedGradeInput.value = grade;
+            selectedGradeInput.value = card.dataset.grade;
         });
     });
 }
 
-// 7. Configurar pestañas de grados en el tablero principal
+// ========================================================
+// 3. CONTROL DE PESTAÑAS Y BLOQUEO DE NAVEGACIÓN DE GRADOS
+// ========================================================
+
+// Configurar pestañas de grados en el tablero principal con bloqueo estricto
 function setupDashboardTabs() {
     dashboardGradeTabs.forEach(tab => {
         tab.addEventListener("click", () => {
-            dashboardGradeTabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-            currentGrade = tab.dataset.grade;
-            loadStories(currentGrade);
+            const requestedGrade = tab.dataset.grade;
+
+            // Si el usuario hace clic en el grado escolar que ya está activo
+            if (requestedGrade === currentGrade) {
+                hideLockAlert();
+                storiesContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+            }
+
+            // Si intenta acceder a cualquier grado anterior o posterior: BLOQUEADO
+            const gradeInfo = userProgression?.grades?.[requestedGrade];
+            const activeInfo = userProgression?.grades?.[currentGrade];
+            const activeName = activeInfo?.name || `${currentGrade}º de Primaria`;
+            const reqName = gradeInfo?.name || `${requestedGrade}º de Primaria`;
+
+            const lockReason = gradeInfo?.lock_reason || (
+                Number(requestedGrade) < Number(currentGrade)
+                    ? `Grado ${reqName} completado. El acceso a grados anteriores está bloqueado durante la partida para mantener el orden cronológico de tu aventura. Tu grado activo actual es ${activeName}.`
+                    : `Grado ${reqName} bloqueado. Para desbloquearlo debes completar primero todas las actividades requeridas de tu grado activo actual (${activeName}).`
+            );
+
+            showLockAlert(
+                `🔒 ¡${reqName} Bloqueado durante la Partida!`,
+                lockReason
+            );
+
+            // Animar pestaña para dar retroalimentación visual al usuario
+            tab.classList.add("shake-tab");
+            setTimeout(() => tab.classList.remove("shake-tab"), 400);
         });
     });
+
+    if (btnCloseLockAlert) {
+        btnCloseLockAlert.addEventListener("click", hideLockAlert);
+    }
 }
 
-// 8. Event listeners principales
+// Mostrar aviso informativo ante intento de acceso a grado bloqueado
+function showLockAlert(title, message) {
+    if (!gradeLockAlert) return;
+    lockAlertTitle.textContent = title;
+    lockAlertMessage.textContent = message;
+    gradeLockAlert.classList.remove("hidden");
+
+    // Reiniciar animación shake
+    gradeLockAlert.style.animation = "none";
+    void gradeLockAlert.offsetWidth;
+    gradeLockAlert.style.animation = "shakeAlert 0.4s ease-in-out";
+
+    gradeLockAlert.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function hideLockAlert() {
+    if (gradeLockAlert) {
+        gradeLockAlert.classList.add("hidden");
+    }
+}
+
+// Actualizar el estado visual de las pestañas y la tarjeta de progresión
+function updateTabsAndProgressionUI(progression) {
+    if (!progression) return;
+    userProgression = progression;
+    if (progression.active_grade) {
+        currentGrade = String(progression.active_grade);
+    }
+
+    const activeInfo = progression.grades?.[currentGrade] || {};
+
+    // 1. Actualizar Tarjeta de Progresión del grado activo
+    if (progressionGradeIcon) {
+        progressionGradeIcon.textContent = activeInfo.icon || GRADE_ICONS[currentGrade] || "🧭";
+    }
+    if (progressionGradeTitle) {
+        progressionGradeTitle.textContent = activeInfo.name || `${currentGrade}º de Primaria`;
+    }
+
+    const doneCount = activeInfo.completed_count || 0;
+    const totalCount = activeInfo.total_count || 2;
+    const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+    if (progressionStatCount) {
+        progressionStatCount.textContent = `${doneCount} de ${totalCount} misiones`;
+    }
+    if (progressionStatPct) {
+        progressionStatPct.textContent = `${pct}% completado`;
+    }
+    if (progressionBarFill) {
+        progressionBarFill.style.width = `${pct}%`;
+    }
+
+    if (progressionRequirementText) {
+        progressionRequirementText.textContent = activeInfo.requirement_text || "Completa todas las actividades de tu grado para avanzar.";
+    }
+
+    if (progressionRequirementBox) {
+        if (pct === 100) {
+            progressionRequirementBox.classList.add("req-completed");
+        } else {
+            progressionRequirementBox.classList.remove("req-completed");
+        }
+    }
+
+    // 2. Actualizar las 6 pestañas de navegación con sus etiquetas y estilos
+    dashboardGradeTabs.forEach(tab => {
+        const g = tab.dataset.grade;
+        const gInfo = progression.grades?.[g] || {};
+        const badge = tab.querySelector(".tab-badge") || document.getElementById(`tab-badge-${g}`);
+
+        tab.classList.remove("active", "tab-active", "tab-completed", "tab-locked");
+
+        if (g === currentGrade) {
+            tab.classList.add("active", "tab-active");
+            if (badge) badge.textContent = "🌟 Activo";
+            tab.title = `Grado escolar activo de tu partida: ${gInfo.name || g}`;
+        } else if (gInfo.status === "completed") {
+            tab.classList.add("tab-completed");
+            if (badge) badge.textContent = "✓ Hecho 🔒";
+            tab.title = gInfo.lock_reason || "Grado completado anteriormente (bloqueado durante la partida).";
+        } else {
+            tab.classList.add("tab-locked");
+            if (badge) badge.textContent = "🔒 Bloqueado";
+            tab.title = gInfo.lock_reason || "Grado bloqueado.";
+        }
+    });
+
+    // 3. Sincronizar encabezado principal del tablero
+    if (displayGradeText) {
+        displayGradeText.textContent = activeInfo.name || `${currentGrade}º de Primaria`;
+    }
+    if (dashboardUserAvatar) {
+        dashboardUserAvatar.textContent = activeInfo.icon || GRADE_ICONS[currentGrade] || "🧭";
+    }
+}
+
+// ========================================================
+// 4. EVENT LISTENERS GENERALES
+// ========================================================
 function setupEventListeners() {
-    // Formulario para crear un nuevo usuario o ingresar apodo nuevo
+    // Registro de nuevo usuario
     onboardingForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = explorerNameInput.value.trim();
@@ -290,42 +468,28 @@ function setupEventListeners() {
 
             const result = await response.json();
             currentHistorian = result.historian;
-            currentGrade = grade;
+            userProgression = result.progression;
+            currentGrade = String(result.progression?.active_grade || grade);
+            badges = result.badges || [];
+            completedStories = result.completed_stories || [];
 
-            // Recargar datos del perfil activo
-            await refreshActiveUserProfile();
-            showDashboard();
+            hideLockAlert();
+            await showDashboard();
 
         } catch (error) {
             console.error("Error al guardar perfil:", error);
             currentHistorian = { name, grade };
             currentGrade = grade;
-            showDashboard();
+            await showDashboard();
         }
     });
 
-    // Botón para cambiar de usuario (desde Dashboard)
-    btnSwitchHistorian.addEventListener("click", async () => {
-        await switchToUserSelection();
-    });
-
-    // Botón para cambiar de usuario (desde Estadísticas)
-    btnStatsSwitchUser.addEventListener("click", async () => {
-        await switchToUserSelection();
-    });
-
-    // Botón para ver estadísticas
-    btnViewStats.addEventListener("click", () => {
-        showStatsScreen();
-    });
-
-    // Botón para regresar al tablero desde estadísticas
-    btnBackToDashboard.addEventListener("click", () => {
-        showDashboard();
-    });
+    btnSwitchHistorian.addEventListener("click", async () => await switchToUserSelection());
+    btnStatsSwitchUser.addEventListener("click", async () => await switchToUserSelection());
+    btnViewStats.addEventListener("click", () => showStatsScreen());
+    btnBackToDashboard.addEventListener("click", () => showDashboard());
 }
 
-// 9. Volver a la pantalla de selección de usuarios
 async function switchToUserSelection() {
     try {
         await fetch("/api/reset-profile", { method: "POST" });
@@ -333,25 +497,15 @@ async function switchToUserSelection() {
         console.error(err);
     }
     explorerNameInput.value = "";
+    storiesCache = {}; // Limpiar caché al salir
+    hideLockAlert();
     await loadRegisteredUsers();
     showWelcomeScreen();
 }
 
-// 10. Refrescar el perfil del usuario activo
-async function refreshActiveUserProfile() {
-    try {
-        const response = await fetch("/api/profile");
-        if (response.ok) {
-            const data = await response.json();
-            badges = data.badges || [];
-            completedStories = data.completed_stories || [];
-        }
-    } catch (e) {
-        console.warn("No se pudo refrescar perfil:", e);
-    }
-}
-
-// 11. Transiciones de pantalla
+// ========================================================
+// 5. NAVEGACIÓN ENTRE PANTALLAS
+// ========================================================
 function showWelcomeScreen() {
     dashboardScreen.classList.remove("active");
     statsScreen.classList.remove("active");
@@ -364,36 +518,27 @@ async function showDashboard() {
     statsScreen.classList.remove("active");
     dashboardScreen.classList.add("active");
 
-    // Actualizar saludo y datos del usuario activo
     displayHistorianName.textContent = currentHistorian.name;
     displayGradeText.textContent = GRADE_NAMES[currentGrade] || `${currentGrade}º de Primaria`;
+    dashboardUserAvatar.textContent = GRADE_ICONS[currentGrade] || "🧭";
 
-    // Avatar del grado escolar
-    const avatarEmoji = GRADE_ICONS[currentGrade] || "🧭";
-    dashboardUserAvatar.textContent = avatarEmoji;
-
-    // Sincronizar pestaña activa
-    dashboardGradeTabs.forEach(tab => {
-        if (tab.dataset.grade === currentGrade) {
-            tab.classList.add("active");
-        } else {
-            tab.classList.remove("active");
-        }
-    });
-
-    // Obtener nivel actual para mostrar en el encabezado
+    // Actualizar nivel en encabezado
     try {
         const statsRes = await fetch("/api/stats");
         if (statsRes.ok) {
             const statsData = await statsRes.json();
             displayLevelText.textContent = `${statsData.level.icon} Nivel ${statsData.level.num}: ${statsData.level.title}`;
+            if (statsData.progression) {
+                userProgression = statsData.progression;
+            }
         }
     } catch (e) {
         displayLevelText.textContent = "Novato del Tiempo";
     }
 
+    updateTabsAndProgressionUI(userProgression);
     renderBadges();
-    loadStories(currentGrade);
+    await loadStories(currentGrade);
 }
 
 function showStatsScreen() {
@@ -406,16 +551,49 @@ function showStatsScreen() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// 12. Cargar relatos y trivias por grado escolar
+// ========================================================
+// 6. CARGA DE RELATOS Y TRIVIAS (CON VALIDACIÓN DE BLOQUEO)
+// ========================================================
 async function loadStories(grade, targetStoryId = null) {
+    // Si ya tenemos las historias cacheadas y no buscamos una específica, renderizar al instante
+    if (storiesCache[grade] && !targetStoryId) {
+        renderStories(storiesCache[grade]);
+        return;
+    }
+
     storiesContainer.innerHTML = `<div class="loading-state">⏳ Viajando en el tiempo al grado ${grade}º...</div>`;
 
     try {
         const response = await fetch(`/api/stories?grade=${grade}`);
+
+        // Manejo ante intento de acceso a grado bloqueado retornado por el servidor (HTTP 403)
+        if (response.status === 403) {
+            const errData = await response.json();
+            showLockAlert(
+                `🔒 ¡Acceso a ${GRADE_NAMES[grade] || grade + "º Primaria"} Bloqueado!`,
+                errData.lock_reason || "Este grado no está disponible durante la partida actual."
+            );
+            if (errData.active_grade && errData.active_grade !== grade) {
+                currentGrade = String(errData.active_grade);
+                if (errData.progression) {
+                    updateTabsAndProgressionUI(errData.progression);
+                }
+                loadStories(currentGrade);
+            }
+            return;
+        }
+
         if (!response.ok) throw new Error("Error al consultar historias");
 
         const data = await response.json();
-        renderStories(data.stories || []);
+        const stories = data.stories || [];
+
+        if (data.progression) {
+            updateTabsAndProgressionUI(data.progression);
+        }
+
+        storiesCache[grade] = stories;
+        renderStories(stories);
 
         if (targetStoryId) {
             setTimeout(() => {
@@ -433,7 +611,7 @@ async function loadStories(grade, targetStoryId = null) {
     }
 }
 
-// 13. Renderizar tarjetas de relatos y trivias
+// Renderizar tarjetas de relatos y trivias
 function renderStories(stories) {
     storiesContainer.innerHTML = "";
 
@@ -493,9 +671,7 @@ function renderStories(stories) {
             </div>
         `;
 
-        // Eventos en opciones de trivia
-        const optionButtons = card.querySelectorAll(".trivia-option-btn");
-        optionButtons.forEach(btn => {
+        card.querySelectorAll(".trivia-option-btn").forEach(btn => {
             btn.addEventListener("click", () => handleAnswer(story.id, parseInt(btn.dataset.optionIdx, 10), card));
         });
 
@@ -503,7 +679,9 @@ function renderStories(stories) {
     });
 }
 
-// 14. Manejar respuesta a trivia histórica
+// ========================================================
+// 7. RESPUESTA A TRIVIAS, DESBLOQUEO Y CELEBRACIÓN DE GRADOS
+// ========================================================
 async function handleAnswer(storyId, selectedOption, cardElement) {
     const feedbackBox = cardElement.querySelector(`#feedback-${storyId}`);
     const optionButtons = cardElement.querySelectorAll(".trivia-option-btn");
@@ -522,7 +700,6 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             feedbackBox.innerHTML = `🎉 <strong>¡Excelente respuesta, pequeño historiador ${escapeHtml(currentHistorian.name)}!</strong> Has demostrado tu sabiduría histórica y has ganado una nueva medalla.`;
             feedbackBox.classList.remove("hidden");
 
-            // Marcar botón correcto y deshabilitar opciones
             optionButtons.forEach((b, idx) => {
                 b.disabled = true;
                 if (idx === result.correct_option) {
@@ -532,10 +709,18 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
 
             cardElement.classList.add("completed-mission");
 
-            // Actualizar medallas
             badges = result.badges || [];
             completedStories = result.completed_stories || [];
             renderBadges();
+
+            if (result.progression) {
+                updateTabsAndProgressionUI(result.progression);
+            }
+
+            // Si se completó el grado actual y se habilitó el siguiente
+            if (result.grade_completed) {
+                showGradeUnlockCelebration(result);
+            }
         } else {
             feedbackBox.className = "trivia-feedback feedback-error";
             feedbackBox.innerHTML = `🤔 <em>¡Cerca, pequeño historiador!</em> Inténtalo de nuevo o repasa el relato para encontrar la pista.`;
@@ -546,7 +731,45 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
     }
 }
 
-// 15. Renderizar vitrina de medallas del usuario activo
+// Mostrar diálogo de celebración y avance al siguiente grado
+function showGradeUnlockCelebration(result) {
+    if (!gradeUnlockModal) return;
+
+    const isMax = result.progression?.is_max_grade && result.new_grade === "6";
+    const nextGradeInfo = result.progression?.grades?.[result.new_grade] || {};
+
+    if (unlockModalTitle) {
+        unlockModalTitle.textContent = isMax ? "👑 ¡Gran Sabio del Tiempo Universal!" : "🎉 ¡Nuevo Grado Desbloqueado!";
+    }
+    if (unlockModalSubtitle) {
+        unlockModalSubtitle.textContent = isMax 
+            ? "¡Has completado toda la máquina del tiempo de primaria!"
+            : `¡Has superado con éxito todas las actividades requeridas!`;
+    }
+    if (unlockModalMessage) {
+        unlockModalMessage.textContent = result.congrats_message || "Tu grado activo se ha actualizado.";
+    }
+    if (unlockNextIcon) {
+        unlockNextIcon.textContent = nextGradeInfo.icon || GRADE_ICONS[result.new_grade] || "🚀";
+    }
+    if (unlockNextName) {
+        unlockNextName.textContent = nextGradeInfo.name || `${result.new_grade}º de Primaria`;
+    }
+
+    gradeUnlockModal.classList.remove("hidden");
+
+    btnContinueNextGrade.onclick = () => {
+        gradeUnlockModal.classList.add("hidden");
+        currentGrade = String(result.new_grade);
+        currentHistorian.grade = currentGrade;
+        updateTabsAndProgressionUI(result.progression);
+        delete storiesCache[currentGrade];
+        loadStories(currentGrade);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+}
+
+// Renderizar vitrina de medallas del usuario activo
 function renderBadges() {
     badgeCount.textContent = `${badges.length} Medalla${badges.length === 1 ? '' : 's'} Ganada${badges.length === 1 ? '' : 's'}`;
 
@@ -563,7 +786,9 @@ function renderBadges() {
     `).join("");
 }
 
-// 16. Cargar y renderizar la pantalla de Estadísticas y Nivel
+// ========================================================
+// 8. PANTALLA DE ESTADÍSTICAS Y NIVEL
+// ========================================================
 async function loadStats() {
     try {
         const response = await fetch("/api/stats");
@@ -571,24 +796,18 @@ async function loadStats() {
 
         const data = await response.json();
 
-        // 1. Nivel y Puntos
         statsLevelIcon.textContent = data.level.icon;
         statsLevelTitle.textContent = `Nivel ${data.level.num}: ${data.level.title}`;
         statsXpValue.textContent = `${data.xp} ⭐`;
         statsNextTarget.textContent = data.level.next_target;
 
-        // 2. Barra de nivel animada
+        // Barra de nivel aplicada directamente para transición inmediata
         statsProgressPercent.textContent = `${data.percent}% Dominado (${data.completed_count} de ${data.total_missions} épocas)`;
-        statsLevelBarFill.style.width = "0%";
-        setTimeout(() => {
-            statsLevelBarFill.style.width = `${data.percent}%`;
-        }, 100);
+        statsLevelBarFill.style.width = `${data.percent}%`;
 
-        // 3. Contadores
         masteredCount.textContent = `${data.mastered.length} tema${data.mastered.length === 1 ? '' : 's'}`;
         notMasteredCount.textContent = `${data.not_mastered.length} tema${data.not_mastered.length === 1 ? '' : 's'}`;
 
-        // 4. Renderizar lista de temas que domina
         if (data.mastered.length === 0) {
             masteredTopicsList.innerHTML = `
                 <div class="empty-topics-card">
@@ -613,7 +832,6 @@ async function loadStats() {
             `).join("");
         }
 
-        // 5. Renderizar lista de temas que no domina tanto / por explorar
         if (data.not_mastered.length === 0) {
             notMasteredTopicsList.innerHTML = `
                 <div class="empty-topics-card congrats-card">
@@ -625,6 +843,9 @@ async function loadStats() {
         } else {
             notMasteredTopicsList.innerHTML = data.not_mastered.map(item => {
                 const isNeedPractice = item.status_type === "needs_practice";
+                const isLocked = item.is_locked || (String(item.grade) !== String(currentGrade));
+                const lockReason = item.lock_reason || `Esta misión pertenece a ${item.grade}º de Primaria y está bloqueada durante tu partida actual (${currentGrade}º Primaria).`;
+
                 return `
                     <div class="topic-item-card ${isNeedPractice ? 'topic-needs-practice' : 'topic-pending'}">
                         <span class="topic-item-icon">${item.icon}</span>
@@ -640,21 +861,31 @@ async function loadStats() {
                             <span class="topic-status-badge ${isNeedPractice ? 'status-needs-practice' : 'status-pending'}">
                                 ${item.status_badge}
                             </span>
-                            <button class="btn btn-challenge-action" data-grade="${item.grade}" data-story-id="${item.id}">
-                                Aceptar Reto ➔
-                            </button>
+                            ${isLocked ? `
+                                <button class="btn btn-challenge-action btn-challenge-locked" data-grade="${item.grade}" data-story-id="${item.id}" data-locked="true" data-lock-reason="${escapeHtml(lockReason)}" title="${escapeHtml(lockReason)}">
+                                    🔒 Bloqueado (${item.grade}º)
+                                </button>
+                            ` : `
+                                <button class="btn btn-challenge-action" data-grade="${item.grade}" data-story-id="${item.id}" data-locked="false">
+                                    Aceptar Reto ➔
+                                </button>
+                            `}
                         </div>
                     </div>
                 `;
             }).join("");
 
-            // Evento en botones "Aceptar Reto"
-            const challengeButtons = notMasteredTopicsList.querySelectorAll(".btn-challenge-action");
-            challengeButtons.forEach(btn => {
+            notMasteredTopicsList.querySelectorAll(".btn-challenge-action").forEach(btn => {
                 btn.addEventListener("click", () => {
+                    const isLocked = btn.dataset.locked === "true";
+                    if (isLocked) {
+                        const reason = btn.dataset.lockReason || "Esta actividad pertenece a un grado bloqueado.";
+                        alert(`🔒 ¡Actividad Bloqueada!\n\n${reason}`);
+                        return;
+                    }
+
                     const grade = btn.dataset.grade;
                     const storyId = btn.dataset.storyId;
-                    currentGrade = grade;
                     showDashboard();
                     loadStories(grade, storyId);
                 });

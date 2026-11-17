@@ -256,6 +256,124 @@ def get_current_user_data(db):
     return users.get(current_uid) or users.get(str(current_uid).lower())
 
 
+def get_user_progression(user_data):
+    """
+    Calcula el estado estricto de progresión de grados del usuario:
+    - Grado activo vinculado a la cuenta.
+    - Bloqueo de grados posteriores y anteriores desde navegación normal.
+    - Requisitos cumplidos y faltantes por cada grado.
+    """
+    if not user_data:
+        user_data = {"name": "Invitado", "grade": "1", "completed_stories": []}
+
+    completed_stories = set(user_data.get("completed_stories", []))
+    raw_grade = str(user_data.get("grade", "1"))
+    if raw_grade not in ["1", "2", "3", "4", "5", "6"]:
+        raw_grade = "1"
+
+    # Verificar si el grado configurado ya tiene todas sus historias completadas
+    # Si ya se completó el grado actual, el grado activo avanza al siguiente grado incompleto (hasta 6)
+    current_active = int(raw_grade)
+    while current_active < 6:
+        req_stories = [s["id"] for s in STORIES_DATA.get(str(current_active), [])]
+        if req_stories and all(sid in completed_stories for sid in req_stories):
+            current_active += 1
+        else:
+            break
+
+    active_grade_str = str(current_active)
+
+    # Detalle de cada grado (1º a 6º)
+    grades_info = {}
+    for g_num in range(1, 7):
+        g_str = str(g_num)
+        req_list = STORIES_DATA.get(g_str, [])
+        req_ids = [s["id"] for s in req_list]
+        total_count = len(req_ids)
+
+        done_in_grade = [sid for sid in req_ids if sid in completed_stories]
+        completed_count = len(done_in_grade)
+        is_completed = (completed_count == total_count and total_count > 0)
+
+        pending_items = [s for s in req_list if s["id"] not in completed_stories]
+        pending_titles = [s["title"] for s in pending_items]
+
+        g_name = GRADE_NAMES.get(g_str, f"{g_str}º de Primaria")
+        active_name = GRADE_NAMES.get(active_grade_str, f"{active_grade_str}º de Primaria")
+
+        if g_num == current_active:
+            status = "active"
+            is_locked = False
+            lock_reason = None
+            if is_completed and current_active == 6:
+                requirement_text = "¡Felicidades! Has completado todas las actividades de 6º y de toda la primaria."
+            elif pending_titles:
+                faltantes_str = ", ".join([f'"{t}"' for t in pending_titles])
+                next_g = current_active + 1
+                next_name = GRADE_NAMES.get(str(next_g), f"{next_g}º de Primaria")
+                requirement_text = f"Te falta completar: {faltantes_str} ({completed_count} de {total_count} completadas) para desbloquear {next_name}."
+            else:
+                requirement_text = "¡Todas las actividades de este grado están completadas!"
+        elif g_num < current_active:
+            status = "completed" if is_completed else "locked_previous"
+            is_locked = True
+            if is_completed:
+                lock_reason = (
+                    f"Grado {g_name} completado. "
+                    f"El acceso a grados anteriores está bloqueado durante la partida para mantener tu avance cronológico. "
+                    f"Tu grado activo actual es {active_name}."
+                )
+                requirement_text = f"Grado completado anteriormente ({completed_count}/{total_count}). Grado activo: {active_name}."
+            else:
+                lock_reason = (
+                    f"El acceso a grados anteriores ({g_name}) está bloqueado durante la partida. "
+                    f"Tu grado activo actual es {active_name}."
+                )
+                requirement_text = f"Grado anterior bloqueado. Tu grado activo actual es {active_name}."
+        else:
+            status = "locked"
+            is_locked = True
+            if g_num == current_active + 1:
+                req_active_list = STORIES_DATA.get(active_grade_str, [])
+                active_pending = [s["title"] for s in req_active_list if s["id"] not in completed_stories]
+                active_done = len(req_active_list) - len(active_pending)
+                faltantes_str = ", ".join([f'"{t}"' for t in active_pending])
+                lock_reason = (
+                    f"Grado bloqueado. Para desbloquear {g_name}, "
+                    f"primero debes completar todas las actividades requeridas de tu grado actual ({active_name}). "
+                    f"Te falta: {faltantes_str} ({active_done} de {len(req_active_list)} completadas)."
+                )
+            else:
+                prev_g = g_num - 1
+                prev_name = GRADE_NAMES.get(str(prev_g), f"{prev_g}º de Primaria")
+                lock_reason = (
+                    f"Grado bloqueado. Para acceder a {g_name}, "
+                    f"debes avanzar en orden y superar primero los grados previos hasta completar {prev_name}."
+                )
+            requirement_text = lock_reason
+
+        grades_info[g_str] = {
+            "grade": g_str,
+            "name": g_name,
+            "icon": GRADE_ICONS.get(g_str, "🧭"),
+            "status": status,
+            "is_active": (g_num == current_active),
+            "is_completed": is_completed,
+            "is_locked": is_locked,
+            "completed_count": completed_count,
+            "total_count": total_count,
+            "pending_titles": pending_titles,
+            "lock_reason": lock_reason,
+            "requirement_text": requirement_text
+        }
+
+    return {
+        "active_grade": active_grade_str,
+        "is_max_grade": (active_grade_str == "6" and grades_info.get("6", {}).get("is_completed", False)),
+        "grades": grades_info
+    }
+
+
 def calculate_user_stats(user_data):
     """Calcula el nivel, progreso y temas dominados vs no dominados para un usuario específico."""
     if not user_data:
@@ -320,9 +438,16 @@ def calculate_user_stats(user_data):
 
     mastered = []
     not_mastered = []
+    progression = get_user_progression(user_data)
+    active_g = progression.get("active_grade", "1")
+    grades_map = progression.get("grades", {})
 
     for s in all_stories:
         sid = s["id"]
+        s_grade = s["grade"]
+        g_info = grades_map.get(s_grade, {})
+        is_locked_for_game = (s_grade != active_g)
+
         if sid in completed_ids:
             mastered.append({
                 "id": s["id"],
@@ -341,6 +466,8 @@ def calculate_user_stats(user_data):
                 "title": s["title"],
                 "period": s["period"],
                 "icon": s["icon"],
+                "is_locked": is_locked_for_game,
+                "lock_reason": g_info.get("lock_reason") if is_locked_for_game else None,
                 "status_type": "needs_practice" if needs_practice else "pending",
                 "status_badge": "Necesita repaso 🤔" if needs_practice else "Por explorar 🔍",
                 "reason": "Has tenido dudas en este reto" if needs_practice else "Aún no has explorado esta época"
@@ -349,8 +476,9 @@ def calculate_user_stats(user_data):
     return {
         "historian": {
             "name": user_data.get("name", "Pequeño Historiador"),
-            "grade": user_data.get("grade", "1")
+            "grade": active_g
         },
+        "progression": progression,
         "total_missions": total,
         "completed_count": completed_count,
         "percent": percent,
@@ -399,19 +527,22 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             users_list = []
             for uid, u in db.get("users", {}).items():
                 st = calculate_user_stats(u)
+                progression = st.get("progression") or get_user_progression(u)
+                eff_grade = progression["active_grade"]
                 users_list.append({
                     "id": uid,
                     "name": u.get("name", uid),
-                    "grade": u.get("grade", "1"),
-                    "grade_desc": GRADE_NAMES.get(u.get("grade", "1"), f"{u.get('grade', '1')}º Primaria"),
-                    "grade_icon": GRADE_ICONS.get(u.get("grade", "1"), "🧭"),
+                    "grade": eff_grade,
+                    "grade_desc": GRADE_NAMES.get(eff_grade, f"{eff_grade}º Primaria"),
+                    "grade_icon": GRADE_ICONS.get(eff_grade, "🧭"),
                     "badges_count": len(u.get("badges", [])),
                     "completed_count": len(u.get("completed_stories", [])),
                     "total_missions": st["total_missions"],
                     "percent": st["percent"],
                     "level": st["level"],
                     "xp": st["xp"],
-                    "last_active": u.get("last_active", u.get("created_at", "Reciente"))
+                    "last_active": u.get("last_active", u.get("created_at", "Reciente")),
+                    "progression": progression
                 })
 
             # Ordenar por mayor porcentaje completado
@@ -423,22 +554,32 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             })
             return
 
-        # Perfil del usuario activo
+        # Perfil del usuario activo con su progresión estricta
         if parsed.path == "/api/profile":
             db = load_database()
             user = get_current_user_data(db)
             if user:
+                progression = get_user_progression(user)
+                # Si el grado activo calculado avanzó por misiones previas, persistir
+                if progression["active_grade"] != str(user.get("grade", "1")):
+                    turso_db.update_user_grade(user["id"], progression["active_grade"])
+                    user["grade"] = progression["active_grade"]
+                    db["users"] = turso_db.load_all_users_from_db()
+                    save_backup(db)
+
                 self._send_json(200, {
                     "historian": {
                         "name": user["name"],
-                        "grade": user.get("grade", "1")
+                        "grade": progression["active_grade"]
                     },
+                    "progression": progression,
                     "badges": user.get("badges", []),
                     "completed_stories": user.get("completed_stories", [])
                 })
             else:
                 self._send_json(200, {
                     "historian": None,
+                    "progression": None,
                     "badges": [],
                     "completed_stories": []
                 })
@@ -452,12 +593,34 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json(200, stats)
             return
 
-        # Historias por grado escolar
+        # Historias por grado escolar con validación de bloqueo en el servidor
         if parsed.path == "/api/stories":
             query = urllib.parse.parse_qs(parsed.query)
-            grade = query.get("grade", ["1"])[0]
-            stories = STORIES_DATA.get(str(grade), STORIES_DATA["1"])
-            self._send_json(200, {"grade": grade, "stories": stories})
+            grade = str(query.get("grade", ["1"])[0])
+            db = load_database()
+            user = get_current_user_data(db)
+            progression = get_user_progression(user) if user else None
+
+            # Si el usuario tiene una sesión activa, verificar que el grado no esté bloqueado
+            if progression and user:
+                grade_info = progression["grades"].get(grade)
+                if grade_info and grade_info.get("is_locked"):
+                    self._send_json(403, {
+                        "error": "grade_locked",
+                        "grade": grade,
+                        "lock_reason": grade_info.get("lock_reason"),
+                        "requirement_text": grade_info.get("requirement_text"),
+                        "active_grade": progression["active_grade"],
+                        "progression": progression
+                    })
+                    return
+
+            stories = STORIES_DATA.get(grade, STORIES_DATA.get("1", []))
+            self._send_json(200, {
+                "grade": grade,
+                "stories": stories,
+                "progression": progression
+            })
             return
 
         if parsed.path == "/":
@@ -494,10 +657,15 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             db["current_user"] = found_user["id"]
-            # Actualizar última actividad en base de datos
-            turso_db.save_user_profile(found_user["name"], found_user.get("grade", "1"))
-            
-            # Sincronizar usuarios actualizados con el respaldo JSON
+            progression = get_user_progression(found_user)
+            # Asegurar que el grado en BD refleje de forma persistente el grado activo
+            active_grade = progression["active_grade"]
+            if active_grade != str(found_user.get("grade", "1")):
+                turso_db.update_user_grade(found_user["id"], active_grade)
+                found_user["grade"] = active_grade
+            else:
+                turso_db.save_user_profile(found_user["name"], active_grade)
+
             db["users"] = turso_db.load_all_users_from_db()
             save_backup(db)
 
@@ -505,8 +673,9 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
                 "success": True,
                 "historian": {
                     "name": found_user["name"],
-                    "grade": found_user.get("grade", "1")
+                    "grade": active_grade
                 },
+                "progression": progression,
                 "badges": found_user.get("badges", []),
                 "completed_stories": found_user.get("completed_stories", [])
             })
@@ -529,14 +698,25 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
 
             db["current_user"] = uid
             db["users"] = turso_db.load_all_users_from_db()
+            created_user = db["users"].get(uid, {"name": name, "grade": grade})
+            progression = get_user_progression(created_user)
+            active_grade = progression["active_grade"]
+
+            if active_grade != str(created_user.get("grade", "1")):
+                turso_db.update_user_grade(uid, active_grade)
+                db["users"] = turso_db.load_all_users_from_db()
+
             save_backup(db)
 
             self._send_json(200, {
                 "success": True,
                 "historian": {
                     "name": name,
-                    "grade": grade
-                }
+                    "grade": active_grade
+                },
+                "progression": progression,
+                "badges": created_user.get("badges", []),
+                "completed_stories": created_user.get("completed_stories", [])
             })
             return
 
@@ -567,23 +747,63 @@ class HistoryAppHandler(http.server.SimpleHTTPRequestHandler):
             correct_index = found_story["trivia"]["answer"]
             is_correct = (selected_option == correct_index)
 
+            grade_completed = False
+            prev_grade = str(user.get("grade", "1"))
+            new_grade = prev_grade
+            congrats_message = None
+
             if is_correct:
                 badge_name = f"Medalla de {found_story['period']}"
                 turso_db.record_mission_completed(user["id"], story_id, badge_name)
+
+                # Recargar estado actualizado desde la BD
+                updated_users = turso_db.load_all_users_from_db()
+                updated_user = updated_users.get(user["id"], user)
+
+                new_progression = get_user_progression(updated_user)
+                adv_active_grade = new_progression["active_grade"]
+
+                if int(adv_active_grade) > int(prev_grade):
+                    grade_completed = True
+                    new_grade = adv_active_grade
+                    turso_db.update_user_grade(updated_user["id"], new_grade)
+                    updated_user["grade"] = new_grade
+                    updated_users[updated_user["id"]] = updated_user
+                    prev_name = GRADE_NAMES.get(prev_grade, f"{prev_grade}º de Primaria")
+                    new_name = GRADE_NAMES.get(new_grade, f"{new_grade}º de Primaria")
+                    congrats_message = (
+                        f"🎉 ¡Felicidades, pequeño historiador {updated_user['name']}! "
+                        f"Has completado con éxito todas las misiones requeridas de {prev_name}. "
+                        f"¡Has desbloqueado {new_name}! Tu grado activo se ha actualizado para continuar la partida."
+                    )
+                elif new_progression.get("is_max_grade"):
+                    grade_completed = True
+                    new_grade = "6"
+                    congrats_message = (
+                        f"👑 ¡Extraordinario, pequeño historiador {updated_user['name']}! "
+                        f"¡Has completado todas las misiones de 6º de Primaria y de toda la máquina del tiempo!"
+                    )
+
+                db["users"] = updated_users
+                save_backup(db)
             else:
                 turso_db.record_mission_wrong(user["id"], story_id)
-
-            # Recargar estado actualizado desde la BD y respaldar
-            updated_users = turso_db.load_all_users_from_db()
-            updated_user = updated_users.get(user["id"], user)
-            db["users"] = updated_users
-            save_backup(db)
+                updated_users = turso_db.load_all_users_from_db()
+                updated_user = updated_users.get(user["id"], user)
+                db["users"] = updated_users
+                save_backup(db)
+                new_progression = get_user_progression(updated_user)
 
             self._send_json(200, {
                 "correct": is_correct,
                 "correct_option": correct_index,
                 "badges": updated_user.get("badges", []),
-                "completed_stories": updated_user.get("completed_stories", [])
+                "completed_stories": updated_user.get("completed_stories", []),
+                "grade_completed": grade_completed,
+                "prev_grade": prev_grade,
+                "new_grade": new_grade,
+                "congrats_message": congrats_message,
+                "progression": new_progression
             })
             return
 

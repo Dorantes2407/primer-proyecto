@@ -44,7 +44,7 @@ def is_turso_configured():
 
 
 class TursoHttpClient:
-    """Cliente HTTP ligero para Turso (LibSQL v2 pipeline) con urllib estándar."""
+    """Cliente HTTP ligero para Turso (LibSQL v2 pipeline) con urllib estándar y fallback local resiliente."""
 
     def __init__(self, db_url, auth_token):
         clean_url = db_url.replace("libsql://", "https://")
@@ -52,6 +52,7 @@ class TursoHttpClient:
             clean_url = f"https://{clean_url}"
         self.endpoint = f"{clean_url.rstrip('/')}/v2/pipeline"
         self.auth_token = auth_token
+        self.local_fallback = LocalSqliteClient()
 
     def execute_batch(self, statements):
         """Ejecuta una lista de consultas (sql, args) en Turso."""
@@ -93,7 +94,7 @@ class TursoHttpClient:
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            with urllib.request.urlopen(req, timeout=8) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
                 return result.get("results", [])
         except urllib.error.HTTPError as e:
@@ -103,41 +104,59 @@ class TursoHttpClient:
             raise RuntimeError(f"Error de conexión con Turso: {e}")
 
     def execute(self, sql, args=None):
-        """Ejecuta una sentencia y devuelve filas con nombres de columna."""
+        """Ejecuta una sentencia y devuelve filas con nombres de columna, con fallback a SQLite local si falla la red."""
         args = args or []
-        results = self.execute_batch([(sql, args)])
-        if not results:
+        is_write = sql.strip().upper().startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "REPLACE"))
+        local_executed = False
+
+        # Si es escritura, siempre ejecutamos también en SQLite local para garantizar persistencia local inmediata
+        if is_write:
+            try:
+                self.local_fallback.execute(sql, args)
+                local_executed = True
+            except Exception as e_local:
+                print(f"[DB] Aviso en fallback local de escritura: {e_local}")
+
+        try:
+            results = self.execute_batch([(sql, args)])
+            if not results:
+                return []
+
+            first_res = results[0]
+            if first_res.get("type") == "error":
+                raise RuntimeError(f"Error en sentencia SQL Turso: {first_res.get('error', {}).get('message')}")
+
+            response = first_res.get("response", {})
+            result_data = response.get("result", {})
+            cols = [c["name"] for c in result_data.get("cols", [])]
+            rows = result_data.get("rows", [])
+
+            parsed_rows = []
+            for r in rows:
+                row_dict = {}
+                for idx, col_name in enumerate(cols):
+                    val_obj = r[idx] if idx < len(r) else None
+                    if isinstance(val_obj, dict):
+                        val = val_obj.get("value")
+                        val_type = val_obj.get("type")
+                        if val_type == "integer" and val is not None:
+                            val = int(val)
+                        elif val_type == "float" and val is not None:
+                            val = float(val)
+                        elif val_type == "null":
+                            val = None
+                    else:
+                        val = val_obj
+                    row_dict[col_name] = val
+                parsed_rows.append(row_dict)
+
+            return parsed_rows
+
+        except Exception as e_turso:
+            # Si Turso no responde (sin internet, timeout o sandbox), consultar SQLite local transparente
+            if not local_executed:
+                return self.local_fallback.execute(sql, args)
             return []
-
-        first_res = results[0]
-        if first_res.get("type") == "error":
-            raise RuntimeError(f"Error en sentencia SQL Turso: {first_res.get('error', {}).get('message')}")
-
-        response = first_res.get("response", {})
-        result_data = response.get("result", {})
-        cols = [c["name"] for c in result_data.get("cols", [])]
-        rows = result_data.get("rows", [])
-
-        parsed_rows = []
-        for r in rows:
-            row_dict = {}
-            for idx, col_name in enumerate(cols):
-                val_obj = r[idx] if idx < len(r) else None
-                if isinstance(val_obj, dict):
-                    val = val_obj.get("value")
-                    val_type = val_obj.get("type")
-                    if val_type == "integer" and val is not None:
-                        val = int(val)
-                    elif val_type == "float" and val is not None:
-                        val = float(val)
-                    elif val_type == "null":
-                        val = None
-                else:
-                    val = val_obj
-                row_dict[col_name] = val
-            parsed_rows.append(row_dict)
-
-        return parsed_rows
 
 
 class LocalSqliteClient:
@@ -271,19 +290,31 @@ def save_user_profile(name, grade):
     uid = name.strip().lower()
     now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    existing = db.execute("SELECT id, created_at FROM users WHERE id = ?", [uid])
-    if existing:
-        db.execute(
-            "UPDATE users SET name = ?, grade = ?, last_active = ? WHERE id = ?",
-            [name.strip(), grade, now_str, uid]
-        )
-    else:
-        db.execute(
-            "INSERT INTO users (id, name, grade, created_at, last_active) VALUES (?, ?, ?, ?, ?)",
-            [uid, name.strip(), grade, now_str, now_str]
-        )
+    db.execute(
+        """
+        INSERT INTO users (id, name, grade, created_at, last_active)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+            name = excluded.name,
+            grade = excluded.grade,
+            last_active = excluded.last_active
+        """,
+        [uid, name.strip(), str(grade), now_str, now_str]
+    )
 
     return uid
+
+
+def update_user_grade(user_id, new_grade):
+    """Actualiza de forma persistente el grado activo de un usuario."""
+    db = get_db()
+    uid = user_id.strip().lower()
+    now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+    db.execute(
+        "UPDATE users SET grade = ?, last_active = ? WHERE id = ?",
+        [str(new_grade), now_str, uid]
+    )
+    return str(new_grade)
 
 
 def delete_user_from_db(user_id):
