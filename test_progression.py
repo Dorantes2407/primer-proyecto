@@ -126,36 +126,43 @@ def run_tests():
     # Acceder a Grado 1 (activo) -> Esperar HTTP 200
     status_g1, res_g1 = client.get("/api/stories?grade=1")
     assert status_g1 == 200, f"Error al cargar historias de grado activo: {res_g1}"
-    assert len(res_g1["stories"]) == 2
+    assert len(res_g1["stories"]) == 10
     assert res_g1["stories"][0]["id"] == "1-1"
-    print("✓ Grado activo 1 accesible correctamente con HTTP 200 (2 misiones disponibles).")
+    print("✓ Grado activo 1 accesible correctamente con HTTP 200 (10 misiones disponibles).")
 
     # =====================================================================
     # CASO 2: COMPLETAR PARCIALMENTE Y LUEGO COMPLETAR EL GRADO
     # =====================================================================
     print("\n--- CASO 2: Completar Grado y Desbloqueo Automático ---")
-    # 1. Completar primera historia de grado 1 (1-1: Triceratops, opción 1)
-    status_m1, res_m1 = client.post("/api/complete-mission", {"story_id": "1-1", "selected_option": 1})
-    assert status_m1 == 200 and res_m1["correct"] is True
-    assert res_m1["grade_completed"] is False, "Aún no debe completar el grado con 1 sola misión"
-    assert res_m1["progression"]["active_grade"] == "1"
-    assert res_m1["progression"]["grades"]["1"]["completed_count"] == 1
-    print("✓ Misión 1-1 completada. Grado activo sigue siendo 1 (1 de 2 completadas).")
+    grade1_answers = [
+        ("1-1", 1), ("1-2", 1), ("1-3", 0), ("1-4", 1), ("1-5", 0),
+        ("1-6", 1), ("1-7", 1), ("1-8", 1), ("1-9", 1), ("1-10", 0)
+    ]
+
+    # Completar primeras 9 historias: debe seguir en Grado 1
+    for s_id, ans in grade1_answers[:-1]:
+        st, res = client.post("/api/complete-mission", {"story_id": s_id, "selected_option": ans})
+        assert st == 200 and res["correct"] is True
+        assert res["grade_completed"] is False
+        assert res["progression"]["active_grade"] == "1"
+
+    print("✓ 9 de 10 misiones completadas. Grado activo sigue siendo 1.")
 
     # Intentar acceder a Grado 2 todavía bloqueado -> Esperar HTTP 403
     status_g2_still, _ = client.get("/api/stories?grade=2")
-    assert status_g2_still == 403, "Grado 2 no debería estar accesible antes de terminar 1-2"
+    assert status_g2_still == 403, "Grado 2 no debería estar accesible antes de terminar 1-10"
     print("✓ Grado 2 continúa estrictamente bloqueado (falta 1 misión).")
 
-    # 2. Completar segunda historia de grado 1 (1-2: Fuego/cuevas, opción 1)
-    status_m2, res_m2 = client.post("/api/complete-mission", {"story_id": "1-2", "selected_option": 1})
-    assert status_m2 == 200 and res_m2["correct"] is True
-    assert res_m2["grade_completed"] is True, "¡Debe detectar grado completado!"
-    assert res_m2["new_grade"] == "2", f"El nuevo grado debe ser 2, se obtuvo {res_m2['new_grade']}"
-    assert "desbloqueado 2º de Primaria" in res_m2["congrats_message"]
-    assert res_m2["progression"]["active_grade"] == "2"
-    print("✓ Misión 1-2 completada. ¡Grado 1 finalizado, grado 2 desbloqueado!")
-    print(f"  Mensaje de felicitación: {res_m2['congrats_message'][:75]}...")
+    # Completar última historia (1-10) -> Desbloquea Grado 2
+    last_id, last_ans = grade1_answers[-1]
+    status_m_last, res_m_last = client.post("/api/complete-mission", {"story_id": last_id, "selected_option": last_ans})
+    assert status_m_last == 200 and res_m_last["correct"] is True
+    assert res_m_last["grade_completed"] is True, "¡Debe detectar grado completado!"
+    assert res_m_last["new_grade"] == "2", f"El nuevo grado debe ser 2, se obtuvo {res_m_last['new_grade']}"
+    assert "desbloqueado 2º de Primaria" in res_m_last["congrats_message"]
+    assert res_m_last["progression"]["active_grade"] == "2"
+    print("✓ Misión 1-10 completada. ¡Grado 1 finalizado, grado 2 desbloqueado!")
+    print(f"  Mensaje de felicitación: {res_m_last['congrats_message'][:75]}...")
 
     # =====================================================================
     # CASO 3: RECARGA DE LA APLICACIÓN (F5) Y BLOQUEO DE ANTERIORES
@@ -164,8 +171,8 @@ def run_tests():
     status_prof, res_prof = client.get("/api/profile")
     assert status_prof == 200
     assert res_prof["historian"]["grade"] == "2", f"El grado persistente debe ser 2, se obtuvo {res_prof['historian']['grade']}"
-    assert set(res_prof["completed_stories"]) == {"1-1", "1-2"}
-    assert len(res_prof["badges"]) == 2
+    assert len(res_prof["completed_stories"]) == 10
+    assert len(res_prof["badges"]) == len(set(s["period"] for s in app.STORIES_DATA["1"]))
     assert res_prof["progression"]["active_grade"] == "2"
     assert res_prof["progression"]["grades"]["1"]["status"] == "completed"
     assert res_prof["progression"]["grades"]["1"]["is_locked"] is True
@@ -174,7 +181,7 @@ def run_tests():
     # Acceso al nuevo grado activo 2 -> HTTP 200
     status_g2_now, res_g2_now = client.get("/api/stories?grade=2")
     assert status_g2_now == 200
-    assert len(res_g2_now["stories"]) == 2
+    assert len(res_g2_now["stories"]) == 10
     print("✓ Grado 2 ahora responde HTTP 200 y entrega sus relatos.")
 
     # Intentar acceder a Grado 1 (anterior ya completado) -> HTTP 403 (bloqueado durante la partida)
@@ -209,7 +216,7 @@ def run_tests():
     assert status_sel == 200
     assert res_sel["historian"]["grade"] == "2"
     assert res_sel["progression"]["active_grade"] == "2"
-    assert set(res_sel["completed_stories"]) == {"1-1", "1-2"}
+    assert len(res_sel["completed_stories"]) == 10
     print("✓ Cambio de vuelta a ExploradorTest1 exitoso: mantiene su grado activo 2 y sus misiones completadas.")
 
     # =====================================================================
@@ -220,7 +227,7 @@ def run_tests():
     assert "exploradortest1" in db_state["users"]
     user1_stored = db_state["users"]["exploradortest1"]
     assert user1_stored["grade"] == "2"
-    assert set(user1_stored["completed_stories"]) == {"1-1", "1-2"}
+    assert len(user1_stored["completed_stories"]) == 10
     print("✓ Datos verificados en SQLite/Turso y data.json:")
     print(f"  Usuario: {user1_stored['name']}, Grado activo: {user1_stored['grade']}, Historias completadas: {user1_stored['completed_stories']}")
 

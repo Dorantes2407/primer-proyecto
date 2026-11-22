@@ -9,7 +9,8 @@
       "last_active": "04/11/2026 09:23",
       "badges": [],
       "completed_stories": [],
-      "attempted_stories": {}
+      "attempted_stories": {},
+      "activity_days": []
     },
     "daya": {
       "id": "daya",
@@ -106,7 +107,8 @@
           "wrong_count": 1,
           "correct": true
         }
-      }
+      },
+      "activity_days": []
     }
   }
 }
