@@ -2,263 +2,343 @@
   "1": [
     {
       "id": "1-1",
-      "title": "El Gran Viaje con los Dinosaurios",
-      "period": "Prehistoria",
-      "icon": "🦖",
-      "summary": "Hace millones de años, enormes criaturas habitaban la Tierra. ¡Descubre cómo vivía el T-Rex y el Triceratops!",
-      "fun_fact": "¿Sabías que algunos dinosaurios tenían plumas de colores brillantes?",
+      "title": "¿Qué es la historia?",
+      "period": "Mi historia y mi familia",
+      "icon": "📖",
+      "summary": "Pregunta de evaluación diagnóstica sobre el concepto de historia.",
+      "fun_fact": "La historia nos ayuda a conocer cómo vivían las personas y qué sucedió antes de nosotros.",
       "trivia": {
-        "question": "¿Cuál de estos dinosaurios era famoso por sus 3 cuernos y un gran escudo?",
-        "options": ["Tiranosaurio Rex", "Triceratops", "Velociraptor"],
-        "answer": 1
-      }
-    },
-    {
-      "id": "1-2",
-      "title": "La Primera Fogata de la Humanidad",
-      "period": "Edad de Piedra",
-      "icon": "🔥",
-      "summary": "Los primeros humanos aprendieron a hacer fuego frotando piedras y maderas para calentarse en las cavernas.",
-      "fun_fact": "El fuego no solo daba calor, ¡también servía para contar historias en la noche y protegerse de animales salvajes!",
-      "trivia": {
-        "question": "¿En qué lugares pintaban los primeros seres humanos a los animales?",
-        "options": ["En cuadernos de papel", "En las paredes de las cuevas", "En computadoras"],
-        "answer": 1
-      }
-    },
-    {
-      "id": "1-3",
-      "title": "El Mamut Lanudo",
-      "period": "Edad de Hielo",
-      "icon": "🦣",
-      "summary": "El mamut era un pariente gigante del elefante, con pelo largo y unos colmillos curvos enormes.",
-      "fun_fact": "Sus colmillos podían medir más que un coche. ¡Imagina cargar con eso todo el día!",
-      "trivia": {
-        "question": "¿Qué comían los mamuts?",
-        "options": ["Plantas y hierba", "Piedras", "Solo carne"],
+        "question": "¿Qué es la historia?",
+        "options": [
+          "El estudio de lo que ocurrió en el pasado.",
+          "Una lista de animales.",
+          "Un cuento inventado."
+        ],
         "answer": 0
       }
     },
     {
-      "id": "1-4",
-      "title": "La Rueda Cambió Todo",
-      "period": "Primeras Invenciones",
-      "icon": "🛞",
-      "summary": "Al principio las personas cargaban todo en sus brazos. Con la rueda pudieron mover cosas pesadas mucho más fácil.",
-      "fun_fact": "Las primeras ruedas eran de madera maciza, sin radios, y giraban muy despacio.",
+      "id": "1-2",
+      "title": "¿Qué podemos utilizar para conocer nuestra historia familiar?",
+      "period": "Mi historia y mi familia",
+      "icon": "📷",
+      "summary": "Pregunta de evaluación diagnóstica sobre fuentes de historia familiar.",
+      "fun_fact": "Las fotografías y los recuerdos de nuestra familia nos permiten conocer el pasado.",
       "trivia": {
-        "question": "¿Para qué sirvió inventar la rueda?",
-        "options": ["Para volar", "Para transportar cosas pesadas", "Para hacer fuego"],
+        "question": "¿Qué podemos utilizar para conocer nuestra historia familiar?",
+        "options": [
+          "Fotografías y relatos familiares.",
+          "Videojuegos solamente.",
+          "Juguetes nuevos."
+        ],
+        "answer": 0
+      }
+    },
+    {
+      "id": "1-3",
+      "title": "¿Quiénes forman parte de nuestra familia?",
+      "period": "Mi historia y mi familia",
+      "icon": "👨‍👩‍👧‍👦",
+      "summary": "Pregunta de evaluación diagnóstica sobre los integrantes de la familia.",
+      "fun_fact": "La familia está formada por personas que tienen vínculos familiares.",
+      "trivia": {
+        "question": "¿Quiénes forman parte de nuestra familia?",
+        "options": [
+          "Solamente nuestros amigos.",
+          "Nuestros padres, abuelos, hermanos y otros familiares.",
+          "Las personas que viven en otros países."
+        ],
         "answer": 1
       }
     },
     {
-      "id": "1-5",
-      "title": "Cazadores y Recolectores",
-      "period": "Prehistoria",
-      "icon": "🏹",
-      "summary": "Antes de las tiendas, las familias buscaban su comida cada día: cazaban animales y recogían frutos del bosque.",
-      "fun_fact": "Las puntas de flecha se hacían de piedra tallada, y algunas eran tan finas como una uña.",
+      "id": "1-4",
+      "title": "¿Qué es el pasado?",
+      "period": "Mi historia y mi familia",
+      "icon": "⏳",
+      "summary": "Pregunta de evaluación diagnóstica sobre la noción del tiempo pasado.",
+      "fun_fact": "El pasado está formado por acontecimientos que sucedieron anteriormente.",
       "trivia": {
-        "question": "¿Qué recogían las personas en el bosque para comer?",
-        "options": ["Frutas y semillas", "Botellas de plástico", "Monedas"],
+        "question": "¿Qué es el pasado?",
+        "options": [
+          "Lo que todavía no sucede.",
+          "Lo que está sucediendo ahora.",
+          "Lo que ya ocurrió."
+        ],
+        "answer": 2
+      }
+    },
+    {
+      "id": "1-5",
+      "title": "¿Qué significa presente?",
+      "period": "Mi historia y mi familia",
+      "icon": "☀️",
+      "summary": "Pregunta de evaluación diagnóstica sobre la noción del tiempo presente.",
+      "fun_fact": "El presente es el momento actual.",
+      "trivia": {
+        "question": "¿Qué significa presente?",
+        "options": [
+          "El tiempo que estamos viviendo ahora.",
+          "Algo que sucedió hace muchos años.",
+          "Algo que ocurrirá mañana."
+        ],
         "answer": 0
       }
     },
     {
       "id": "1-6",
-      "title": "Las Pinturas de las Cuevas",
-      "period": "Arte Rupestre",
-      "icon": "🎨",
-      "summary": "En las paredes de las cuevas, los primeros artistas dibujaron bisontes, ciervos y personas cazando.",
-      "fun_fact": "Usaban tierras de colores y carbón. ¡Sus dibujos tienen más de 15.000 años y siguen ahí!",
+      "title": "¿Cuál es un ejemplo de un recuerdo personal?",
+      "period": "Mi historia y mi familia",
+      "icon": "💭",
+      "summary": "Pregunta de evaluación diagnóstica sobre recuerdos y vivencias personales.",
+      "fun_fact": "Los recuerdos personales son experiencias que forman parte de nuestra vida.",
       "trivia": {
-        "question": "¿Con qué pintaban los artistas de las cuevas?",
-        "options": ["Rotuladores", "Tierras de colores y carbón", "Pintura en espray"],
-        "answer": 1
+        "question": "¿Cuál es un ejemplo de un recuerdo personal?",
+        "options": [
+          "El nacimiento de una persona.",
+          "La construcción de una pirámide hace miles de años.",
+          "La llegada de un astronauta a Marte."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "1-7",
-      "title": "El Perro, Nuestro Mejor Amigo",
-      "period": "Prehistoria",
-      "icon": "🐕",
-      "summary": "Hace mucho tiempo, unos lobos se acercaron a los campamentos humanos buscando restos de comida. Poco a poco se volvieron amigos.",
-      "fun_fact": "El perro fue el primer animal que vivió con las personas, ¡mucho antes que los gatos o las gallinas!",
+      "title": "¿Qué nos permite una línea del tiempo?",
+      "period": "Mi historia y mi familia",
+      "icon": "📏",
+      "summary": "Pregunta de evaluación diagnóstica sobre la función de las líneas del tiempo.",
+      "fun_fact": "Una línea del tiempo organiza los hechos desde los más antiguos hasta los más recientes.",
       "trivia": {
-        "question": "¿Qué animal fue de los primeros en vivir con las personas?",
-        "options": ["El león", "El perro", "El pingüino"],
-        "answer": 1
+        "question": "¿Qué nos permite una línea del tiempo?",
+        "options": [
+          "Ordenar acontecimientos según cuándo sucedieron.",
+          "Medir la temperatura.",
+          "Contar objetos."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "1-8",
-      "title": "La Primera Semilla Plantada",
-      "period": "Agricultura",
-      "icon": "🌾",
-      "summary": "Alguien descubrió que si enterraba una semilla y esperaba, nacía una planta con más comida. ¡Así nació la agricultura!",
-      "fun_fact": "Con la agricultura las familias dejaron de viajar todo el tiempo y construyeron las primeras aldeas.",
+      "title": "¿Qué podemos aprender de nuestros abuelos?",
+      "period": "Mi historia y mi familia",
+      "icon": "👵",
+      "summary": "Pregunta de evaluación diagnóstica sobre el valor del testimonio de los abuelos.",
+      "fun_fact": "Sus experiencias nos ayudan a conocer cómo era la vida en otras épocas.",
       "trivia": {
-        "question": "¿Qué pasó cuando las personas aprendieron a sembrar?",
-        "options": ["Se fueron a vivir a la Luna", "Dejaron de viajar tanto y formaron aldeas", "Dejaron de comer"],
-        "answer": 1
+        "question": "¿Qué podemos aprender de nuestros abuelos?",
+        "options": [
+          "Cómo era su vida cuando eran pequeños.",
+          "Cómo será exactamente el futuro.",
+          "Qué sucederá mañana."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "1-9",
-      "title": "El Tigre de Dientes de Sable",
-      "period": "Edad de Hielo",
-      "icon": "🐅",
-      "summary": "Este felino prehistórico tenía dos colmillos larguísimos, como dos cuchillos. Era un cazador muy veloz.",
-      "fun_fact": "A pesar de su nombre, no era un tigre de verdad: era un pariente lejano de los gatos actuales.",
+      "title": "¿Cuál de estos objetos puede ayudarnos a conocer el pasado?",
+      "period": "Mi historia y mi familia",
+      "icon": "🖼️",
+      "summary": "Pregunta de evaluación diagnóstica sobre testimonios y objetos del pasado.",
+      "fun_fact": "Las fotografías conservan imágenes de personas, lugares y acontecimientos de otras épocas.",
       "trivia": {
-        "question": "¿Qué comía el tigre de dientes de sable?",
-        "options": ["Hierba", "Carne de otros animales", "Frutas del desierto"],
-        "answer": 1
+        "question": "¿Cuál de estos objetos puede ayudarnos a conocer el pasado?",
+        "options": [
+          "Una fotografía antigua.",
+          "Una nube.",
+          "Una fruta recién cortada."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "1-10",
-      "title": "Cuando el Mundo Estaba Helado",
-      "period": "Edad de Hielo",
-      "icon": "🧊",
-      "summary": "Durante la Edad de Hielo hacía tanto frío que enormes capas de hielo cubrían parte de la Tierra.",
-      "fun_fact": "Las personas de esa época se abrigaban con pieles de animales y vivían en cuevas o chozas de huesos.",
+      "title": "¿Por qué es importante conocer nuestra historia familiar?",
+      "period": "Mi historia y mi familia",
+      "icon": "🌳",
+      "summary": "Pregunta de evaluación diagnóstica sobre la importancia de la historia familiar.",
+      "fun_fact": "Conocer nuestra historia familiar nos ayuda a comprender de dónde venimos.",
       "trivia": {
-        "question": "¿Cómo se llama la época en la que hizo muchísimo frío?",
-        "options": ["Edad de Hielo", "Verano eterno", "Edad de Oro"],
-        "answer": 0
+        "question": "¿Por qué es importante conocer nuestra historia familiar?",
+        "options": [
+          "Para olvidar nuestras costumbres.",
+          "Para conocer nuestros orígenes y valorar a nuestra familia.",
+          "Para dejar de escuchar a nuestros familiares."
+        ],
+        "answer": 1
       }
     }
   ],
   "2": [
     {
       "id": "2-1",
-      "title": "El Misterio de las Pirámides y Faraones",
-      "period": "Antiguo Egipto",
-      "icon": "🏺",
-      "summary": "A orillas del río Nilo, los antiguos egipcios construyeron monumentos gigantescos que aún asombran al mundo.",
-      "fun_fact": "Los gatos eran tan sagrados en Egipto que se creía que traían buena suerte a las casas de los faraones.",
+      "title": "¿Qué son las generaciones?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "👥",
+      "summary": "Pregunta de evaluación diagnóstica sobre el concepto de generaciones.",
+      "fun_fact": "Los abuelos, los padres y los hijos pertenecen a generaciones distintas.",
       "trivia": {
-        "question": "¿Cómo se llamaba la escritura egipcia hecha con dibujos y símbolos?",
-        "options": ["Jeroglíficos", "Código Morse", "Alfabeto romano"],
+        "question": "¿Qué son las generaciones?",
+        "options": [
+          "Grupos de personas que nacieron en épocas diferentes.",
+          "Grupos de animales.",
+          "Personas que viven en una misma escuela."
+        ],
         "answer": 0
       }
     },
     {
       "id": "2-2",
-      "title": "Navegantes del Nilo",
-      "period": "Egipto y Comercio",
-      "icon": "⛵",
-      "summary": "Gracias a los barcos de papiro, los egipcios podían transportar trigo, piedras enormes y tesoros.",
-      "fun_fact": "El papiro fue el abuelo del papel moderno; se hacía con tallos de plantas acuáticas.",
+      "title": "¿Qué podemos conocer al entrevistar a nuestros abuelos?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🎙️",
+      "summary": "Pregunta de evaluación diagnóstica sobre las entrevistas como fuente histórica.",
+      "fun_fact": "Las entrevistas nos permiten conocer recuerdos y experiencias del pasado.",
       "trivia": {
-        "question": "¿Cuál es el río más famoso donde floreció la civilización egipcia?",
-        "options": ["Río Amazonas", "Río Nilo", "Río Bravo"],
-        "answer": 1
+        "question": "¿Qué podemos conocer al entrevistar a nuestros abuelos?",
+        "options": [
+          "Cómo era su vida cuando eran pequeños.",
+          "Lo que sucederá dentro de cien años.",
+          "La vida de personas que nunca conocieron."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "2-3",
-      "title": "El Faraón, Rey de Egipto",
-      "period": "Antiguo Egipto",
-      "icon": "👑",
-      "summary": "El faraón era la persona más poderosa de Egipto. Llevaba una corona especial y todos lo obedecían.",
-      "fun_fact": "Al faraón se le llamaba 'gran casa', porque vivía en un palacio enorme con muchos sirvientes.",
+      "title": "¿Cuál es un ejemplo de un cambio en la comunidad?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🏫",
+      "summary": "Pregunta de evaluación diagnóstica sobre las transformaciones en la comunidad.",
+      "fun_fact": "Las comunidades cambian con el paso del tiempo y pueden tener nuevos edificios y servicios.",
       "trivia": {
-        "question": "¿Quién mandaba en el antiguo Egipto?",
-        "options": ["El faraón", "Un pirata", "El alcalde de la aldea"],
+        "question": "¿Cuál es un ejemplo de un cambio en la comunidad?",
+        "options": [
+          "La construcción de una nueva escuela.",
+          "Que el sol salga todos los días.",
+          "Que las personas tengan cumpleaños."
+        ],
         "answer": 0
       }
     },
     {
       "id": "2-4",
-      "title": "La Esfinge de Giza",
-      "period": "Antiguo Egipto",
-      "icon": "🦁",
-      "summary": "Junto a las pirámides hay una estatua gigante con cuerpo de león y cabeza de persona. Se llama la Esfinge.",
-      "fun_fact": "La Esfinge fue tallada en una sola roca y mide como un edificio de seis pisos.",
+      "title": "¿Cómo podemos conocer cómo eran las escuelas antiguamente?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "📚",
+      "summary": "Pregunta de evaluación diagnóstica sobre el pasado escolar.",
+      "fun_fact": "Las fotografías y los relatos nos dan información sobre las escuelas de otras épocas.",
       "trivia": {
-        "question": "¿Qué animal tiene cuerpo de león y cabeza humana?",
-        "options": ["El dragón", "La Esfinge", "El grifo"],
-        "answer": 1
+        "question": "¿Cómo podemos conocer cómo eran las escuelas antiguamente?",
+        "options": [
+          "Observando fotografías y escuchando testimonios.",
+          "Adivinando.",
+          "Imaginando sin investigar."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "2-5",
-      "title": "Pan, Cebolla y Cerveza",
-      "period": "Vida Cotidiana en Egipto",
-      "icon": "🍞",
-      "summary": "Los egipcios comían pan hecho de trigo, cebollas, pescado del Nilo y algunas frutas como los dátiles.",
-      "fun_fact": "El pan era tan importante que a los trabajadores les pagaban parte de su sueldo en pan.",
+      "title": "¿Qué es un testimonio histórico?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🗣️",
+      "summary": "Pregunta de evaluación diagnóstica sobre qué es un testimonio histórico.",
+      "fun_fact": "Los testimonios de las personas nos ayudan a conocer acontecimientos y formas de vida anteriores.",
       "trivia": {
-        "question": "¿Qué alimento era básico para los egipcios?",
-        "options": ["La pizza", "El pan de trigo", "El helado"],
-        "answer": 1
+        "question": "¿Qué es un testimonio histórico?",
+        "options": [
+          "Un relato o recuerdo que aporta información sobre el pasado.",
+          "Una receta de cocina inventada.",
+          "Un anuncio de televisión."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "2-6",
-      "title": "El Escritor de Jeroglíficos",
-      "period": "Antiguo Egipto",
-      "icon": "✍️",
-      "summary": "Pocas personas sabían escribir. Los escribas aprendían muchos años y trabajaban para el faraón.",
-      "fun_fact": "Escribían con una caña afilada y tinta sobre hojas de papiro.",
+      "title": "¿Cuál de estos objetos puede ser un testimonio del pasado?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "✉️",
+      "summary": "Pregunta de evaluación diagnóstica sobre objetos que dan testimonio del pasado.",
+      "fun_fact": "Los documentos familiares pueden conservar información de otras épocas.",
       "trivia": {
-        "question": "¿Cómo se llamaba la persona que sabía escribir en Egipto?",
-        "options": ["Escriba", "Cocinero", "Carpintero"],
+        "question": "¿Cuál de estos objetos puede ser un testimonio del pasado?",
+        "options": [
+          "Una carta antigua.",
+          "Una pelota nueva.",
+          "Un alimento recién preparado."
+        ],
         "answer": 0
       }
     },
     {
       "id": "2-7",
-      "title": "Los Gatos Sagrados",
-      "period": "Antiguo Egipto",
-      "icon": "🐈",
-      "summary": "En Egipto los gatos vivían en las casas y eran muy respetados, porque cazaban ratones que comían el grano.",
-      "fun_fact": "Había una diosa con cabeza de gato llamada Bastet, protectora del hogar.",
+      "title": "¿Qué son las tradiciones?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🎉",
+      "summary": "Pregunta de evaluación diagnóstica sobre el concepto de tradiciones.",
+      "fun_fact": "Las tradiciones forman parte de la identidad de las familias y comunidades.",
       "trivia": {
-        "question": "¿Qué animal era sagrado en el antiguo Egipto?",
-        "options": ["El perro", "El gato", "El caballo"],
-        "answer": 1
+        "question": "¿Qué son las tradiciones?",
+        "options": [
+          "Costumbres que se transmiten entre generaciones.",
+          "Actividades que nadie realiza.",
+          "Objetos que se compran diariamente."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "2-8",
-      "title": "Piedras del Tamaño de un Autobús",
-      "period": "Antiguo Egipto",
-      "icon": "🧱",
-      "summary": "Las pirámides son tumbas hechas con millones de bloques de piedra muy pesados, apilados uno sobre otro.",
-      "fun_fact": "La Gran Pirámide fue el edificio más alto del mundo durante más de 3.000 años.",
+      "title": "¿Cuál es un ejemplo de una actividad que ayuda a conservar la memoria de la comunidad?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🤝",
+      "summary": "Pregunta de evaluación diagnóstica sobre la preservación de la memoria colectiva.",
+      "fun_fact": "Compartir recuerdos permite conservar la historia de nuestra comunidad.",
       "trivia": {
-        "question": "¿Con qué construyeron las pirámides?",
-        "options": ["Con bloques de piedra", "Con madera y papel", "Con hielo"],
+        "question": "¿Cuál es un ejemplo de una actividad que ayuda a conservar la memoria de la comunidad?",
+        "options": [
+          "Escuchar las historias de las personas mayores.",
+          "Destruir las fotografías antiguas.",
+          "Ignorar las costumbres locales."
+        ],
         "answer": 0
       }
     },
     {
       "id": "2-9",
-      "title": "El Dios Sol y sus Viajes",
-      "period": "Religión Egipcia",
-      "icon": "☀️",
-      "summary": "Los egipcios pensaban que el sol era un dios llamado Ra, que cruzaba el cielo en un barco cada día.",
-      "fun_fact": "Muchos faraones añadían el nombre de Ra al suyo, como Ramsés.",
+      "title": "¿Qué podemos comparar para identificar cambios en nuestra comunidad?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🏙️",
+      "summary": "Pregunta de evaluación diagnóstica sobre la comparación de épocas.",
+      "fun_fact": "Al comparar imágenes podemos observar cómo han cambiado las calles, viviendas y edificios.",
       "trivia": {
-        "question": "¿Cómo se llamaba el dios del sol en Egipto?",
-        "options": ["Ra", "Zeus", "Júpiter"],
+        "question": "¿Qué podemos comparar para identificar cambios en nuestra comunidad?",
+        "options": [
+          "Fotografías antiguas y actuales.",
+          "Dos frutas diferentes.",
+          "Los colores de los juguetes."
+        ],
         "answer": 0
       }
     },
     {
       "id": "2-10",
-      "title": "Momias: Conservar el Cuerpo",
-      "period": "Antiguo Egipto",
-      "icon": "⚰️",
-      "summary": "Los egipcios creían en la vida después de la muerte. Por eso cuidaban el cuerpo y lo envolvían en vendas.",
-      "fun_fact": "Tardaban unos 70 días en preparar una momia, y guardaban vendas, joyas y comida en la tumba.",
+      "title": "¿Qué significa pertenecer a una comunidad?",
+      "period": "Mi historia y mi comunidad",
+      "icon": "🏡",
+      "summary": "Pregunta de evaluación diagnóstica sobre la pertenencia a una comunidad.",
+      "fun_fact": "Una comunidad está formada por personas que conviven y participan en actividades compartidas.",
       "trivia": {
-        "question": "¿Cómo se llama un cuerpo envuelto en vendas por los egipcios?",
-        "options": ["Momia", "Estatua", "Pintura"],
+        "question": "¿Qué significa pertenecer a una comunidad?",
+        "options": [
+          "Formar parte de un grupo de personas que comparten un lugar y una vida en común.",
+          "Vivir sin relacionarse con nadie.",
+          "No conocer las costumbres del lugar."
+        ],
         "answer": 0
       }
     }
@@ -266,263 +346,343 @@
   "3": [
     {
       "id": "3-1",
-      "title": "El Primer Estadio de los Juegos Olímpicos",
-      "period": "Antigua Grecia",
-      "icon": "🏛️",
-      "summary": "En la ciudad de Olimpia, los atletas competían en carreras y lanzamiento de disco en honor a los dioses griegos.",
-      "fun_fact": "A los campeones no les daban medallas de oro, ¡les colocaban coronas hechas con ramas de olivo silvestre!",
+      "title": "¿Qué son los pueblos originarios?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🗿",
+      "summary": "Pregunta de evaluación diagnóstica sobre los pueblos originarios.",
+      "fun_fact": "Los pueblos originarios tienen culturas, lenguas y tradiciones que forman parte de la historia de nuestro país.",
       "trivia": {
-        "question": "¿Cada cuántos años se celebraban los Juegos Olímpicos en la antigua Grecia?",
-        "options": ["Cada 10 años", "Cada 4 años", "Cada semana"],
-        "answer": 1
+        "question": "¿Qué son los pueblos originarios?",
+        "options": [
+          "Pueblos que tienen raíces históricas anteriores a la colonización europea.",
+          "Personas que llegaron recientemente a una ciudad.",
+          "Grupos que solamente viven en otros continentes."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "3-2",
-      "title": "El Coliseo y los Acueductos Romanos",
-      "period": "Imperio Romano",
-      "icon": "🛡️",
-      "summary": "Los ingenieros romanos inventaron puentes gigantes llamados acueductos para llevar agua limpia a ciudades enteras.",
-      "fun_fact": "Los romanos inventaron un tipo de concreto tan resistente que sus edificios siguen en pie después de 2,000 años.",
+      "title": "¿Cuál de estos pueblos originarios habitó la región de Campeche?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🏛️",
+      "summary": "Pregunta de evaluación diagnóstica sobre los pueblos originarios de Campeche.",
+      "fun_fact": "La cultura maya tiene una presencia histórica muy importante en Campeche.",
       "trivia": {
-        "question": "¿Cómo se llamaba la prenda de vestir blanca que usaban los ciudadanos de Roma?",
-        "options": ["Sombraje", "Toga", "Armadura de cuero"],
-        "answer": 1
+        "question": "¿Cuál de estos pueblos originarios habitó la región de Campeche?",
+        "options": [
+          "Los mayas.",
+          "Los romanos.",
+          "Los vikingos."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "3-3",
-      "title": "El Teatro Griego",
-      "period": "Antigua Grecia",
-      "icon": "🎭",
-      "summary": "Los griegos inventaron el teatro. Actuaban al aire libre, en gradas de piedra donde cabía muchísima gente.",
-      "fun_fact": "Los actores usaban máscaras grandes para que su voz sonara fuerte y todos vieran si estaban tristes o contentos.",
+      "title": "¿En qué región de América se desarrolló la civilización maya?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🗺️",
+      "summary": "Pregunta de evaluación diagnóstica sobre la región geográfica de la civilización maya.",
+      "fun_fact": "Los mayas se desarrollaron en una región que comprende el sureste de México y partes de Centroamérica.",
       "trivia": {
-        "question": "¿Dónde actuaban los actores griegos?",
-        "options": ["En teatros al aire libre", "En un cine", "Dentro de una cueva"],
+        "question": "¿En qué región de América se desarrolló la civilización maya?",
+        "options": [
+          "Mesoamérica.",
+          "Europa.",
+          "Oceanía."
+        ],
         "answer": 0
       }
     },
     {
       "id": "3-4",
-      "title": "Los Dioses del Olimpo",
-      "period": "Religión Griega",
-      "icon": "⚡",
-      "summary": "Los griegos contaban historias de dioses que vivían en una montaña llamada Olimpo: Zeus, Atenea, Poseidón...",
-      "fun_fact": "A Zeus se le dibujaba con un rayo en la mano, porque era el dios del cielo y de las tormentas.",
+      "title": "¿Cuál era una de las principales actividades de los antiguos mayas?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🌽",
+      "summary": "Pregunta de evaluación diagnóstica sobre las actividades de los antiguos mayas.",
+      "fun_fact": "Los mayas cultivaban productos como el maíz, que era muy importante en su alimentación.",
       "trivia": {
-        "question": "¿Quién era el rey de los dioses griegos?",
-        "options": ["Poseidón", "Zeus", "Hércules"],
-        "answer": 1
+        "question": "¿Cuál era una de las principales actividades de los antiguos mayas?",
+        "options": [
+          "La agricultura.",
+          "La fabricación de automóviles.",
+          "La exploración espacial."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "3-5",
-      "title": "La Carrera de Maratón",
-      "period": "Grecia y sus Leyendas",
-      "icon": "🏃",
-      "summary": "Cuenta la leyenda que un mensajero corrió muchos kilómetros para dar una buena noticia a su ciudad sin parar.",
-      "fun_fact": "Por esa historia, hoy corremos maratones de más de 42 kilómetros.",
+      "title": "¿Qué alimento era fundamental para los antiguos mayas?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🌾",
+      "summary": "Pregunta de evaluación diagnóstica sobre la alimentación maya.",
+      "fun_fact": "El maíz era uno de los alimentos principales de la cultura maya.",
       "trivia": {
-        "question": "¿Qué hacía el mensajero de la leyenda?",
-        "options": ["Nadar en el mar", "Correr para llevar una noticia", "Volar en globo"],
-        "answer": 1
+        "question": "¿Qué alimento era fundamental para los antiguos mayas?",
+        "options": [
+          "El maíz.",
+          "La pizza.",
+          "La hamburguesa."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "3-6",
-      "title": "El Ágora, la Plaza Griega",
-      "period": "Vida Cotidiana en Grecia",
-      "icon": "🏺",
-      "summary": "El ágora era la plaza principal. Allí se compraban cosas, se hablaba de política y se escuchaban noticias.",
-      "fun_fact": "En el ágora también se hacían juicios: los ciudadanos votaban y decidían juntos.",
+      "title": "¿Qué conocimientos desarrollaron los antiguos mayas?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "⭐",
+      "summary": "Pregunta de evaluación diagnóstica sobre los conocimientos científicos de los mayas.",
+      "fun_fact": "Los mayas desarrollaron conocimientos sobre los números, el tiempo y los movimientos de los astros.",
       "trivia": {
-        "question": "¿Qué era el ágora?",
-        "options": ["Una plaza para comprar y hablar", "Un templo", "Un barco"],
+        "question": "¿Qué conocimientos desarrollaron los antiguos mayas?",
+        "options": [
+          "Matemáticas y astronomía.",
+          "Fabricación de teléfonos celulares.",
+          "Construcción de aviones modernos."
+        ],
         "answer": 0
       }
     },
     {
       "id": "3-7",
-      "title": "Los Gladiadores del Coliseo",
-      "period": "Imperio Romano",
-      "icon": "⚔️",
-      "summary": "El Coliseo era un estadio enorme en Roma donde se hacían espectáculos y luchas ante miles de personas.",
-      "fun_fact": "Cabían más de 50.000 espectadores, ¡y podían entrar y salir por 80 puertas!",
+      "title": "¿Qué utilizaban los mayas para registrar información y acontecimientos?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "📝",
+      "summary": "Pregunta de evaluación diagnóstica sobre el sistema de registro de los mayas.",
+      "fun_fact": "Los mayas desarrollaron un sistema de escritura con signos y símbolos.",
       "trivia": {
-        "question": "¿Dónde se celebraban las luchas de gladiadores?",
-        "options": ["En el Coliseo", "En la escuela", "En el mercado"],
+        "question": "¿Qué utilizaban los mayas para registrar información y acontecimientos?",
+        "options": [
+          "La escritura maya.",
+          "Computadoras.",
+          "Máquinas de escribir."
+        ],
         "answer": 0
       }
     },
     {
       "id": "3-8",
-      "title": "Las Termas Romanas",
-      "period": "Vida Cotidiana en Roma",
-      "icon": "🛁",
-      "summary": "Los romanos iban a las termas a bañarse en agua caliente y fría, y a charlar con sus amigos.",
-      "fun_fact": "Algunas termas eran tan grandes que tenían biblioteca y jardines dentro.",
+      "title": "¿Cuál es una antigua ciudad maya ubicada en Campeche?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🛕",
+      "summary": "Pregunta de evaluación diagnóstica sobre zonas arqueológicas de Campeche.",
+      "fun_fact": "Edzná es una importante zona arqueológica maya del estado de Campeche.",
       "trivia": {
-        "question": "¿A qué iban los romanos a las termas?",
-        "options": ["A bañarse y conversar", "A hacer la compra", "A dormir"],
+        "question": "¿Cuál es una antigua ciudad maya ubicada en Campeche?",
+        "options": [
+          "Edzná.",
+          "París.",
+          "Roma."
+        ],
         "answer": 0
       }
     },
     {
       "id": "3-9",
-      "title": "El Legionario y su Armadura",
-      "period": "Imperio Romano",
-      "icon": "🪖",
-      "summary": "Los legionarios eran los soldados de Roma. Llevaban casco, escudo y una espada corta llamada gladius.",
-      "fun_fact": "Caminaban unos 30 kilómetros al día cargando su mochila, la comida y las herramientas.",
+      "title": "¿Qué es Calakmul?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🌴",
+      "summary": "Pregunta de evaluación diagnóstica sobre Calakmul.",
+      "fun_fact": "Calakmul fue una importante ciudad de la civilización maya y hoy es una zona arqueológica.",
       "trivia": {
-        "question": "¿Cómo se llamaba el soldado romano?",
-        "options": ["Legionario", "Pirata", "Jinete"],
+        "question": "¿Qué es Calakmul?",
+        "options": [
+          "Una antigua ciudad maya ubicada en Campeche.",
+          "Una ciudad de España.",
+          "Un edificio moderno de la Ciudad de México."
+        ],
         "answer": 0
       }
     },
     {
       "id": "3-10",
-      "title": "Los Números Romanos",
-      "period": "Legado Romano",
-      "icon": "🔢",
-      "summary": "Los romanos escribían los números con letras: I, V, X, L, C, D y M. ¡Todavía los usamos en los siglos!",
-      "fun_fact": "El número 4 se escribe IV: una I delante de la V significa 'uno menos que cinco'.",
+      "title": "¿Por qué es importante conservar las zonas arqueológicas mayas?",
+      "period": "Conozco la historia de Campeche",
+      "icon": "🛡️",
+      "summary": "Pregunta de evaluación diagnóstica sobre la conservación del patrimonio arqueológico.",
+      "fun_fact": "Estos lugares conservan vestigios que nos ayudan a comprender cómo vivían los pueblos antiguos.",
       "trivia": {
-        "question": "¿Qué número representa la letra X en números romanos?",
-        "options": ["1", "10", "100"],
-        "answer": 1
+        "question": "¿Por qué es importante conservar las zonas arqueológicas mayas?",
+        "options": [
+          "Porque nos permiten conocer y valorar la historia y cultura de los antiguos mayas.",
+          "Porque son lugares para construir centros comerciales.",
+          "Porque no tienen relación con nuestra historia."
+        ],
+        "answer": 0
       }
     }
   ],
   "4": [
     {
       "id": "4-1",
-      "title": "Los Astrónomos de Chichén Itzá y Palenque",
-      "period": "Cultura Maya",
-      "icon": "🌽",
-      "summary": "Los sabios mayas contaban los días observando las estrellas y el movimiento de los planetas con asombrosa exactitud.",
-      "fun_fact": "Los mayas fueron de los primeros pueblos en inventar y utilizar el número CERO.",
+      "title": "¿Qué ocurrió durante la invasión española de los territorios mesoamericanos?",
+      "period": "La invasión española y el México colonial",
+      "icon": "⚔️",
+      "summary": "Pregunta de evaluación diagnóstica sobre la invasión y colonización española.",
+      "fun_fact": "La llegada de los españoles transformó la vida de los pueblos originarios.",
       "trivia": {
-        "question": "¿Qué bebida deliciosa y amarga preparaban con semillas de cacao?",
-        "options": ["Té de limón", "Chocolate sagrado (xocolātl)", "Jugo de naranja"],
-        "answer": 1
+        "question": "¿Qué ocurrió durante la invasión española de los territorios mesoamericanos?",
+        "options": [
+          "Los españoles llegaron y comenzaron un proceso de conquista y colonización.",
+          "Se inventaron los teléfonos.",
+          "Se construyeron los primeros aviones."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "4-2",
-      "title": "Torneos y Castillos Medievales",
-      "period": "Edad Media",
-      "icon": "🏰",
-      "summary": "Caballeros con pesadas armaduras de metal cuidaban fortalezas con puentes levadizos y altas torres vigía.",
-      "fun_fact": "Una armadura completa de caballero podía llegar a pesar más de 25 kilos.",
+      "title": "¿Cómo reaccionaron algunos pueblos indígenas ante la conquista española?",
+      "period": "La invasión española y el México colonial",
+      "icon": "🏹",
+      "summary": "Pregunta de evaluación diagnóstica sobre la resistencia indígena.",
+      "fun_fact": "Diversos pueblos originarios defendieron sus territorios, formas de vida y autonomía.",
       "trivia": {
-        "question": "¿Qué rodeaba los castillos para evitar que los enemigos se acercaran fácilmente?",
-        "options": ["Un foso con agua", "Una autopista", "Campos de girasoles"],
+        "question": "¿Cómo reaccionaron algunos pueblos indígenas ante la conquista española?",
+        "options": [
+          "Ofrecieron resistencia.",
+          "Todos abandonaron sus territorios voluntariamente.",
+          "Dejaron de existir inmediatamente."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-3",
-      "title": "El Juego de Pelota Maya",
-      "period": "Cultura Maya",
-      "icon": "🏐",
-      "summary": "Los mayas jugaban a pasar una pelota de hule por un aro, usando la cadera. Era un juego importante y ceremonial.",
-      "fun_fact": "La pelota era de hule natural y botaba mucho, aunque pesaba más que un balón de fútbol.",
+      "title": "¿Qué fue la Nueva España?",
+      "period": "La invasión española y el México colonial",
+      "icon": "👑",
+      "summary": "Pregunta de evaluación diagnóstica sobre el periodo del virreinato.",
+      "fun_fact": "Nueva España fue uno de los principales territorios del imperio español en América.",
       "trivia": {
-        "question": "¿De qué material era la pelota maya?",
-        "options": ["De hule natural", "De plástico", "De cristal"],
+        "question": "¿Qué fue la Nueva España?",
+        "options": [
+          "El territorio colonial gobernado por España en América.",
+          "Un país europeo.",
+          "Una ciudad maya."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-4",
-      "title": "Las Pirámides de Tikal",
-      "period": "Cultura Maya",
-      "icon": "🏛️",
-      "summary": "En medio de la selva, los mayas construyeron pirámides escalonadas para sus templos y ceremonias.",
-      "fun_fact": "Desde lo alto de un templo de Tikal se veían las copas de los árboles por encima de la selva.",
+      "title": "¿Qué actividad económica fue importante durante la época colonial?",
+      "period": "La invasión española y el México colonial",
+      "icon": "⚖️",
+      "summary": "Pregunta de evaluación diagnóstica sobre las actividades económicas coloniales.",
+      "fun_fact": "Durante la Colonia se intercambiaban productos entre diferentes regiones y territorios.",
       "trivia": {
-        "question": "¿Qué edificaban los mayas en sus ciudades?",
-        "options": ["Pirámides y templos", "Rascacielos de vidrio", "Molinos de viento"],
+        "question": "¿Qué actividad económica fue importante durante la época colonial?",
+        "options": [
+          "El comercio.",
+          "La fabricación de computadoras.",
+          "La producción de teléfonos inteligentes."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-5",
-      "title": "El Maíz, Regalo de los Dioses",
-      "period": "Cultura Maya",
-      "icon": "🌽",
-      "summary": "El maíz era el alimento más importante. Con él hacían tortillas, tamales y hasta bebidas.",
-      "fun_fact": "Los mayas decían que las personas fueron creadas con masa de maíz.",
+      "title": "¿Qué ciudad de Campeche fue importante como puerto durante la época colonial?",
+      "period": "La invasión española y el México colonial",
+      "icon": "⚓",
+      "summary": "Pregunta de evaluación diagnóstica sobre el puerto de Campeche en la Colonia.",
+      "fun_fact": "Su ubicación junto al mar la convirtió en un puerto importante para el comercio.",
       "trivia": {
-        "question": "¿Cuál era el grano sagrado para los mayas?",
-        "options": ["El arroz", "El maíz", "El trigo"],
-        "answer": 1
+        "question": "¿Qué ciudad de Campeche fue importante como puerto durante la época colonial?",
+        "options": [
+          "San Francisco de Campeche.",
+          "Monterrey.",
+          "Guadalajara."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "4-6",
-      "title": "El Caballero y su Caballo",
-      "period": "Edad Media",
-      "icon": "🐎",
-      "summary": "Ser caballero requería años de entrenamiento: montar, usar la espada y cuidar la armadura.",
-      "fun_fact": "Los caballos de guerra también llevaban armadura, llamada barda.",
+      "title": "¿Quiénes eran los piratas?",
+      "period": "La invasión española y el México colonial",
+      "icon": "🏴‍☠️",
+      "summary": "Pregunta de evaluación diagnóstica sobre los ataques piratas en las costas coloniales.",
+      "fun_fact": "Los ataques de piratas y corsarios afectaron a varios puertos, incluido Campeche.",
       "trivia": {
-        "question": "¿Qué necesitaba un caballero para luchar?",
-        "options": ["Armadura y caballo", "Una bicicleta", "Un disfraz"],
+        "question": "¿Quiénes eran los piratas?",
+        "options": [
+          "Personas que atacaban y robaban embarcaciones y poblaciones.",
+          "Agricultores que cultivaban maíz.",
+          "Personas que construían escuelas."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-7",
-      "title": "El Foso y el Puente Levadizo",
-      "period": "Edad Media",
-      "icon": "🏯",
-      "summary": "Los castillos tenían un foso con agua alrededor y un puente que se levantaba para que nadie entrara.",
-      "fun_fact": "Las murallas eran tan gruesas que dentro había pasillos secretos para moverse sin ser visto.",
+      "title": "¿Para qué se construyeron las murallas de Campeche?",
+      "period": "La invasión española y el México colonial",
+      "icon": "🧱",
+      "summary": "Pregunta de evaluación diagnóstica sobre las murallas defensivas de Campeche.",
+      "fun_fact": "Las murallas formaron parte del sistema defensivo de la ciudad.",
       "trivia": {
-        "question": "¿Para qué servía el foso del castillo?",
-        "options": ["Para que los enemigos no entraran", "Para pescar", "Para nadar en verano"],
+        "question": "¿Para qué se construyeron las murallas de Campeche?",
+        "options": [
+          "Para proteger la ciudad de los ataques.",
+          "Para separar las escuelas.",
+          "Para cultivar alimentos."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-8",
-      "title": "El Molino del Pueblo",
-      "period": "Edad Media",
-      "icon": "💨",
-      "summary": "Los molinos usaban la fuerza del viento o del agua para mover unas piedras que molían el grano.",
-      "fun_fact": "Con la harina del molino se hacía el pan que comía todo el pueblo.",
+      "title": "¿Qué son los baluartes?",
+      "period": "La invasión española y el México colonial",
+      "icon": "🏰",
+      "summary": "Pregunta de evaluación diagnóstica sobre los baluartes y fortificaciones.",
+      "fun_fact": "Los baluartes ayudaban a defender la ciudad de posibles ataques.",
       "trivia": {
-        "question": "¿Para qué servía un molino?",
-        "options": ["Para moler el grano y hacer harina", "Para navegar", "Para hacer fuego"],
+        "question": "¿Qué son los baluartes?",
+        "options": [
+          "Construcciones defensivas que formaban parte de las fortificaciones.",
+          "Tipos de embarcaciones comerciales.",
+          "Herramientas para sembrar."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-9",
-      "title": "Los Monjes Copistas",
-      "period": "Edad Media",
-      "icon": "📖",
-      "summary": "Antes de las imprentas, los monjes copiaban los libros a mano en los monasterios, letra por letra.",
-      "fun_fact": "Un solo libro podía tardar meses en copiarse, y algunos se decoraban con letras de oro.",
+      "title": "¿Qué cambio cultural ocurrió durante la época colonial?",
+      "period": "La invasión española y el México colonial",
+      "icon": "🎭",
+      "summary": "Pregunta de evaluación diagnóstica sobre el mestizaje y transformaciones culturales.",
+      "fun_fact": "Durante la Colonia hubo intercambios y transformaciones culturales, aunque también se impusieron formas de vida y creencias.",
       "trivia": {
-        "question": "¿Qué hacían los monjes copistas?",
-        "options": ["Copiar libros a mano", "Construir barcos", "Cocinar para el rey"],
+        "question": "¿Qué cambio cultural ocurrió durante la época colonial?",
+        "options": [
+          "Se mezclaron costumbres y tradiciones de diferentes pueblos.",
+          "Desaparecieron todas las culturas indígenas.",
+          "Todas las personas comenzaron a hablar el mismo idioma de inmediato."
+        ],
         "answer": 0
       }
     },
     {
       "id": "4-10",
-      "title": "Las Ferias Medievales",
-      "period": "Edad Media",
-      "icon": "🎪",
-      "summary": "En las ferias se juntaban mercaderes de muchos lugares a vender telas, especias, herramientas y animales.",
-      "fun_fact": "También había músicos, malabaristas y cuentacuentos que entretenían a la gente.",
+      "title": "¿Por qué es importante conocer la historia colonial de Campeche?",
+      "period": "La invasión española y el México colonial",
+      "icon": "📖",
+      "summary": "Pregunta de evaluación diagnóstica sobre el valor de la historia colonial.",
+      "fun_fact": "La historia colonial ayuda a entender el origen de muchas construcciones y tradiciones de Campeche.",
       "trivia": {
-        "question": "¿Qué se hacía en las ferias medievales?",
-        "options": ["Comprar y vender mercancías", "Volar cometas", "Ir a la playa"],
+        "question": "¿Por qué es importante conocer la historia colonial de Campeche?",
+        "options": [
+          "Para comprender cómo se formó y transformó nuestra ciudad.",
+          "Para olvidar las construcciones antiguas.",
+          "Para conocer solamente la historia de otros países."
+        ],
         "answer": 0
       }
     }
@@ -530,131 +690,171 @@
   "5": [
     {
       "id": "5-1",
-      "title": "La Gran Tenochtitlan sobre el Lago",
-      "period": "Cultura Mexica",
-      "icon": "🦅",
-      "summary": "Una impresionante ciudad fundada sobre islotes en medio del lago de Texcoco, con calzadas, canales y chinampas flotantes.",
-      "fun_fact": "Las chinampas eran huertos flotantes donde cultivaban maíz, frijol y flores durante todo el año.",
+      "title": "¿En qué año se consumó la Independencia de México?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🔔",
+      "summary": "Pregunta de evaluación diagnóstica sobre la consumación de la Independencia.",
+      "fun_fact": "En 1821 se consumó la Independencia de México y terminó el dominio español.",
       "trivia": {
-        "question": "¿Qué señal vieron los mexicas para fundar su ciudad?",
-        "options": ["Un arcoíris doble", "Un águila devorando una serpiente sobre un nopal", "Un cometa de oro"],
+        "question": "¿En qué año se consumó la Independencia de México?",
+        "options": [
+          "1810.",
+          "1821.",
+          "1910."
+        ],
         "answer": 1
       }
     },
     {
       "id": "5-2",
-      "title": "Grandes Navegantes y Nuevos Horizontes",
-      "period": "Era de las Exploraciones",
-      "icon": "🧭",
-      "summary": "Capitanes valientes cruzaron océanos desconocidos guiados por la brújula y las constelaciones marinas.",
-      "fun_fact": "Para orientarse de noche en alta mar, los marineros usaban un instrumento llamado astrolabio.",
+      "title": "¿Qué sucedió después de la Independencia?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🇲🇽",
+      "summary": "Pregunta de evaluación diagnóstica sobre la organización del México independiente.",
+      "fun_fact": "Después de independizarse, México enfrentó el reto de establecer su gobierno y sus leyes.",
       "trivia": {
-        "question": "¿Qué instrumento con una aguja imantada siempre apunta hacia el Norte?",
-        "options": ["Telescopio", "Brújula", "Reloj de arena"],
-        "answer": 1
+        "question": "¿Qué sucedió después de la Independencia?",
+        "options": [
+          "México tuvo que organizarse como país independiente.",
+          "México volvió a ser parte de España.",
+          "México dejó de tener habitantes."
+        ],
+        "answer": 0
       }
     },
     {
       "id": "5-3",
-      "title": "Las Chinampas Flotantes",
-      "period": "Cultura Mexica",
-      "icon": "🌱",
-      "summary": "Los mexicas hacían islas artificiales con tierra y plantas sobre el agua para sembrar allí sus alimentos.",
-      "fun_fact": "Las raíces de los árboles sujetaban la tierra, así las chinampas no se iban con la corriente.",
+      "title": "¿Qué es una república federal?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🏛️",
+      "summary": "Pregunta de evaluación diagnóstica sobre el sistema de república federal.",
+      "fun_fact": "El federalismo permite que los estados tengan autoridades y ciertas responsabilidades propias.",
       "trivia": {
-        "question": "¿Qué cultivaban en las chinampas?",
-        "options": ["Maíz y flores", "Café", "Naranjas"],
+        "question": "¿Qué es una república federal?",
+        "options": [
+          "Una forma de gobierno en la que el poder se distribuye entre el gobierno nacional y los estados.",
+          "Un gobierno dirigido por otro país.",
+          "Un territorio sin autoridades."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-4",
-      "title": "El Templo Mayor",
-      "period": "Cultura Mexica",
-      "icon": "🛕",
-      "summary": "En el centro de Tenochtitlan estaba el Templo Mayor, una pirámide doble con escaleras para subir a los santuarios.",
-      "fun_fact": "El templo se fue agrandando varias veces, y cada ampliación se construía encima de la anterior.",
+      "title": "¿Qué buscaban los centralistas?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🏛️",
+      "summary": "Pregunta de evaluación diagnóstica sobre el pensamiento centralista.",
+      "fun_fact": "Los centralistas defendían que las principales decisiones estuvieran concentradas en el gobierno central.",
       "trivia": {
-        "question": "¿Dónde estaba el Templo Mayor?",
-        "options": ["En Tenochtitlan", "En Egipto", "En Roma"],
+        "question": "¿Qué buscaban los centralistas?",
+        "options": [
+          "Concentrar el poder político en un gobierno central.",
+          "Dar independencia a cada familia.",
+          "Eliminar todas las leyes."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-5",
-      "title": "El Mercado de Tlatelolco",
-      "period": "Cultura Mexica",
-      "icon": "🧺",
-      "summary": "El mercado era enorme: se vendían alimentos, telas, plumas, herramientas y hasta animales vivos.",
-      "fun_fact": "Había personas encargadas de vigilar que nadie hiciera trampa al pesar o al vender.",
+      "title": "¿Qué fue una intervención extranjera?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "⚔️",
+      "summary": "Pregunta de evaluación diagnóstica sobre las intervenciones extranjeras en el siglo XIX.",
+      "fun_fact": "México enfrentó conflictos e intervenciones de otros países durante el siglo XIX.",
       "trivia": {
-        "question": "¿Qué se vendía en el mercado de Tlatelolco?",
-        "options": ["Comida, ropa y herramientas", "Coches", "Teléfonos"],
+        "question": "¿Qué fue una intervención extranjera?",
+        "options": [
+          "La participación de un país extranjero en los asuntos de otro, incluso mediante acciones militares.",
+          "Una fiesta tradicional.",
+          "Una actividad escolar."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-6",
-      "title": "La Carabela y el Viento",
-      "period": "Era de las Exploraciones",
-      "icon": "⛵",
-      "summary": "Las carabelas eran barcos pequeños y rápidos que usaban el viento para cruzar el océano.",
-      "fun_fact": "Los marineros dormían en hamacas colgadas para no caerse cuando el barco se movía.",
+      "title": "¿Quién fue Benito Juárez?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "📜",
+      "summary": "Pregunta de evaluación diagnóstica sobre Benito Juárez.",
+      "fun_fact": "Benito Juárez fue una figura importante en la historia política de México durante el siglo XIX.",
       "trivia": {
-        "question": "¿Qué hacía mover a las carabelas?",
-        "options": ["El viento en las velas", "Un motor de gasolina", "Remos de metal"],
+        "question": "¿Quién fue Benito Juárez?",
+        "options": [
+          "Un presidente de México que impulsó importantes reformas.",
+          "Un conquistador español.",
+          "Un antiguo gobernante maya."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-7",
-      "title": "Dibujar el Mundo: los Mapas",
-      "period": "Era de las Exploraciones",
-      "icon": "🗺️",
-      "summary": "Los mapas se dibujaban a mano con la información que traían los navegantes de cada viaje.",
-      "fun_fact": "Algunos mapas antiguos tenían dibujos de monstruos marinos en las zonas que nadie conocía.",
+      "title": "¿Qué buscaban las Leyes de Reforma?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "⚖️",
+      "summary": "Pregunta de evaluación diagnóstica sobre los objetivos de las Leyes de Reforma.",
+      "fun_fact": "Las Leyes de Reforma impulsaron cambios importantes en la organización del país.",
       "trivia": {
-        "question": "¿Para qué servía un mapa?",
-        "options": ["Para saber por dónde navegar", "Para cocinar", "Para escribir cartas"],
+        "question": "¿Qué buscaban las Leyes de Reforma?",
+        "options": [
+          "Transformar la relación entre la Iglesia y el Estado y establecer cambios legales.",
+          "Construir más barcos piratas.",
+          "Eliminar la educación."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-8",
-      "title": "Del Trueque a las Monedas",
-      "period": "Comercio y Ciudades",
-      "icon": "🪙",
-      "summary": "Antes se cambiaban cosas: un saco de maíz por una manta. Luego se empezaron a usar monedas.",
-      "fun_fact": "En Mesoamérica también se usaban granos de cacao como moneda.",
+      "title": "¿Qué significa democracia?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🗳️",
+      "summary": "Pregunta de evaluación diagnóstica sobre el significado de democracia.",
+      "fun_fact": "La democracia permite que las personas participen, por ejemplo, mediante el voto.",
       "trivia": {
-        "question": "¿Qué es el trueque?",
-        "options": ["Cambiar una cosa por otra", "Comprar con tarjeta", "Regalar sin recibir nada"],
+        "question": "¿Qué significa democracia?",
+        "options": [
+          "Una forma de gobierno en la que la ciudadanía participa en las decisiones públicas.",
+          "Un gobierno en el que nadie puede opinar.",
+          "Una forma de gobierno sin leyes."
+        ],
         "answer": 0
       }
     },
     {
       "id": "5-9",
-      "title": "La Ruta de las Especias",
-      "period": "Era de las Exploraciones",
-      "icon": "🌶️",
-      "summary": "Las especias venían de muy lejos y costaban mucho, porque viajaban en barco durante meses.",
-      "fun_fact": "La pimienta valía tanto que se usaba para pagar alquileres y deudas.",
+      "title": "¿En qué año se reconoció a nivel federal el derecho de las mujeres a votar y ser elegidas en México?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "👩‍⚖️",
+      "summary": "Pregunta de evaluación diagnóstica sobre los derechos políticos de las mujeres en México.",
+      "fun_fact": "En 1953 se reconocieron los derechos políticos de las mujeres para votar y ser elegidas en elecciones federales.",
       "trivia": {
-        "question": "¿Para qué se usaban las especias?",
-        "options": ["Para dar sabor y conservar la comida", "Para pintar casas", "Para hacer velas"],
-        "answer": 0
+        "question": "¿En qué año se reconoció a nivel federal el derecho de las mujeres a votar y ser elegidas en México?",
+        "options": [
+          "1821.",
+          "1910.",
+          "1953."
+        ],
+        "answer": 2
       }
     },
     {
       "id": "5-10",
-      "title": "El Regreso de los Barcos",
-      "period": "Encuentro de Dos Mundos",
-      "icon": "📦",
-      "summary": "Cuando los barcos volvían, traían alimentos que en Europa no se conocían: papa, maíz, tomate y cacao.",
-      "fun_fact": "La papa llegó tan lejos que hoy es comida básica en muchos países del mundo.",
+      "title": "¿Por qué es importante la participación ciudadana?",
+      "period": "México independiente y sus transformaciones",
+      "icon": "🤝",
+      "summary": "Pregunta de evaluación diagnóstica sobre la importancia de la participación ciudadana.",
+      "fun_fact": "La participación ciudadana permite expresar opiniones y contribuir a mejorar la sociedad.",
       "trivia": {
-        "question": "¿Qué alimentos llegaron a Europa desde América?",
-        "options": ["Papa, maíz y tomate", "Arroz y trigo", "Solo pan"],
+        "question": "¿Por qué es importante la participación ciudadana?",
+        "options": [
+          "Porque ayuda a las personas a involucrarse en las decisiones de su comunidad y país.",
+          "Porque impide que existan opiniones diferentes.",
+          "Porque solamente las autoridades pueden participar."
+        ],
         "answer": 0
       }
     }
@@ -662,131 +862,171 @@
   "6": [
     {
       "id": "6-1",
-      "title": "La Revolución de las Máquinas de Vapor",
-      "period": "Revolución Industrial",
-      "icon": "🚂",
-      "summary": "El ferrocarril y las locomotoras cambiaron la forma en que los seres humanos viajaban y comerciaban en todo el planeta.",
-      "fun_fact": "Antes de los trenes, un viaje entre dos ciudades podía tardar varias semanas en diligencia o a caballo.",
+      "title": "¿Qué fue el Porfiriato?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🎩",
+      "summary": "Pregunta de evaluación diagnóstica sobre el Porfiriato.",
+      "fun_fact": "Durante el Porfiriato hubo modernización económica, pero también desigualdad social y falta de libertades políticas.",
       "trivia": {
-        "question": "¿Qué elemento hacía funcionar a las primeras locomotoras de la Revolución Industrial?",
-        "options": ["Vapor de agua generado por carbón", "Baterías de litio", "Gasolina espacial"],
+        "question": "¿Qué fue el Porfiriato?",
+        "options": [
+          "El periodo en el que Porfirio Díaz tuvo un papel dominante en el gobierno de México.",
+          "La época de los antiguos mayas.",
+          "El periodo de la Independencia."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-2",
-      "title": "El Salto a las Estrellas: Llegada a la Luna",
-      "period": "Historia Contemporánea",
-      "icon": "🚀",
-      "summary": "En 1969, la nave Apolo 11 llevó a los primeros seres humanos a pisar la superficie de la Luna.",
-      "fun_fact": "La computadora del Apolo 11 tenía menos potencia de cálculo que cualquier reloj inteligente de hoy en día.",
+      "title": "¿Qué medio de transporte se desarrolló durante el Porfiriato?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🚂",
+      "summary": "Pregunta de evaluación diagnóstica sobre los avances en transporte durante el Porfiriato.",
+      "fun_fact": "Durante ese periodo se construyeron vías ferroviarias que facilitaron el transporte y el comercio.",
       "trivia": {
-        "question": "¿Quién fue el astronauta que pronunció la famosa frase: 'Un pequeño paso para el hombre, un gran salto para la humanidad'?",
-        "options": ["Neil Armstrong", "Galileo Galilei", "Julio Verne"],
+        "question": "¿Qué medio de transporte se desarrolló durante el Porfiriato?",
+        "options": [
+          "El ferrocarril.",
+          "El automóvil eléctrico moderno.",
+          "El avión comercial."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-3",
-      "title": "Los Telares y las Fábricas",
-      "period": "Revolución Industrial",
-      "icon": "⚙️",
-      "summary": "Las máquinas hicieron que se pudiera fabricar mucha ropa en menos tiempo, dentro de grandes fábricas.",
-      "fun_fact": "Las primeras fábricas usaban la fuerza del agua de los ríos para mover las máquinas.",
+      "title": "¿En qué año comenzó la Revolución Mexicana?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🇲🇽",
+      "summary": "Pregunta de evaluación diagnóstica sobre el inicio de la Revolución Mexicana.",
+      "fun_fact": "La Revolución Mexicana comenzó en 1910 como un movimiento que buscaba cambios políticos y sociales.",
       "trivia": {
-        "question": "¿Qué movía las máquinas de las primeras fábricas?",
-        "options": ["El vapor del agua", "La energía del sol", "Los patinetes"],
-        "answer": 0
+        "question": "¿En qué año comenzó la Revolución Mexicana?",
+        "options": [
+          "1821.",
+          "1910.",
+          "1953."
+        ],
+        "answer": 1
       }
     },
     {
       "id": "6-4",
-      "title": "La Bombilla de Edison",
-      "period": "Grandes Inventos",
-      "icon": "💡",
-      "summary": "Antes de la electricidad, las casas se alumbraban con velas y lámparas de aceite. Todo cambió con la bombilla.",
-      "fun_fact": "Edison probó cientos de materiales hasta encontrar el filamento que duraba más tiempo encendido.",
+      "title": "¿Quién fue Francisco I. Madero?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "📜",
+      "summary": "Pregunta de evaluación diagnóstica sobre Francisco I. Madero.",
+      "fun_fact": "Madero defendió el principio de no reelección y llamó al levantamiento contra el gobierno de Díaz.",
       "trivia": {
-        "question": "¿Qué inventó Thomas Edison?",
-        "options": ["La bombilla eléctrica", "El teléfono", "El avión"],
+        "question": "¿Quién fue Francisco I. Madero?",
+        "options": [
+          "Un personaje que se opuso al gobierno de Porfirio Díaz y participó en el inicio de la Revolución.",
+          "Un emperador romano.",
+          "Un conquistador español."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-5",
-      "title": "El Primer Teléfono",
-      "period": "Grandes Inventos",
-      "icon": "☎️",
-      "summary": "El teléfono permitió hablar con alguien que estaba lejos por primera vez en la historia.",
-      "fun_fact": "Las primeras llamadas necesitaban operadoras que conectaban los cables a mano.",
+      "title": "¿Qué defendía Emiliano Zapata?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🌾",
+      "summary": "Pregunta de evaluación diagnóstica sobre las causas zapatistas y la justicia agraria.",
+      "fun_fact": "Zapata defendió los derechos de los campesinos y la justicia agraria.",
       "trivia": {
-        "question": "¿Qué permite hacer el teléfono?",
-        "options": ["Hablar con alguien que está lejos", "Volar", "Cocinar"],
+        "question": "¿Qué defendía Emiliano Zapata?",
+        "options": [
+          "Las demandas de los campesinos y la restitución de tierras.",
+          "La construcción de ferrocarriles en Europa.",
+          "La conquista de otros países."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-6",
-      "title": "El Primer Vuelo en Avión",
-      "period": "Historia Contemporánea",
-      "icon": "✈️",
-      "summary": "Los hermanos Wright construyeron un avión de madera y tela que voló unos segundos, y cambiaron la historia.",
-      "fun_fact": "Ese primer vuelo de 1903 duró 12 segundos: hoy un avión cruza un océano en horas.",
+      "title": "¿Quién fue Francisco Villa?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🐎",
+      "summary": "Pregunta de evaluación diagnóstica sobre Francisco Villa.",
+      "fun_fact": "Francisco Villa fue uno de los personajes destacados de la Revolución Mexicana y encabezó fuerzas revolucionarias en el norte del país.",
       "trivia": {
-        "question": "¿Qué lograron los hermanos Wright?",
-        "options": ["Volar en el primer avión", "Llegar a la Luna", "Inventar el tren"],
+        "question": "¿Quién fue Francisco Villa?",
+        "options": [
+          "Un importante líder revolucionario.",
+          "Un presidente de España.",
+          "Un gobernante de la antigua Grecia."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-7",
-      "title": "Los Derechos de Todas las Personas",
-      "period": "Derechos Humanos",
-      "icon": "🕊️",
-      "summary": "Después de las guerras, los países escribieron una lista de derechos para proteger a todas las personas.",
-      "fun_fact": "La Declaración Universal de los Derechos Humanos se aprobó en 1948 y tiene 30 artículos.",
+      "title": "¿En qué año se promulgó la Constitución Política de los Estados Unidos Mexicanos que continúa siendo la base de nuestro orden jurídico?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "📖",
+      "summary": "Pregunta de evaluación diagnóstica sobre la promulgación de la Constitución de 1917.",
+      "fun_fact": "La Constitución de 1917 estableció derechos y principios importantes para la organización de México.",
       "trivia": {
-        "question": "¿Quiénes tienen derechos humanos?",
-        "options": ["Todas las personas", "Solo los adultos", "Solo los reyes"],
-        "answer": 0
+        "question": "¿En qué año se promulgó la Constitución Política de los Estados Unidos Mexicanos que continúa siendo la base de nuestro orden jurídico?",
+        "options": [
+          "1824.",
+          "1917.",
+          "1953."
+        ],
+        "answer": 1
       }
     },
     {
       "id": "6-8",
-      "title": "Internet y las Computadoras",
-      "period": "Era Digital",
-      "icon": "💻",
-      "summary": "Las computadoras empezaron siendo enormes máquinas y hoy caben en un bolsillo. Internet las conecta a todas.",
-      "fun_fact": "La primera página web se publicó en 1991 y explicaba qué era la propia web.",
+      "title": "¿Qué derechos importantes incluyó la Constitución de 1917?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "⚖️",
+      "summary": "Pregunta de evaluación diagnóstica sobre los derechos sociales y laborales de la Constitución de 1917.",
+      "fun_fact": "La Constitución incorporó disposiciones relacionadas con el trabajo, la educación y la propiedad de la tierra.",
       "trivia": {
-        "question": "¿Para qué sirve internet?",
-        "options": ["Para buscar información y comunicarse", "Para hacer llover", "Para apagar el sol"],
+        "question": "¿Qué derechos importantes incluyó la Constitución de 1917?",
+        "options": [
+          "Derechos sociales y laborales.",
+          "Derechos exclusivos para los gobernantes.",
+          "Derechos para conquistar otros países."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-9",
-      "title": "El Telescopio y las Estrellas",
-      "period": "Ciencia y Descubrimientos",
-      "icon": "🔭",
-      "summary": "Con un telescopio, Galileo pudo ver cráteres en la Luna y lunas alrededor de Júpiter.",
-      "fun_fact": "Un telescopio pequeño ya permite ver los anillos de Saturno desde tu ventana.",
+      "title": "¿Qué es una fuente histórica?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "🔍",
+      "summary": "Pregunta de evaluación diagnóstica sobre el concepto de fuente histórica.",
+      "fun_fact": "Las fotografías, cartas, documentos y testimonios pueden utilizarse para investigar la historia.",
       "trivia": {
-        "question": "¿Para qué sirve un telescopio?",
-        "options": ["Para ver cosas lejanas del cielo", "Para oír música", "Para medir la temperatura"],
+        "question": "¿Qué es una fuente histórica?",
+        "options": [
+          "Un elemento que proporciona información para conocer el pasado.",
+          "Una historia inventada sin pruebas.",
+          "Un objeto que solamente sirve de decoración."
+        ],
         "answer": 0
       }
     },
     {
       "id": "6-10",
-      "title": "Robots Explorando Marte",
-      "period": "Exploración Espacial",
-      "icon": "🛰️",
-      "summary": "Los científicos envían robots llamados rovers a Marte para estudiar su suelo y buscar agua.",
-      "fun_fact": "Un rover tarda varios minutos en recibir una orden desde la Tierra, ¡porque la señal viaja por el espacio!",
+      "title": "¿Para qué sirve comparar diferentes fuentes históricas?",
+      "period": "La Revolución Mexicana y las transformaciones políticas",
+      "icon": "📚",
+      "summary": "Pregunta de evaluación diagnóstica sobre el análisis y comparación de fuentes históricas.",
+      "fun_fact": "Comparar fuentes permite identificar semejanzas, diferencias y distintos puntos de vista sobre un hecho histórico.",
       "trivia": {
-        "question": "¿Qué robot explora Marte?",
-        "options": ["Un rover", "Un submarino", "Un tren"],
+        "question": "¿Para qué sirve comparar diferentes fuentes históricas?",
+        "options": [
+          "Para analizar la información y comprender mejor un acontecimiento.",
+          "Para cambiar los hechos del pasado.",
+          "Para evitar conocer otras versiones."
+        ],
         "answer": 0
       }
     }

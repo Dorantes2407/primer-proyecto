@@ -27,21 +27,21 @@ with open(STORIES_FILE, "r", encoding="utf-8") as f:
 
 
 GRADE_ICONS = {
-    "1": "🦖",
-    "2": "🏺",
+    "1": "📖",
+    "2": "🏘️",
     "3": "🏛️",
-    "4": "🏰",
-    "5": "🧭",
-    "6": "🚀"
+    "4": "⛵",
+    "5": "🇲🇽",
+    "6": "🚂"
 }
 
 GRADE_NAMES = {
-    "1": "1º de Primaria",
-    "2": "2º de Primaria",
-    "3": "3º de Primaria",
-    "4": "4º de Primaria",
-    "5": "5º de Primaria",
-    "6": "6º de Primaria"
+    "1": "1º de Primaria (Mi historia y mi familia)",
+    "2": "2º de Primaria (Mi historia y mi comunidad)",
+    "3": "3º de Primaria (Conozco la historia de Campeche)",
+    "4": "4º de Primaria (La invasión española y el México colonial)",
+    "5": "5º de Primaria (México independiente y sus transformaciones)",
+    "6": "6º de Primaria (La Revolución Mexicana y las transformaciones políticas)"
 }
 
 # Niveles: (misiones completadas necesarias, número, título, icono)

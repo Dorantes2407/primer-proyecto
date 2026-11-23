@@ -113,7 +113,7 @@ def run_tests():
     assert prog["grades"]["4"]["is_locked"] is True
     assert prog["grades"]["5"]["is_locked"] is True
     assert prog["grades"]["6"]["is_locked"] is True
-    assert "La Primera Fogata de la Humanidad" in prog["grades"]["1"]["requirement_text"]
+    assert "¿Qué podemos utilizar para conocer nuestra historia familiar?" in prog["grades"]["1"]["requirement_text"]
     print("✓ Perfil creado con Grado 1 activo.")
 
     # Intentar acceder a Grado 2 (posterior bloqueado) -> Esperar HTTP 403
@@ -135,8 +135,8 @@ def run_tests():
     # =====================================================================
     print("\n--- CASO 2: Completar Grado y Desbloqueo Automático ---")
     grade1_answers = [
-        ("1-1", 1), ("1-2", 1), ("1-3", 0), ("1-4", 1), ("1-5", 0),
-        ("1-6", 1), ("1-7", 1), ("1-8", 1), ("1-9", 1), ("1-10", 0)
+        ("1-1", 0), ("1-2", 0), ("1-3", 1), ("1-4", 2), ("1-5", 0),
+        ("1-6", 0), ("1-7", 0), ("1-8", 0), ("1-9", 0), ("1-10", 1)
     ]
 
     # Completar primeras 9 historias: debe seguir en Grado 1
