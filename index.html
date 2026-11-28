@@ -114,6 +114,10 @@
                             </div>
                             <input type="hidden" id="selected-grade" value="1">
                         </div>
+                        <div class="input-section avatar-pick-section">
+                            <label class="section-label" for="initial-avatar">✨ Elige tu personaje para la aventura</label>
+                            <select id="initial-avatar" class="text-input"><option value="🧑‍🚀">🧑‍🚀 Explorador</option><option value="👩‍🚀">👩‍🚀 Exploradora</option><option value="🧙">🧙 Maga/o del tiempo</option><option value="🧒">🧒 Historiador/a</option></select>
+                        </div>
 
                         <!-- Botón para Iniciar -->
                         <button type="submit" class="btn btn-hero" id="btn-start-adventure">
@@ -142,6 +146,7 @@
                 </div>
 
                 <div class="header-actions">
+                    <button id="btn-settings" class="btn btn-secondary" title="Personalizar la aventura">⚙️ Ajustes</button>
                     <button id="btn-view-stats" class="btn btn-stats" title="Ver mis estadísticas y nivel">
                         📊 Mis Estadísticas
                     </button>
@@ -277,6 +282,21 @@
             </button>
 
             <!-- Misiones y Relatos Históricos -->
+            <section class="adventure-tools" aria-label="Herramientas de aventura">
+                <button class="btn btn-primary-action" id="btn-games">🎲 Minijuegos</button>
+                <button class="btn btn-primary-action" id="btn-rewards">🎁 Tienda de recompensas</button>
+                <p>🦖 <strong>Zip Zip:</strong> ¡Cada relato es una pista nueva! Puedes escuchar los textos con 🔊.</p>
+            </section>
+            <section id="games-panel" class="feature-panel hidden">
+                <div class="section-title-row"><h3>🎲 Juegos del grado <span id="games-grade-label"></span></h3><button class="btn btn-secondary" data-close-panel="games-panel">Cerrar</button></div>
+                <div class="game-card"><h4>🔎 Sopa de palabras</h4><p>Encuentra una palabra tomada de los relatos que estás estudiando.</p><div id="word-search-board" class="word-search-board"></div><p id="word-search-target"></p><button class="btn btn-primary-action" id="new-word-search">Otra palabra</button></div>
+                <div class="game-card"><h4>✏️ Completa la oración</h4><p id="word-clue"></p><div class="word-game-row"><input id="word-answer" class="text-input" aria-label="Completa la oración" autocomplete="off"><button class="btn btn-primary-action" id="check-word">Comprobar</button></div><p id="word-feedback" aria-live="polite"></p></div>
+            </section>
+            <section id="rewards-panel" class="feature-panel hidden">
+                <div class="section-title-row"><h3>🎁 Tienda de Zip Zip</h3><button class="btn btn-secondary" data-close-panel="rewards-panel">Cerrar</button></div>
+                <p>⭐ Saldo disponible: <strong id="reward-balance">0</strong> puntos</p>
+                <div id="rewards-list" class="rewards-grid"></div>
+            </section>
             <section class="stories-section">
                 <div class="section-title-row">
                     <h3 id="current-period-title">📜 Relatos y Retos para Pequeños Historiadores</h3>
@@ -287,6 +307,31 @@
                 </div>
             </section>
         </main>
+
+        <div id="zip-welcome" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="zip-welcome-title">
+            <div class="unlock-modal-card zip-card"><div class="zip-avatar">🦖</div><h2 id="zip-welcome-title">¡Hola! Soy Zip Zip</h2><p>Seré tu compañero de aventuras. Elige tu grado, abre un relato, lee o escucha la historia y responde el reto. Si te equivocas, puedes intentarlo otra vez. ¡Ganas puntos y medallas al aprender!</p><button id="zip-welcome-start" class="btn btn-hero">¡Vamos a aprender! 🚀</button></div>
+        </div>
+        <div class="zip-voice-control">
+            <div id="zip-speaking-comment" class="zip-speaking-comment" role="status">💬 ¡Toca para escuchar a Zip Zip!</div>
+            <button id="zip-companion" class="zip-companion" aria-label="Escuchar un mensaje de Zip Zip" title="Zip Zip te anima">🦖</button>
+        </div>
+        <div class="rawr-control">
+            <div id="rawr-count-message" class="rawr-count-message" role="status" aria-live="polite"></div>
+            <button id="rawr-companion" class="zip-companion rawr-companion" aria-label="Toca al dinosaurio" title="Toca para ver qué pasa">
+                <img id="rawr-companion-image" src="img/zip-zip.png" alt="Dinosaurio naranja">
+            </button>
+        </div>
+        <div id="settings-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <div class="unlock-modal-card settings-card"><button class="btn btn-secondary modal-close" data-close-modal="settings-modal">Cerrar ✕</button><h2 id="settings-title">⚙️ Mi aventura</h2>
+                <label class="setting-row"><input type="checkbox" id="zip-enabled"> Mostrar a Zip Zip y sus mensajes</label>
+                <label class="setting-row">Mi personaje <select id="avatar-choice"><option value="🧑‍🚀">🧑‍🚀 Explorador</option><option value="👩‍🚀">👩‍🚀 Exploradora</option><option value="🧙">🧙 Maga/o del tiempo</option><option value="🧒">🧒 Historiador/a</option></select></label>
+                <label class="setting-row">Zip Zip <select id="zip-character"><option value="🦖">🦖 Zip Zip</option><option value="🦕">🦕 Zip Zip exploradora</option></select></label>
+                <label class="setting-row">Atuendo <select id="zip-outfit"><option value="explorer">Explorador 🧢</option><option value="scientist">Científico 🥼</option><option value="astronaut">Astronauta 🚀</option><option value="royal">Real 👑</option><option value="maya">Viajero maya 🪶</option><option value="roman">Romano 🛡️</option></select></label>
+                <label class="setting-row"><input type="checkbox" id="audio-enabled" checked> Activar lectura en voz alta</label>
+                <label class="setting-row"><input type="checkbox" id="sound-enabled" checked> Activar sonidos de celebración</label>
+                <button id="save-settings" class="btn btn-hero">Guardar cambios</button>
+            </div>
+        </div>
 
         <!-- ================= PANTALLA DE ESTADÍSTICAS Y NIVEL ================= -->
         <main id="stats-screen" class="screen">
