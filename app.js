@@ -111,6 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupGradeCardSelection();
     setupDashboardTabs();
     setupEventListeners();
+    setupLearningExtras();
     await checkServerStatus();
 
     // Comprobar si hay una sesión activa persistente (por recarga de navegador F5)
@@ -480,6 +481,9 @@ function setupEventListeners() {
 
             const result = await response.json();
             currentHistorian = result.historian;
+            try { experiencePrefs = JSON.parse(localStorage.getItem(profileKey()) || "{}"); } catch { experiencePrefs = {}; }
+            experiencePrefs.avatar = document.getElementById("initial-avatar")?.value || "🧑‍🚀";
+            saveExperienceProfile();
             userProgression = result.progression;
             currentGrade = String(result.progression?.active_grade || grade);
             badges = result.badges || [];
@@ -491,6 +495,9 @@ function setupEventListeners() {
         } catch (error) {
             console.error("Error al guardar perfil:", error);
             currentHistorian = { name, grade };
+            try { experiencePrefs = JSON.parse(localStorage.getItem(profileKey()) || "{}"); } catch { experiencePrefs = {}; }
+            experiencePrefs.avatar = document.getElementById("initial-avatar")?.value || "🧑‍🚀";
+            saveExperienceProfile();
             currentGrade = grade;
             await showDashboard();
         }
@@ -557,6 +564,7 @@ async function showDashboard() {
 
     const avatarEmoji = GRADE_ICONS[currentGrade] || "🧭";
     dashboardUserAvatar.textContent = avatarEmoji;
+    loadExperienceProfile();
     if (typeof applyGradeTheme === "function") {
         applyGradeTheme(currentGrade);
     }
@@ -728,6 +736,14 @@ function renderStories(stories) {
             btn.addEventListener("click", () => handleAnswer(story.id, parseInt(btn.dataset.optionIdx, 10), card));
         });
 
+        const listen = document.createElement("button");
+        listen.type = "button";
+        listen.className = "btn btn-listen";
+        listen.textContent = "🔊 Escuchar relato y pregunta";
+        listen.setAttribute("aria-label", `Leer en voz alta ${story.title} y su pregunta`);
+        listen.addEventListener("click", () => speak(`${story.title}. ${story.summary}. Dato curioso: ${story.fun_fact}. ${story.trivia.question}. ${story.trivia.options.map((o, i) => `Opción ${i + 1}: ${o}`).join(". ")}`));
+        card.querySelector(".story-trivia").prepend(listen);
+
         storiesContainer.appendChild(card);
     });
 }
@@ -750,7 +766,7 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
 
         if (result.correct) {
             feedbackBox.className = "trivia-feedback feedback-success";
-            feedbackBox.innerHTML = `🎉 <strong>¡Excelente respuesta, pequeño historiador ${escapeHtml(currentHistorian.name)}!</strong> Has demostrado tu sabiduría histórica y has ganado una nueva medalla.`;
+            feedbackBox.innerHTML = `🎉 <strong>¡Excelente respuesta, ${escapeHtml(currentHistorian.name)}!</strong> ¡Lo lograste! Zip Zip celebra contigo. Ganaste una medalla y 100 puntos.`;
             feedbackBox.classList.remove("hidden");
 
             // Marcar botón correcto y deshabilitar opciones
@@ -764,6 +780,9 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
 
             cardElement.classList.add("completed-mission");
             if (botonElegido) burstParticles(cardElement, botonElegido);
+            playRewardSound();
+            showZipMessage("¡Lo lograste! Cada respuesta te ayuda a descubrir más.");
+            updateRewardShop();
 
             const medallasPrevias = badges;
             badges = result.badges || [];
@@ -785,7 +804,8 @@ async function handleAnswer(storyId, selectedOption, cardElement) {
             }
         } else {
             feedbackBox.className = "trivia-feedback feedback-error";
-            feedbackBox.innerHTML = `🤔 <em>¡Cerca, pequeño historiador!</em> Inténtalo de nuevo o repasa el relato para encontrar la pista.`;
+            feedbackBox.innerHTML = `🤔 <em>¡Buen intento!</em> Lee otra vez el relato y busca una pista. Puedes probar de nuevo; Zip Zip cree en ti. <button type="button" class="btn btn-listen retry-listen">🔊 Escuchar pista</button>`;
+            feedbackBox.querySelector(".retry-listen")?.addEventListener("click", () => speak(`${cardElement.querySelector(".story-summary")?.textContent || ""}. ${cardElement.querySelector(".trivia-question")?.textContent || ""}`));
             feedbackBox.classList.remove("hidden");
 
             if (!prefersReducedMotion()) {
@@ -1153,6 +1173,190 @@ function burstParticles(contenedor, origen) {
 function focusScreen(elemento) {
     elemento.setAttribute("tabindex", "-1");
     elemento.focus({ preventScroll: true });
+}
+
+// Preferencias y actividades extra: se guardan por perfil en este navegador.
+let experiencePrefs = {};
+let currentGameStories = [];
+let currentGameWord = "";
+let currentGameAnswer = "";
+let selectedWordLetters = "";
+let wordSearchTargetIndices = [];
+// Imágenes originales del segundo compañero: los clics nunca las guardan en almacenamiento.
+const imagenOriginal = "img/zip-zip.png";
+const imagenRawr = "img/zip-zip-rawr.webp";
+let contadorRawr = 0;
+let temporizadorReinicioRawr = null;
+let temporizadorImagenRawr = null;
+const outfitNames = { explorer: "Explorador", scientist: "Científico", astronaut: "Astronauta", royal: "Real", maya: "Viajero maya", roman: "Romano" };
+function profileKey() { return `historia-divertida:${(currentHistorian?.name || "invitado").trim().toLowerCase()}`; }
+function loadExperienceProfile() {
+    try { experiencePrefs = JSON.parse(localStorage.getItem(profileKey()) || "{}"); } catch { experiencePrefs = {}; }
+    experiencePrefs.avatar ||= "🧑‍🚀"; experiencePrefs.zip ||= "🦖"; experiencePrefs.outfit ||= "explorer";
+    experiencePrefs.zipEnabled ??= true; experiencePrefs.audioEnabled ??= true; experiencePrefs.soundEnabled ??= true;
+    const companion = document.getElementById("zip-companion");
+    if (companion) companion.hidden = !experiencePrefs.zipEnabled;
+    const rawrCompanion = document.getElementById("rawr-companion");
+    if (rawrCompanion) rawrCompanion.hidden = !experiencePrefs.zipEnabled;
+    const voiceComment = document.getElementById("zip-speaking-comment");
+    if (voiceComment) voiceComment.hidden = !experiencePrefs.zipEnabled;
+    const rawrComment = document.getElementById("rawr-count-message");
+    if (rawrComment) rawrComment.hidden = !experiencePrefs.zipEnabled;
+    dashboardUserAvatar.textContent = experiencePrefs.avatar;
+    renderZipCompanion();
+    if (!experiencePrefs.welcomed) {
+        document.getElementById("zip-welcome")?.classList.remove("hidden");
+        experiencePrefs.welcomed = true; saveExperienceProfile();
+    }
+    if (document.getElementById("zip-enabled")) {
+        document.getElementById("zip-enabled").checked = experiencePrefs.zipEnabled;
+        document.getElementById("avatar-choice").value = experiencePrefs.avatar;
+        document.getElementById("zip-character").value = experiencePrefs.zip;
+        document.getElementById("zip-outfit").value = experiencePrefs.outfit;
+        document.getElementById("audio-enabled").checked = experiencePrefs.audioEnabled;
+        document.getElementById("sound-enabled").checked = experiencePrefs.soundEnabled;
+        syncOutfitChoices();
+    }
+    updateRewardShop();
+}
+function saveExperienceProfile() { if (currentHistorian) localStorage.setItem(profileKey(), JSON.stringify(experiencePrefs)); }
+function renderZipCompanion() {
+    const outfitIcons = { explorer: "🧢", scientist: "🥼", astronaut: "🚀", royal: "👑", maya: "🪶", roman: "🛡️" };
+    const label = `${experiencePrefs.zip || "🦖"}${outfitIcons[experiencePrefs.outfit] || "🧢"}`;
+    const companion = document.getElementById("zip-companion"); if (companion) companion.textContent = label;
+    const welcome = document.querySelector("#zip-welcome .zip-avatar"); if (welcome) welcome.textContent = experiencePrefs.zip || "🦖";
+}
+function syncOutfitChoices() {
+    const owned = experiencePrefs.rewards || [];
+    document.querySelectorAll("#zip-outfit option").forEach(option => { option.disabled = option.value !== "explorer" && !owned.includes(option.value); });
+}
+function speak(text) {
+    if (experiencePrefs.audioEnabled === false || !window.speechSynthesis) return;
+    speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(text); utterance.lang = "es-MX"; utterance.rate = .88; speechSynthesis.speak(utterance);
+}
+function showZipMessage(message) {
+    if (experiencePrefs.zipEnabled === false) return;
+    let bubble = document.getElementById("zip-message");
+    if (!bubble) { bubble = document.createElement("div"); bubble.id = "zip-message"; bubble.className = "zip-message"; document.body.appendChild(bubble); }
+    bubble.textContent = `${experiencePrefs.zip || "🦖"} ${message}`; bubble.classList.add("visible"); clearTimeout(bubble._timer); bubble._timer = setTimeout(() => bubble.classList.remove("visible"), 4200);
+}
+function awardGamePoints(word) {
+    experiencePrefs.rewardedWords ||= [];
+    if (experiencePrefs.rewardedWords.includes(word)) return false;
+    experiencePrefs.rewardedWords.push(word); experiencePrefs.gamePoints = (experiencePrefs.gamePoints || 0) + 10;
+    saveExperienceProfile(); updateRewardShop(); return true;
+}
+function playRewardSound() {
+    if (experiencePrefs.soundEnabled === false) return;
+    try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const extra = experiencePrefs.rewards?.includes("celebration") ? .18 : 0; osc.frequency.setValueAtTime(660, ctx.currentTime); osc.frequency.setValueAtTime(880, ctx.currentTime + extra); gain.gain.setValueAtTime(.07, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .32); osc.start(); osc.stop(ctx.currentTime + .32); } catch { /* Audio opcional del navegador */ }
+}
+function mostrarConteoRawr() {
+    const mensaje = document.getElementById("rawr-count-message");
+    if (mensaje) mensaje.textContent = contadorRawr > 0 ? String(contadorRawr) : "";
+}
+function reiniciarContadorRawr() {
+    contadorRawr = 0;
+    temporizadorReinicioRawr = null;
+    mostrarConteoRawr();
+}
+// Cambia la imagen por 10 s; limpia el temporizador anterior para evitar efectos superpuestos.
+function activarModoRawr() {
+    const imagen = document.getElementById("rawr-companion-image");
+    if (!imagen) return;
+    imagen.src = imagenRawr;
+    const mensaje = document.getElementById("rawr-count-message");
+    if (mensaje) mensaje.textContent = "rawr";
+    if (temporizadorImagenRawr !== null) clearTimeout(temporizadorImagenRawr);
+    temporizadorImagenRawr = setTimeout(() => {
+        imagen.src = imagenOriginal;
+        temporizadorImagenRawr = null;
+        mostrarConteoRawr();
+    }, 10_000);
+}
+// Cada clic reemplaza el reinicio de 5 s, así solo hay una cuenta regresiva de inactividad activa.
+function manejarClicRawr() {
+    contadorRawr += 1;
+    if (temporizadorReinicioRawr !== null) clearTimeout(temporizadorReinicioRawr);
+    temporizadorReinicioRawr = setTimeout(reiniciarContadorRawr, 5_000);
+
+    if (contadorRawr > 4) activarModoRawr();
+    else mostrarConteoRawr();
+}
+function availablePoints() { return Math.max(0, Number(window.currentXp || 0) + Number(experiencePrefs.gamePoints || 0) - Number(experiencePrefs.spent || 0)); }
+async function updateRewardShop() {
+    if (!currentHistorian) return;
+    try { const r = await fetch("/api/stats"); if (r.ok) window.currentXp = (await r.json()).xp || 0; } catch { window.currentXp ||= 0; }
+    const balance = document.getElementById("reward-balance"); if (balance) balance.textContent = availablePoints();
+    const list = document.getElementById("rewards-list"); if (!list) return;
+    const grade = Number(currentGrade) || 1; const base = 25 + grade * 5;
+    const items = [{ id: "scientist", label: "Atuendo científico para Zip Zip", kind: "outfit", price: base }, { id: "astronaut", label: "Atuendo astronauta para Zip Zip", kind: "outfit", price: base + 10 }, { id: "royal", label: "Atuendo real para Zip Zip", kind: "outfit", price: base + 15 }, { id: "maya", label: "Atuendo viajero maya", kind: "outfit", price: base + 10 }, { id: "roman", label: "Atuendo romano", kind: "outfit", price: base + 10 }, { id: "celebration", label: "Sonido especial de celebración", kind: "sound", price: base }];
+    list.innerHTML = items.map(it => { const owned = (experiencePrefs.rewards || []).includes(it.id); return `<article class="reward-card"><strong>🎁 ${it.label}</strong><p>${owned ? "Ya es tuyo" : `${it.price} ⭐`}</p><button class="btn btn-primary-action" data-reward="${it.id}" data-price="${it.price}" data-kind="${it.kind}" ${owned || availablePoints() < it.price ? "disabled" : ""}>${owned ? "Conseguido" : "Canjear"}</button></article>`; }).join("");
+    list.querySelectorAll("[data-reward]").forEach(btn => btn.addEventListener("click", () => {
+        const id = btn.dataset.reward, price = Number(btn.dataset.price);
+        if (availablePoints() < price) return;
+        experiencePrefs.spent = (experiencePrefs.spent || 0) + price; experiencePrefs.rewards ||= []; experiencePrefs.rewards.push(id);
+        if (btn.dataset.kind === "outfit") { experiencePrefs.outfit = id; document.getElementById("zip-outfit").value = id; syncOutfitChoices(); renderZipCompanion(); }
+        saveExperienceProfile(); updateRewardShop(); showZipMessage("¡Tu recompensa ya está lista!");
+    }));
+}
+function buildWordGame() {
+    currentGameAnswer = "";
+    const gridSize = 11;
+    // La sopa elige términos sueltos de títulos, periodos y respuestas correctas.
+    const palabrasVacias = new Set(["PARA", "PERO", "COMO", "ESTOS", "ESTAS", "ESTE", "ESTA", "AQUEL", "AQUELLA", "CUAL", "CUALES", "QUIEN", "QUIENES", "DONDE", "DESDE", "HASTA", "ENTRE", "SOBRE", "TAMBIEN", "FUERON", "ERAN", "ERA", "FUE", "HACE", "HAY", "TENIAN", "PUEDE", "PUEDEN", "FORMA", "HACER", "PARTE", "ALGUN", "ALGUNA", "ALGUNOS", "ALGUNAS", "OTROS", "OTRAS", "SOLO", "SOLOS", "SOLA", "CADA", "MUCHOS", "MUCHAS", "CUANDO", "ANTES", "DESPUES", "NUESTROS", "NUESTRAS", "NUESTRA", "NUESTRO", "PERSONAS", "HISTORIA"]);
+    const palabras = currentGameStories.flatMap(story => [story.title, story.period, story.trivia.options[story.trivia.answer]])
+        .flatMap(text => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().match(/[A-Z]+/g) || [])
+        .filter(word => word.length >= 4 && word.length <= 11 && !palabrasVacias.has(word));
+    const usable = [...new Set(palabras)];
+    if (!usable.length) {
+        document.getElementById("word-search-target").textContent = "Aún no hay palabras para este juego en los relatos cargados.";
+        return;
+    }
+    currentGameWord = usable[Math.floor(Math.random() * usable.length)]; selectedWordLetters = "";
+    // Llena el tablero con letras de la palabra objetivo para que cueste más distinguirla.
+    const letrasObjetivo = [...currentGameWord];
+    const pool = Array.from({ length: gridSize * gridSize }, () => letrasObjetivo[Math.floor(Math.random() * letrasObjetivo.length)]);
+    // Coloca la palabra dentro de los límites del tablero fijo, sin recortarla.
+    const row = Math.floor(Math.random() * gridSize);
+    const col = Math.floor(Math.random() * (gridSize - currentGameWord.length + 1));
+    wordSearchTargetIndices = Array.from({ length: currentGameWord.length }, (_, n) => row * gridSize + col + n);
+    currentGameWord.split("").forEach((letter, n) => { pool[wordSearchTargetIndices[n]] = letter; });
+    const board = document.getElementById("word-search-board"); board.innerHTML = "";
+    pool.forEach((letter, i) => { const b = document.createElement("button"); b.className = "letter-tile"; b.textContent = letter; b.setAttribute("aria-label", `Letra ${letter}, casilla ${i+1}`); b.onclick = () => { if (selectedWordLetters.length >= currentGameWord.length) return; const nextIndex = wordSearchTargetIndices[selectedWordLetters.length]; if (i !== nextIndex) { selectedWordLetters = ""; board.querySelectorAll(".selected").forEach(tile => tile.classList.remove("selected")); document.getElementById("word-search-target").textContent = "Busca la palabra en línea y vuelve a empezar desde la primera letra."; return; } selectedWordLetters += letter; b.classList.add("selected"); document.getElementById("word-search-target").textContent = `¡Bien! ${selectedWordLetters.length} de ${currentGameWord.length} letras`; if (selectedWordLetters.length === currentGameWord.length) { const earned = awardGamePoints(currentGameWord); document.getElementById("word-search-target").textContent = earned ? "¡Encontraste la palabra! +10 ⭐" : "¡Encontraste la palabra! 🌟"; } }; board.appendChild(b); });
+    document.getElementById("word-search-target").textContent = `Encuentra: ${currentGameWord.length} letras (pulsa en orden)`;
+    // El reto de completar usa una oración real del resumen, con una palabra omitida.
+    const sentences = currentGameStories.map(story => story.summary).filter(Boolean);
+    const sentence = sentences[Math.floor(Math.random() * sentences.length)] || "";
+    const tokens = sentence.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{4,}/g) || [];
+    const candidates = tokens.filter(token => !palabrasVacias.has(token.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()));
+    currentGameAnswer = candidates[Math.floor(Math.random() * candidates.length)] || "";
+    const sentenceWithBlank = currentGameAnswer ? sentence.replace(currentGameAnswer, "_______") : sentence;
+    document.getElementById("word-clue").textContent = currentGameAnswer ? `Completa la oración del relato: ${sentenceWithBlank}` : "No hay una oración disponible en este lote. Prueba con otra actividad.";
+    document.getElementById("word-answer").value = ""; document.getElementById("word-feedback").textContent = "";
+}
+function setupLearningExtras() {
+    document.getElementById("btn-settings")?.addEventListener("click", () => document.getElementById("settings-modal").classList.remove("hidden"));
+    document.querySelectorAll("[data-close-modal]").forEach(b => b.addEventListener("click", () => document.getElementById(b.dataset.closeModal).classList.add("hidden")));
+    document.getElementById("zip-welcome-start")?.addEventListener("click", () => document.getElementById("zip-welcome").classList.add("hidden"));
+    document.getElementById("save-settings")?.addEventListener("click", () => { experiencePrefs.zipEnabled = document.getElementById("zip-enabled").checked; experiencePrefs.avatar = document.getElementById("avatar-choice").value; experiencePrefs.zip = document.getElementById("zip-character").value; experiencePrefs.outfit = document.getElementById("zip-outfit").value; experiencePrefs.audioEnabled = document.getElementById("audio-enabled").checked; experiencePrefs.soundEnabled = document.getElementById("sound-enabled").checked; saveExperienceProfile(); dashboardUserAvatar.textContent = experiencePrefs.avatar; document.getElementById("zip-companion").hidden = !experiencePrefs.zipEnabled; document.getElementById("rawr-companion").hidden = !experiencePrefs.zipEnabled; document.getElementById("zip-speaking-comment").hidden = !experiencePrefs.zipEnabled; document.getElementById("rawr-count-message").hidden = !experiencePrefs.zipEnabled; renderZipCompanion(); document.getElementById("settings-modal").classList.add("hidden"); showZipMessage("¡Aventura personalizada! Vamos a aprender."); });
+    document.getElementById("btn-games")?.addEventListener("click", () => { document.getElementById("games-panel").classList.toggle("hidden"); document.getElementById("games-grade-label").textContent = `${currentGrade}º`; currentGameStories = storiesCache[currentGrade] || []; buildWordGame(); });
+    document.getElementById("new-word-search")?.addEventListener("click", buildWordGame);
+    document.getElementById("check-word")?.addEventListener("click", () => { const guess = document.getElementById("word-answer").value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z]/g, ""); const expected = currentGameAnswer.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase(); const feedback = document.getElementById("word-feedback"); if (guess && expected && guess === expected) { feedback.textContent = awardGamePoints(expected) ? "¡Oración completada! Ganaste 10 puntos ⭐" : "¡Correcto! Ya habías ganado puntos por esta respuesta."; playRewardSound(); showZipMessage("¡Oración completada!"); } else feedback.textContent = "Casi. Lee la oración del relato y vuelve a intentarlo. ¡Tú puedes!"; });
+    document.getElementById("zip-companion")?.addEventListener("click", () => {
+        const comment = document.getElementById("zip-speaking-comment");
+        const message = "¡Hola! Soy Zip Zip. Lee un relato, escucha la pregunta si lo necesitas y prueba tu respuesta. ¡Cada intento te acerca a descubrir algo nuevo!";
+        if (comment) comment.textContent = `💬 Zip Zip dice: ${message}`;
+        if (experiencePrefs.audioEnabled !== false && window.speechSynthesis) {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(message);
+            utterance.lang = "es-MX"; utterance.rate = .88;
+            utterance.onend = () => { if (comment) comment.textContent = "💬 ¡Toca para escuchar a Zip Zip!"; };
+            speechSynthesis.speak(utterance);
+        }
+    });
+    document.getElementById("rawr-companion")?.addEventListener("click", manejarClicRawr);
+    document.getElementById("btn-rewards")?.addEventListener("click", () => { document.getElementById("rewards-panel").classList.toggle("hidden"); updateRewardShop(); });
+    document.querySelectorAll("[data-close-panel]").forEach(b => b.addEventListener("click", () => document.getElementById(b.dataset.closePanel).classList.add("hidden")));
 }
 
 /* ========================================================

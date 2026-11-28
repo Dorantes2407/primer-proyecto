@@ -2330,11 +2330,11 @@ body {
     transition: background-color 400ms var(--ease-out);
 }
 
-body[data-grade="1"] { --bg-page: #F7E7D2; }  /* Prehistoria: tierra y fuego */
-body[data-grade="2"] { --bg-page: #F5E6C4; }  /* Egipto: arena y papiro */
-body[data-grade="3"] { --bg-page: #E7EEF6; }  /* Grecia y Roma: azul Egeo */
-body[data-grade="4"] { --bg-page: #E8F1E6; }  /* Edad Media: bosque y castillos */
-body[data-grade="5"] { --bg-page: #FAE4DA; }  /* Mexica y exploradores: adobe */
+body[data-grade="1"] { --bg-page: #ecd28c; }  /* Prehistoria: tierra y fuego */
+body[data-grade="2"] { --bg-page: #e0ea8b; }  /* Egipto: arena y papiro */
+body[data-grade="3"] { --bg-page: #a0eac6; }  /* Grecia y Roma: azul Egeo */
+body[data-grade="4"] { --bg-page: #b4d5e2; }  /* Edad Media: bosque y castillos */
+body[data-grade="5"] { --bg-page: #d7ccea; }  /* Mexica y exploradores: adobe */
 body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y modernidad */
 
 /* ========================================================
@@ -2500,3 +2500,18 @@ body[data-grade="6"] { --bg-page: #ECEAF6; }  /* Contemporánea: espacio y moder
         padding: 0.75rem;
     }
 }
+/* Herramientas de aprendizaje, compañero y personalización */
+.adventure-tools,.feature-panel,.game-card,.reward-card{background:var(--paper,#fffdf7);border:1px solid rgba(140,90,27,.2);border-radius:18px;padding:1.1rem;margin:1rem 0;box-shadow:0 8px 24px rgba(30,42,74,.07)}
+.adventure-tools{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}.adventure-tools p{margin:.2rem 0;color:var(--ink)}
+.feature-panel{animation:feature-in .28s ease-out}.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}.word-search-board{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px;width:min(100%,460px);margin:1rem 0}.letter-tile{width:100%;min-width:0;aspect-ratio:1;padding:0;border:1px solid #d7c6a6;border-radius:7px;background:#fff;color:var(--ink);font-size:clamp(.68rem,2.4vw,1rem);font-weight:800;cursor:pointer}.letter-tile.selected{background:#f3e3c3;transform:scale(.95)}.word-game-row{display:flex;gap:.5rem;max-width:540px}.rewards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem}.reward-card{margin:0}.reward-card button:disabled{opacity:.6;cursor:not-allowed}.btn-listen{margin:.4rem 0}.setting-row{display:flex;align-items:center;gap:.65rem;margin:1rem 0;text-align:left}.setting-row select{margin-left:auto;max-width:60%;padding:.6rem;border-radius:10px;border:1px solid #c8b894}.settings-card{max-height:88vh;overflow:auto}.modal-close{float:right}.zip-card{text-align:center;max-width:520px}.zip-avatar{font-size:4rem;animation:zip-bob 1.8s ease-in-out infinite}.zip-companion{position:fixed;right:1rem;bottom:1rem;z-index:20;border:2px solid white;border-radius:50%;width:62px;height:62px;background:#f3e3c3;box-shadow:0 5px 18px #1e2a4a33;font-size:2rem;cursor:pointer}.zip-message{position:fixed;right:5.8rem;bottom:1.4rem;z-index:21;max-width:min(360px,70vw);padding:.8rem 1rem;border-radius:16px 16px 4px 16px;background:#fffdf7;color:var(--ink);box-shadow:0 5px 20px #1e2a4a33;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}.zip-message.visible{opacity:1;transform:translateY(0)}
+@keyframes feature-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes zip-bob{50%{transform:translateY(-7px)}}
+@media(max-width:600px){.adventure-tools{align-items:stretch}.adventure-tools .btn{width:100%}.zip-companion{width:54px;height:54px}.word-search-board{grid-template-columns:repeat(11,minmax(0,1fr));gap:3px;width:100%}.letter-tile{border-radius:5px;font-size:clamp(.6rem,3vw,.9rem)}.word-game-row{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.feature-panel,.zip-avatar{animation:none}.zip-message{transition:none}}
+
+/* Dos compañeros independientes en las esquinas inferiores */
+.zip-speaking-comment,.rawr-count-message{position:fixed;bottom:88px;z-index:20;max-width:min(340px,68vw);padding:.65rem .9rem;border:1px solid rgba(140,90,27,.2);border-radius:16px;background:#fffdf7;color:var(--ink);box-shadow:0 5px 18px #1e2a4a33;font-size:.9rem;line-height:1.35}
+.zip-speaking-comment{right:1rem;border-bottom-right-radius:5px}.rawr-count-message{left:1rem;border-bottom-left-radius:5px;text-align:center;min-width:118px}
+.rawr-companion{left:1rem;right:auto;display:grid;place-items:center;padding:7px}.rawr-companion img{display:block;width:100%;height:100%;object-fit:contain}
+.zip-companion:focus-visible{outline:4px solid #f4ae35;outline-offset:3px}
+.rawr-count-message:empty{display:none}
+@media(max-width:600px){.zip-speaking-comment,.rawr-count-message{bottom:76px;max-width:42vw;font-size:.78rem}.zip-speaking-comment{right:.5rem}.rawr-count-message{left:.5rem}.rawr-companion{left:.5rem}}
